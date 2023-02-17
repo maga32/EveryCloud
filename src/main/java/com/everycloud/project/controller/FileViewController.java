@@ -20,13 +20,17 @@ public class FileViewController {
 	@RequestMapping("/file")
 	public String files(@RequestParam(value="path", required=false, defaultValue="") String path,
 			Model model) throws IOException {
-		
+
 		boolean validPath = fileService.isPathExist(path);
 
 		if(validPath) {
 			File nowPath = fileService.getFile(path);
-			if(!nowPath.getCanonicalPath().equals(path)) {
-				return "redirect:/file?path=" + nowPath.getCanonicalPath();
+			// windows folder path processing
+			path = path.replaceAll("\\\\", "/");
+			String realpath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
+			
+			if(!realpath.equals(path)) {
+				return "redirect:/file?path=" + realpath;
 			}
 			model.addAttribute("fileList", fileService.getPathFiles(path));
 			model.addAttribute("nowPath", nowPath);

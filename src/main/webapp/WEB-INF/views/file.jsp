@@ -6,13 +6,13 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:if test="${ validPath }">
-	<span id="nowPath">${ nowPath.getPath() }</span>
+	<span id="nowPath">${ path }</span>
 	<br><br>
 	<c:forEach items="${ fileList }" var="li">
 		<c:set var="extension" value="${ li.isDirectory() ? 'folder' : FilenameUtils.getExtension(li.getName()).toString().toLowerCase() }" />
 		<span>
 			<span class="fileList">
-				<span ${ extension eq 'folder' ? "style=cursor:pointer onClick=\"location.href='" += pageContext.request.contextPath += "?path=" += li.getPath() += "'" += "\"" : '' }>
+				<span ${ extension eq 'folder' ? "style=cursor:pointer onClick=\"location.href='" += pageContext.request.contextPath += "?path=" += fn:replace(li.getPath(),'\\','/') += "'" += "\"" : '' }>
 					<c:choose>
 						<c:when test="${ extension eq 'png' || extension eq 'jpg' || extension eq 'jpeg' || extension eq 'bmp' || extension eq 'gif' || extension eq 'exif' || extension eq 'heif' }">
 							<img src="/api/thumbnailmaker?name=${ li.getPath() }" onerror="this.onerror=null; this.src='/resources/img/fileicons/default.png';">
@@ -34,21 +34,23 @@
 </c:if>
 
 <script>
-	const parents = $("#nowPath").text().replace("/", "").split("/");
-	if(parents[0]){
-		let parentsText = "";
-		let parentsLink = "/";
-		for(let i=0; i < parents.length; i++){
+	const parents = $("#nowPath").text().split("/");
+	
+	if($("#nowPath").text()) {
+		let parentsHtml = "";
+		let parentsLink = "";
+		if(!parents[0]) parentsLink += "/";
+		
+		for(let i=0; i < parents.length; i++) {
 			parentsLink += parents[i] + "/";
-			if(i != parents.length-1){
-				parentsText += "<a href='/file?path=" + parentsLink + "'>" + parents[i] + "</a> <i class='fa-solid fa-angle-right'></i> ";
+			if(i==0 && !parents[i]) parents[0] = "root";
+			if(parents[i+1]) {
+				parentsHtml += "<a href='/file?path=" + parentsLink + "'>" + parents[i] + "</a> <i class='fa-solid fa-angle-right'></i> ";
 			} else {
-				parentsText += "<a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a>";
+				parentsHtml += "<a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a>";
 			}
 		}
-		console.log(parentsLink);
-		console.log(parentsText);
-		$("#nowPath").html(parentsText);
+		$("#nowPath").html(parentsHtml);
 	}
 	
 	$(".fileList").each(function(){
