@@ -15,10 +15,20 @@
 	<script src="https://kit.fontawesome.com/2adeaa7ee7.js" crossorigin="anonymous"></script>
 	
 	<link href="${ pageContext.request.contextPath }/resources/css/index.css" rel="stylesheet">	
+	<script src="${ pageContext.request.contextPath }/resources/js/index.js"></script>
 </head>
 <body>
-	<%--@ include file="template/header.jsp" --%>
-	<jsp:include page="${ param.body }" />
-	<%--@ include file="template/footer.jsp" --%>
+	<div class="row">
+		<div class="col-12" id="header">
+			<%@ include file="frame/header.jsp" %>
+		</div>
+		
+		<div class="col-d-none col-md-3"></div>
+			<%@ include file="frame/wing.jsp" %>
+		
+		<div class="col-9" id="body">
+			<jsp:include page="${ param.body }" />
+		</div>
+	</div>
 </body>
 </html>
