@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+/*--------------- header start ---------------*/
+#nowPath {
+	position: fixed;
+	top: 100;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 10px;
+	display:block;
+	background: var(--bs-body-bg);
+	-ms-overflow-style: none;
+}
+/*---------------- header end ----------------*/

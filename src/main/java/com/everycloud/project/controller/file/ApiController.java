@@ -1,4 +1,4 @@
-package com.everycloud.project.controller;
+package com.everycloud.project.controller.file;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
