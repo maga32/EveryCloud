@@ -5,7 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- wing button -->
-<span id="wingButton" class="d-block d-md-none">
+<span id="wingButton" class="d-block d-md-none pointer">
 	<span class="fa-stack fa-lg">
 		<i class="fa fa-circle fa-stack-2x headerColor"></i>
 		<i class="fa fa-bars fa-stack-1x fa-inverse"></i>

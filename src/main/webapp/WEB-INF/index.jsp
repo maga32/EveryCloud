@@ -26,7 +26,7 @@
 		<div class="col-d-none col-md-3"></div>
 			<%@ include file="frame/wing.jsp" %>
 		
-		<div class="col-12 col-md-9" id="body">
+		<div class="col-12 col-md-9 px-4 px-md-0" id="body">
 			<jsp:include page="${ param.body }" />
 		</div>
 	</div>

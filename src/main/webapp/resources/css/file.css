@@ -1,15 +1,20 @@
 @charset "UTF-8";
 
-/*--------------- header start ---------------*/
-#nowPath {
-	position: fixed;
-	top: 100;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 10px;
-	display:block;
-	background: var(--bs-body-bg);
-	-ms-overflow-style: none;
+:root{
+	--file-menu-height: 100px;
 }
-/*---------------- header end ----------------*/
+	
+#fileMenuContainer {
+	margin-top: 95px;
+	height: var(--file-menu-height);
+	background-color: var(--bs-body-bg);
+	z-index: 10;
+}
+
+#fileListContainer {
+	margin-top: var(--file-menu-height);
+}
+
+#nowPath {
+	
+}
