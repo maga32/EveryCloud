@@ -6,7 +6,6 @@
 	
 #fileMenuContainer {
 	margin-top: 95px;
-	height: var(--file-menu-height);
 	background-color: var(--bs-body-bg);
 	z-index: 10;
 }

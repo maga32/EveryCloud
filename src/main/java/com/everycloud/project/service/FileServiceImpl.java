@@ -37,14 +37,15 @@ public class FileServiceImpl implements FileService {
 			param.put("getPath", i.getPath());
 			param.put("lastModified", i.lastModified());
 			param.put("length", i.length());
-			try { param.put("getCanonicalPath", i.getCanonicalPath()); 
+			try { param.put("getCanonicalPath", i.getCanonicalPath());
 			} catch (IOException e) { e.printStackTrace(); }
 			
 			fileList.add(param);
 		}
 		
 		fileList.sort(
-				Comparator.comparing((Map<String, Object> param) -> (String) param.get("getName"))
+				Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
+				.thenComparing((Map<String, Object> param) -> (String) param.get("getName"))
 		);
 		
 		return fileList;

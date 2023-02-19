@@ -22,7 +22,7 @@ public class FileViewController {
 	FileService fileService;
 	
 	@RequestMapping("/file")
-	public String file(@RequestParam(value="path", required=false, defaultValue="") String path,
+	public String file(@RequestParam(value="path", required=false, defaultValue="/") String path,
 			Model model) throws IOException {
 		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
 		return "/file/file";

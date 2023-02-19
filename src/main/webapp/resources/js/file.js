@@ -16,12 +16,13 @@ function loadFileList() {
 				$("#nowPath").html(pathLink(result.nowPath));
 
 				const fileList = result.fileList;
-				let listHtml = "";
-				let extension;
+				let listHtml = "<table class='w-100'>";
 
 				for(i in fileList) {
 					listHtml += makeList(fileList[i].isDirectory, fileList[i].isHidden, fileList[i].getPath, fileList[i].getName, fileList[i].getExtension, fileList[i].lastModified, fileList[i].length);
 				}
+
+				listHtml += "</table>";
 
 				$("#fileList").html(listHtml);
 			} else {
@@ -42,19 +43,37 @@ function loadFileList() {
 function pathLink(path) {
 	const parents = path.replace(/\\/g, "/").split("/");
 	let parentsHtml = "";
+	let parentHtml = "";
 	let parentsLink = "";
-	
+
 	for(let i=0; i < parents.length; i++) {
 		parentsLink += encodeURIComponent(parents[i]) + "/";
 		if(!parents[0]) parents[0] = "root";
-		if(parents[i+1]) {
-			parentsHtml += "<a href='/file?path=" + parentsLink + "'>" + parents[i] + "</a> <i class='fa-solid fa-angle-right'></i> ";
+		if(parents[i+2]) {
+			parentsHtml += "<a href='/file?path=" + parentsLink + "' class='dropdown-item'>" + parents[i] + "</a>\n";
+		} else if(parents[i+1]) {
+			parentHtml += "<div class='mx-2'><a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a></div>\n<div><i class='fa-solid fa-angle-right'></i> </div>\n";
 		} else if(parents[i]) {
-			parentsHtml += "<a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a>";
+			parentHtml += "<div class='mx-2'>" + parents[i] + "</div>\n";
 		}
 	}
 
-	return parentsHtml;
+	let resultHtml = "";
+
+	if(parents.length >2) {
+		resultHtml += 	"<div class='btn-group'>"
+					+		"<span class='dropdown-toggle pointer' data-bs-toggle='dropdown' aria-expanded='false'>"
+					+			"<i class='fa-solid fa-house'></i>"
+					+		"</span>"
+					+		"<span class='dropdown-menu dropdown-menu-start'>"
+					+			parentsHtml
+					+		"</span>"
+					+	"</div>";
+	}
+
+	resultHtml += parentHtml;
+
+	return resultHtml;
 }
 
 
@@ -67,22 +86,28 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 
 	let fileHtml = "";
 
-	fileHtml += "<span class='fileList'>\n";
-	fileHtml += "	<span " + ( extension == "folder" ? "class='pointer' onClick=\"location.href='/file?path=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'\" " : "" ) + ">\n";
+	fileHtml += "<tr>\n";
+	fileHtml += 	"<td ><input type='checkbox' class='form-check-input' name='checkedFile' value='" + name + "'></td>\n";
+	fileHtml += 	"<td class='text-center p-2'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml += "		" + "<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
+		fileHtml +=		"<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
 	} else {
-		fileHtml += "		" + "<img src='/resources/img/fileicons/" + extensions[extension] + ".png'>" + "\n";
+		fileHtml +=		"<img src='/resources/img/fileicons/" + extensions[extension] + ".png'>" + "\n";
 	}
-	fileHtml += "		" + name + "<br>\n";
-	fileHtml += "	</span>\n";
-	fileHtml += "	<span>\n";
-	fileHtml += "		날짜 : " + moment(date, "x").format("YY/MM/DD HH:mm") + "\n";
-	fileHtml += "	</span><br>\n";
-	fileHtml += "	<span>\n";
-	fileHtml += "		크기 : " + ( extension == "folder" ? "-" : fileSize(size) ) + "\n";
-	fileHtml += "	</span><br>\n";
-	fileHtml += "</span><br>\n";
+	fileHtml += 	"</td>\n";
+	fileHtml += 	"<td class='text-break'>\n";
+	fileHtml += 		"<span " + ( extension == "folder" ? "class='pointer' onClick=\"location.href='/file?path=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'\" " : "" ) + ">"+ name + "</span>\n";
+	fileHtml += 	"</td>\n";
+	fileHtml += 	"<td class='px-2'>\n";
+	fileHtml += 		extensions[extension] + "\n";
+	fileHtml += 	"</td>\n";
+	fileHtml += 	"<td>\n";
+	fileHtml += 		"<div class='row'>\n";
+	fileHtml += 			"<div class='col-12 col-xl-8'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</div>\n";
+	fileHtml += 			"<div class='col-12 col-xl-4'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</div>\n";
+	fileHtml += 		"</div>\n";
+	fileHtml += 	"</td>\n";
+	fileHtml += "</tr>";
 
 	return fileHtml;
 }

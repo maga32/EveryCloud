@@ -81,7 +81,7 @@ a:hover { text-decoration: underline; }
 #wingButton {
 	position: fixed;
 	z-index: 80;
-	top: 150px;
+	top: 50px;
 	left: -32px;
 	width: 70px;
 }
