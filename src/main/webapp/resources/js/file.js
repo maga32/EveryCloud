@@ -40,7 +40,7 @@ function loadFileList() {
 
 // define link of #nowPath
 function pathLink(path) {
-	const parents = path.split("/");
+	const parents = path.replace(/\\/g, "/").split("/");
 	let parentsHtml = "";
 	let parentsLink = "";
 
@@ -48,10 +48,11 @@ function pathLink(path) {
 	if(!parents[0]) parentsLink += "/";
 	
 	for(let i=0; i < parents.length; i++) {
-		parentsLink += parents[i] + "/";
+		parentsLink += encodeURIComponent(parents[i]);
 		if(i==0 && !parents[i]) parents[0] = "root";
 		if(parents[i+1]) {
 			parentsHtml += "<a href='/file?path=" + parentsLink + "'>" + parents[i] + "</a> <i class='fa-solid fa-angle-right'></i> ";
+			parentsLink += "/";
 		} else {
 			parentsHtml += "<a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a>";
 		}
@@ -71,9 +72,9 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	let fileHtml = "";
 
 	fileHtml += "<span class='fileList'>\n";
-	fileHtml += "	<span " + ( extension == "folder" ? "class='pointer' onClick=\"location.href='/file?path=" + path + "'\" " : "" ) + ">\n";
+	fileHtml += "	<span " + ( extension == "folder" ? "class='pointer' onClick=\"location.href='/file?path=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'\" " : "" ) + ">\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml += "		" + "<img src='/api/thumbnailmaker?name=" + path + "'>\n"
+		fileHtml += "		" + "<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
 	} else {
 		fileHtml += "		" + "<img src='/resources/img/fileicons/" + extensions[extension] + ".png'>" + "\n";
 	}

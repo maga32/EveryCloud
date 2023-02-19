@@ -2,6 +2,7 @@ package com.everycloud.project.controller.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class FileViewController {
 	@RequestMapping("/file")
 	public String file(@RequestParam(value="path", required=false, defaultValue="") String path,
 			Model model) throws IOException {
-		model.addAttribute("path", path);
+		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
 		return "/file/file";
 	}
 	
@@ -40,7 +41,7 @@ public class FileViewController {
 			String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
 			
 			if(!realPath.equals(path)) {
-				map.put("realPath", realPath);
+				map.put("realPath", URLEncoder.encode(realPath,"utf-8"));
 				return map;
 			}
 			map.put("fileList", fileService.fileList(path));
