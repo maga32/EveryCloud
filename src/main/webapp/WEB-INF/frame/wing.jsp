@@ -48,7 +48,9 @@
 	
 	<div class="row">
 		<div class="col-12">
-			테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히테스트히히
+			<div class="list-group list-group-flush">
+				<a href="/file?path=/" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder"></i> 파일</a>
+			</div>
 		</div>
 	</div>
 </div>

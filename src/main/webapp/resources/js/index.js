@@ -46,4 +46,7 @@ $(document).ready(function(){
 		$("#wing").removeClass("open");
 		$(this).css("display", "none");
 	});
+
+	// select wing menu
+	$("#list_" + window.location.pathname.split("/")[1]).addClass("active");
 });
