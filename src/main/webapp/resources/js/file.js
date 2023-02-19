@@ -43,17 +43,13 @@ function pathLink(path) {
 	const parents = path.replace(/\\/g, "/").split("/");
 	let parentsHtml = "";
 	let parentsLink = "";
-
-	// for mac,linux
-	if(!parents[0]) parentsLink += "/";
 	
 	for(let i=0; i < parents.length; i++) {
-		parentsLink += encodeURIComponent(parents[i]);
-		if(i==0 && !parents[i]) parents[0] = "root";
+		parentsLink += encodeURIComponent(parents[i]) + "/";
+		if(!parents[0]) parents[0] = "root";
 		if(parents[i+1]) {
 			parentsHtml += "<a href='/file?path=" + parentsLink + "'>" + parents[i] + "</a> <i class='fa-solid fa-angle-right'></i> ";
-			parentsLink += "/";
-		} else {
+		} else if(parents[i]) {
 			parentsHtml += "<a href='/file?path=" + parentsLink + "' id='parent'>" + parents[i] + "</a>";
 		}
 	}
