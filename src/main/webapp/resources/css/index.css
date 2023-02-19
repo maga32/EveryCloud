@@ -35,7 +35,6 @@ a:hover { text-decoration: underline; }
 	right: 0;
 	height: 100vh;
 	display:block;
-	background: var(--bs-body-bg);
 	transform: translateX(0px);
 	transition: 0.3s all ease;
 	transition: 0.2s all;
@@ -56,6 +55,7 @@ a:hover { text-decoration: underline; }
 	
 	#wing.open {
 		top: 0;
+		background: var(--bs-body-bg);
 		transform: translateX(0px);
 	}
 	
