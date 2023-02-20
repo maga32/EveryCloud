@@ -8,7 +8,11 @@ a {
 a:hover { text-decoration: underline; }
 
 .pointer {
-	cursor:pointer;
+	cursor: pointer;
+}
+
+.text-gray {
+	color: #8b8b8b;
 }
 
 /*--------------- header start ---------------*/

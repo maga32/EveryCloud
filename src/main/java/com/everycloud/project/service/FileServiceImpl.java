@@ -37,8 +37,8 @@ public class FileServiceImpl implements FileService {
 			param.put("getExtension", FilenameUtils.getExtension(i.getName()).toLowerCase());
 			param.put("getParent", i.getParent());
 			param.put("getPath", i.getPath());
-			param.put("lastModified", Long.toString(i.lastModified()));
-			param.put("length", Long.toString(i.length()));
+			param.put("lastModified", i.lastModified());
+			param.put("length", i.length());
 			try { param.put("getCanonicalPath", i.getCanonicalPath());
 			} catch (IOException e) { e.printStackTrace(); }
 			
@@ -51,18 +51,31 @@ public class FileServiceImpl implements FileService {
 		} else if (sort.equals("size")) { sortParam = "length";
 		}
 		
-		if(order.equals("asc")) {
-			fileList.sort(
+		if(sort.equals("name") || sort.equals("type")) {
+			if(order.equals("asc")) {
+				fileList.sort(
 					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
 					.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam))
-			);
-		} else {
-			fileList.sort(
+				);
+			} else {
+				fileList.sort(
 					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
 					.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam)).reversed()
-			);
+				);
+			}
+		} else {
+			if(order.equals("asc")) {
+				fileList.sort(
+					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
+					.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam))
+				);
+			} else {
+				fileList.sort(
+					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
+					.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam)).reversed()
+				);
+			}
 		}
-		
 		return fileList;
 	}
 

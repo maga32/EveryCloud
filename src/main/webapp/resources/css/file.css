@@ -2,6 +2,7 @@
 
 :root{
 	--file-menu-height: 100px;
+	--file-select-color: rgba(184,184,204,0.4);
 }
 	
 #fileMenuContainer {
@@ -14,6 +15,10 @@
 	margin-top: var(--file-menu-height);
 }
 
-#nowPath {
-	
+.fileTable:hover {
+	background-color: var(--file-select-color);
+}
+
+.fileTable.checked {
+	background-color: var(--file-select-color);
 }
