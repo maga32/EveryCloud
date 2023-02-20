@@ -1,10 +1,14 @@
 $(document).ready(function(){
-	loadFileList();
+	loadFileList($("#path").val(),"name","asc");
 });
 
 // loading FileList
-function loadFileList() {
-	let data = "path=" + $("#path").val();
+function loadFileList(path, sort, order) {
+	if(!path) path = $("#path").val();
+	if(!sort) sort = $("#sort").val();
+	if(!order) order = $("#order").val();
+	let data = "path=" + path + "&sort=" + sort + "&order=" + order;
+	console.log(data);
 	$.ajax({
 		url: "fileList",
 		type: "post",
@@ -16,7 +20,7 @@ function loadFileList() {
 				$("#nowPath").html(pathLink(result.nowPath));
 
 				const fileList = result.fileList;
-				let listHtml = "<table class='w-100'>";
+				let listHtml = "<table class='w-100'><colgroup><col><col><col style='width:60%'><col style='width:10%'><col></colgroup>";
 
 				for(i in fileList) {
 					listHtml += makeList(fileList[i].isDirectory, fileList[i].isHidden, fileList[i].getPath, fileList[i].getName, fileList[i].getExtension, fileList[i].lastModified, fileList[i].length);
@@ -25,9 +29,11 @@ function loadFileList() {
 				listHtml += "</table>";
 
 				$("#fileList").html(listHtml);
+
+				setFileMenu(path, sort, order);
+
 			} else {
 				setTimeout(function() { $("#fileList").html("잘못된 경로입니다."); }, 300);
-				
 			}
 		},
 		error: function() {
@@ -96,15 +102,15 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	}
 	fileHtml += 	"</td>\n";
 	fileHtml += 	"<td class='text-break'>\n";
-	fileHtml += 		"<span " + ( extension == "folder" ? "class='pointer' onClick=\"location.href='/file?path=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'\" " : "" ) + ">"+ name + "</span>\n";
+	fileHtml += 		"<span " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','')\" " : "" ) + ">"+ name + "</span>\n";
 	fileHtml += 	"</td>\n";
-	fileHtml += 	"<td class='px-2'>\n";
+	fileHtml += 	"<td>\n";
 	fileHtml += 		extensions[extension] + "\n";
 	fileHtml += 	"</td>\n";
 	fileHtml += 	"<td>\n";
 	fileHtml += 		"<div class='row'>\n";
-	fileHtml += 			"<div class='col-12 col-xl-8'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</div>\n";
 	fileHtml += 			"<div class='col-12 col-xl-4'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</div>\n";
+	fileHtml += 			"<div class='col-12 col-xl-8'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</div>\n";
 	fileHtml += 		"</div>\n";
 	fileHtml += 	"</td>\n";
 	fileHtml += "</tr>";
@@ -123,4 +129,17 @@ function fileSize(size) {
 	} else {
 		return size + "byte";
 	}
+}
+
+function setFileMenu(path, sort, order) {	
+	$("#path").val(path);
+	$("#sort").val(sort);
+	$("#order").val(order);
+	$("#nameSort").text("이름");
+	$("#typeSort").text("종류");
+	$("#dateSort").text("날짜");
+	$("#sizeSort").text("크기");
+
+	$("#"+sort+"Sort").attr("onClick","loadFileList('', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "')");
+	(order=='asc') ? $("#"+sort+"Sort").append("↑") : $("#"+sort+"Sort").append("↓");
 }

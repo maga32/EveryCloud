@@ -85,9 +85,12 @@ extensions = {
   "hwp": "hwp",
 
   "css": "code",
+  "ini": "code",
   "js": "code",
   "java": "code",
+  "log": "code",
   "php": "code",
+  "xml": "code",
 
   "ses": "ses",
   "sesx": "ses",

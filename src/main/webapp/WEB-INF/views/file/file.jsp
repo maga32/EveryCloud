@@ -10,11 +10,13 @@
 <link href="${ pageContext.request.contextPath }/resources/css/file.css" rel="stylesheet">
 
 <input type="hidden" id="path" name="path" value="${ path }">
+<input type="hidden" id="sort" name="sort" value="${ sort }">
+<input type="hidden" id="order" name="order" value="${ order }">
 
 <div class="row fixed-top" id="fileMenuContainer">
 	<div class="col-0 col-md-3"></div>
 	<div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
-		<div class="row rounded border">
+		<div class="row rounded border p-2">
 			<div class="d-flex">
 				<div class="flex-grow-1 d-flex" id="nowPath"></div>
 				<div class="btn-group">
@@ -29,21 +31,38 @@
 				</div>
 			</div>
 			
-			<div class="text-center align-items-center row">
-				<div class="col-1"><input type="checkbox" class="form-check-input"></div>
-				<div class="col-7">이름</div>
-				<div class="col-1">종류</div>
-				<div class="col-3 row">
-					<div class="col-12 col-xl-8">날짜</div>
-					<div class="col-12 col-xl-4">크기</div>
-				</div>
-			</div>
-			
+			<table class="w-100 text-center">
+				<colgroup>
+					<col>
+					<col style="width:65%">
+					<col>
+					<col>
+ 				</colgroup>
+				<tr>
+					<td><input type="checkbox"  class="form-check-input"></td>
+					<td>
+						<span class="pointer" id="nameSort" onClick="loadFileList('', 'name', '')">이름${ sort eq 'name' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+					</td>
+					<td>
+						<div class="row">
+							<div class="col-12 col-xl-6">
+								<span class="pointer" id="typeSort" onClick="loadFileList('', 'type' ,'')">종류${ sort eq 'type' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+							</div>
+							<div class="col-12 col-xl-6">
+								<span class="pointer" id="sizeSort" onClick="loadFileList('', 'size' ,'')">크기${ sort eq 'size' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+							</div>
+						</div>
+					</td>
+					<td>
+						<span class="pointer" id="dateSort"  onClick="loadFileList('', 'date' ,'')">날짜${ sort eq 'date' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+					</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </div>
 <div class="col-12" id="fileListContainer">
-	<div id="fileList" class="ps-3 px-md-4"></div>
+	<div id="fileList" class="px-2"></div>
 	<div id="loadingList" class="text-center m-2"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading... </div>
 </div>
 

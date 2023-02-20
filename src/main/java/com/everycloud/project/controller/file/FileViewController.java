@@ -23,14 +23,21 @@ public class FileViewController {
 	
 	@RequestMapping("/file")
 	public String file(@RequestParam(value="path", required=false, defaultValue="/") String path,
+			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
+			@RequestParam(value="order", required=false, defaultValue="asc") String order,
 			Model model) throws IOException {
 		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
+		model.addAttribute("sort", sort);
+		model.addAttribute("order",order);
+		
 		return "/file/file";
 	}
 	
 	@RequestMapping("/fileList")
 	@ResponseBody
-	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path) throws IOException {
+	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
+			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
+			@RequestParam(value="order", required=false, defaultValue="asc") String order) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		boolean validPath = fileService.isPathExist(path);
 
@@ -44,7 +51,7 @@ public class FileViewController {
 				map.put("realPath", URLEncoder.encode(realPath,"utf-8"));
 				return map;
 			}
-			map.put("fileList", fileService.fileList(path));
+			map.put("fileList", fileService.fileList(path, sort, order));
 			map.put("nowPath", nowPath);
 		}
 		
