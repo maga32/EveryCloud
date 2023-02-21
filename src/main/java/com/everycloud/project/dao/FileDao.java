@@ -3,9 +3,7 @@ package com.everycloud.project.dao;
 import java.io.File;
 
 public interface FileDao {
-	File[] getPathFiles(String path);
-	
-	File[] getPathFiles(String path, String keyword);
+	File[] getPathFiles(String path, boolean viewHidden, String keyword);
 	
 	File getFile(String path);
 	

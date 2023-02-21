@@ -1,50 +1,50 @@
 package com.everycloud.project.dao;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class FileDaoImpl implements FileDao {
-
+	
 	@Override
-	public File[] getPathFiles(String path) {
-		File file = new File(path);
-		File[] list = null;
+	public File[] getPathFiles(String path, boolean viewHidden, String keyword) {
+	    List<File> fileList = new ArrayList<>();
+	    addFileList(path, viewHidden, keyword.toLowerCase(), fileList);
+	    return fileList.toArray(new File[0]);
+	}
+
+	private void addFileList(String path, boolean viewHidden, String keyword, List<File> fileList) {
+	    File file = new File(path);
+	    File[] list = null;
 		if(file.isFile()) {
-			list = new File[1];
-			list[0] = file;
+			fileList.add(file);
 		} else {
-			list = file.listFiles();
-		}
-		
-		return list;
-	}
-	
-	@Override
-	public File[] getPathFiles(String path, String keyword) {
-		ArrayList<File> fileList = findFiles(path, keyword);
-		return (File[]) fileList.toArray(new File[fileList.size()]);
-	}
-	
-	private ArrayList<File> findFiles(String directoryPath, String keyword) {
-		ArrayList<File> matchingFiles = new ArrayList<File>();
-		File directory = new File(directoryPath);
-		
-		if (directory.exists() && directory.isDirectory()) {
-			File[] files = directory.listFiles();
-			for (File file : files) {
-			    if (file.isDirectory()) {
-			    	matchingFiles.addAll(findFiles(file.getAbsolutePath(), keyword));
-			    } else if (file.getName().contains(keyword)) {
-			        matchingFiles.add(file);
-			    }
+	    	list = file.listFiles(fileFilter(viewHidden));
+	    	if(!keyword.equals("")) {
+				for(File subFile : list) {
+				    if(subFile.getName().toLowerCase().contains(keyword)) fileList.add(subFile);
+				    if(subFile.isDirectory()) addFileList(subFile.getAbsolutePath(), viewHidden, keyword, fileList);
+				}
+			} else {
+				fileList.addAll(Arrays.asList(list));
 			}
-	    }
-	    return matchingFiles;
+		}
 	}
 
+	// hidden file filter
+	private FileFilter fileFilter(boolean viewHidden) {
+	    if(viewHidden) {
+	        return file -> true;
+	    } else {
+	        return file -> !file.isHidden();
+	    }
+	}
+	
 	@Override
 	public File getFile(String path) {
 		File file = new File(path);

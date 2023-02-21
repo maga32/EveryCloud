@@ -23,14 +23,10 @@ public class FileServiceImpl implements FileService {
 	FileDao fileDao;
 	
 	@Override
-	public List<Map<String, Object>> fileList(String path, String sort, String order, String keyword) {
+	public List<Map<String, Object>> fileList(String path, String sort, String order, String keyword, boolean viewHidden) {
 		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
 		File[] files = null;
-		if(keyword.equals("")) {
-			files = fileDao.getPathFiles(path);
-		} else {
-			files = fileDao.getPathFiles(path, keyword);
-		}
+		files = fileDao.getPathFiles(path, viewHidden, keyword);
 		
 		for(File i : files) {
 			Map<String, Object> param = new HashMap<String, Object>();

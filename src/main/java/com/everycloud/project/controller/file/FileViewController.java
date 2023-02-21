@@ -40,7 +40,8 @@ public class FileViewController {
 	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
-			@RequestParam(value="keyword", required=false, defaultValue="") String keyword) throws IOException {
+			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
+			@RequestParam(value="viewHidden", required=false) boolean viewHidden) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		boolean validPath = fileService.isPathExist(path);
 
@@ -54,7 +55,7 @@ public class FileViewController {
 				map.put("realPath", URLEncoder.encode(realPath,"utf-8"));
 				return map;
 			}
-			map.put("fileList", fileService.fileList(path, sort, order, keyword));
+			map.put("fileList", fileService.fileList(path, sort, order, keyword, viewHidden));
 			map.put("nowPath", nowPath);
 		}
 		

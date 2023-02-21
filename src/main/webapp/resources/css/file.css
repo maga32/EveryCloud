@@ -25,6 +25,10 @@
 	height: 30px;
 }
 
+.inactive {
+	display: none;
+}
+
 .fileTable:hover {
 	background-color: var(--file-select-color);
 }

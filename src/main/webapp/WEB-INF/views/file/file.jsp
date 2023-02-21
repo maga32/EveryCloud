@@ -12,6 +12,7 @@
 <input type="hidden" id="path" name="path" value="${ path }">
 <input type="hidden" id="sort" name="sort" value="${ sort }">
 <input type="hidden" id="order" name="order" value="${ order }">
+<input type="hidden" id="viewHidden" name="viewHidden" value="${ viewHidden }">
 
 <div class="row fixed-top" id="fileMenuContainer">
 	<div class="col-0 col-md-3"></div>
@@ -27,12 +28,12 @@
 							<div class="col-12 col-md-6 text-end">
 								<input type="text" class="rounded-5 px-2 mx-1" id="keyword" name="keyword" size="10" value="${ keyword }" onkeypress="searchFileEnter(event)">
 								<span class="pointer" onClick="searchFileClick()"><i class="fa-solid fa-magnifying-glass"></i></span>
-								<span class="btn-group">
+								<span class="btn-group px-2">
 									<span class="pointer" data-bs-toggle="dropdown" aria-expanded="false">
 										<i class="fa-solid fa-wrench"></i>
 									</span>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><button class="dropdown-item" type="button">Action</button></li>
+										<li><div class="dropdown-item" onClick="toggleHiddenCheck()"><span id="viewHiddenCheck" class="inactive"><i class="fa-solid fa-check"></i> </span>숨김파일</div></li>
 										<li><button class="dropdown-item" type="button">Another action</button></li>
 										<li><button class="dropdown-item" type="button">Something else here</button></li>
 									</ul>

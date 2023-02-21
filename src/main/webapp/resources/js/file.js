@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	loadFileList($("#path").val(),$("#sort").val(),$("#order").val());
+	loadFileList($("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
 
 	$("#checkAllFile").click(function(){
 		if(this.checked) {
@@ -14,19 +14,20 @@ $(document).ready(function(){
 // when history back clicked
 window.addEventListener('popstate', function(event) {
 	if (event.state != null) {
-		loadFileList(event.state.path, event.state.sort, event.state.order, false);
+		loadFileList(event.state.path, event.state.sort, event.state.order, event.state.keyword, false, false);
     }
 });
 
 // loading FileList
-function loadFileList(path, sort, order, saveHistory = true) {
+function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHistory = true) {
 	$("#fileList").html("");
 	$("#loadingList").addClass("act");
 
 	if(!path) path = $("#path").val();
 	if(!sort) sort = $("#sort").val();
 	if(!order) order = $("#order").val();
-	let keyword = $("#keyword").val();
+	if(resetKeyword) $("#keyword").val("");
+	if(!keyword) keyword = $("#keyword").val();
 
 	if(keyword) {
 		$("#pathSort").removeClass("d-none");
@@ -37,6 +38,7 @@ function loadFileList(path, sort, order, saveHistory = true) {
 	}
 
 	let data = "path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword;
+	if(!$("#viewHiddenCheck").hasClass("inactive")) data += "&viewHidden=true	";
 
 	$.ajax({
 		url: "fileList",
@@ -44,7 +46,7 @@ function loadFileList(path, sort, order, saveHistory = true) {
 		data: data,
 		success: function(result) {
 			if(result.realPath) {
-				loadFileList(result.realPath,'','',false);
+				loadFileList(result.realPath,'','','',true,false);
 				return false;
 			}
 
@@ -74,7 +76,7 @@ function loadFileList(path, sort, order, saveHistory = true) {
 		complete: function() {
 			$("#loadingList").removeClass("act");
 			if(saveHistory) {
-				history.pushState({"path":path, "sort":sort, "order":order}, null, "file?" + data);
+				history.pushState({"path":path, "sort":sort, "order":order, "keyword":keyword}, null, "file?path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword);
 			}
 		}
 	});
@@ -91,11 +93,11 @@ function pathLink(path) {
 		parentsLink += parents[i] + "/";
 		if(!parents[0]) parents[0] = "root";
 		if(parents[i+2]) {
-			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','')\">" + parents[i] + "</div>\n";
+			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\">" + parents[i] + "</div>\n";
 		} else if(parents[i+1]) {
-			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','')\" id='parent'>" + parents[i] + "</span></span>\n<span><i class='fa-solid fa-angle-right'></i> </span>\n";
+			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></span>\n<span><i class='fa-solid fa-angle-right'></i> </span>\n";
 		} else if(parents[i]) {
-			parentHtml += "<span class='mx-2'>" + parents[i] + "</span>\n";
+			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></span>\n";
 		}
 	}
 
@@ -117,7 +119,7 @@ function pathLink(path) {
 	return resultHtml;
 }
 
-
+// make a file list each line
 function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	if(isDirectory) {
 		extension = "folder";
@@ -138,7 +140,7 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	}
 	fileHtml += 		"</td>\n";
 	fileHtml += 		"<td colspan='3' class='text-break w-auto'>\n";
-	fileHtml += 			"<span " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','')\" " : "" ) + ">"+ name + "</span>\n";
+	fileHtml += 			"<span " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "" ) + ">"+ name + "</span>\n";
 	fileHtml += 		"</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += 	"<tr class='text-gray'>\n";
@@ -165,6 +167,7 @@ function fileSize(size) {
 	}
 }
 
+// set file sort
 function setFileMenu(path, sort, order) {
 	$("#path").val(path);
 	$("#sort").val(sort);
@@ -175,20 +178,26 @@ function setFileMenu(path, sort, order) {
 	$("#dateSort").text("날짜");
 	$("#sizeSort").text("크기");
 
-	$("#"+sort+"Sort").attr("onClick","loadFileList('', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "')");
+	$("#"+sort+"Sort").attr("onClick","loadFileList('', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "', '')");
 	(order=='asc') ? $("#"+sort+"Sort").append("↑") : $("#"+sort+"Sort").append("↓");
 }
 
+// search file with Enter key
 function searchFileEnter(e) {
-	if(e.keyCode == 13){
-		loadFileList('','','');
-	}
+	if(e.keyCode == 13) loadFileList('','','','');
 }
 
+// search file with click search button
 function searchFileClick() {
-	loadFileList('','','');
+	loadFileList('','','','');
 }
 
+function toggleHiddenCheck() {
+	$("#viewHiddenCheck").toggleClass("inactive");
+	loadFileList('','','','');
+}
+
+// select file with background color
 $(document).on("change", ".checkFile", function(){
 	if($(this).is(":checked")) {
 		$(this).closest("table").addClass("checked");
