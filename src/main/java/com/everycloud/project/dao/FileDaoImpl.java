@@ -1,6 +1,7 @@
 package com.everycloud.project.dao;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,29 @@ public class FileDaoImpl implements FileDao {
 		}
 		
 		return list;
+	}
+	
+	@Override
+	public File[] getPathFiles(String path, String keyword) {
+		ArrayList<File> fileList = findFiles(path, keyword);
+		return (File[]) fileList.toArray(new File[fileList.size()]);
+	}
+	
+	private ArrayList<File> findFiles(String directoryPath, String keyword) {
+		ArrayList<File> matchingFiles = new ArrayList<File>();
+		File directory = new File(directoryPath);
+		
+		if (directory.exists() && directory.isDirectory()) {
+			File[] files = directory.listFiles();
+			for (File file : files) {
+			    if (file.isDirectory()) {
+			    	matchingFiles.addAll(findFiles(file.getAbsolutePath(), keyword));
+			    } else if (file.getName().contains(keyword)) {
+			        matchingFiles.add(file);
+			    }
+			}
+	    }
+	    return matchingFiles;
 	}
 
 	@Override

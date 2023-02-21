@@ -25,10 +25,12 @@ public class FileViewController {
 	public String file(@RequestParam(value="path", required=false, defaultValue="/") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
+			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
 			Model model) throws IOException {
 		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
 		model.addAttribute("sort", sort);
 		model.addAttribute("order",order);
+		model.addAttribute("keyword",keyword);
 		
 		return "/file/file";
 	}
@@ -37,7 +39,8 @@ public class FileViewController {
 	@ResponseBody
 	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
-			@RequestParam(value="order", required=false, defaultValue="asc") String order) throws IOException {
+			@RequestParam(value="order", required=false, defaultValue="asc") String order,
+			@RequestParam(value="keyword", required=false, defaultValue="") String keyword) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		boolean validPath = fileService.isPathExist(path);
 
@@ -51,7 +54,7 @@ public class FileViewController {
 				map.put("realPath", URLEncoder.encode(realPath,"utf-8"));
 				return map;
 			}
-			map.put("fileList", fileService.fileList(path, sort, order));
+			map.put("fileList", fileService.fileList(path, sort, order, keyword));
 			map.put("nowPath", nowPath);
 		}
 		

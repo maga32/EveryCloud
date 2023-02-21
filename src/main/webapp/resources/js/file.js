@@ -21,13 +21,22 @@ window.addEventListener('popstate', function(event) {
 // loading FileList
 function loadFileList(path, sort, order, saveHistory = true) {
 	$("#fileList").html("");
-	$("#loadingList").css("display","block");
+	$("#loadingList").addClass("act");
 
 	if(!path) path = $("#path").val();
 	if(!sort) sort = $("#sort").val();
 	if(!order) order = $("#order").val();
+	let keyword = $("#keyword").val();
 
-	let data = "path=" + path + "&sort=" + sort + "&order=" + order;
+	if(keyword) {
+		$("#pathSort").removeClass("d-none");
+		$("#typeSort").addClass("d-none");
+	} else {		
+		$("#typeSort").removeClass("d-none");
+		$("#pathSort").addClass("d-none");
+	}
+
+	let data = "path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword;
 
 	$.ajax({
 		url: "fileList",
@@ -63,7 +72,7 @@ function loadFileList(path, sort, order, saveHistory = true) {
 			console.log("error");
 		},
 		complete: function() {
-			$("#loadingList").css("display","none");
+			$("#loadingList").removeClass("act");
 			if(saveHistory) {
 				history.pushState({"path":path, "sort":sort, "order":order}, null, "file?" + data);
 			}
@@ -84,9 +93,9 @@ function pathLink(path) {
 		if(parents[i+2]) {
 			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','')\">" + parents[i] + "</div>\n";
 		} else if(parents[i+1]) {
-			parentHtml += "<div class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','')\" id='parent'>" + parents[i] + "</span></div>\n<div><i class='fa-solid fa-angle-right'></i> </div>\n";
+			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','')\" id='parent'>" + parents[i] + "</span></span>\n<span><i class='fa-solid fa-angle-right'></i> </span>\n";
 		} else if(parents[i]) {
-			parentHtml += "<div class='mx-2'>" + parents[i] + "</div>\n";
+			parentHtml += "<span class='mx-2'>" + parents[i] + "</span>\n";
 		}
 	}
 
@@ -125,7 +134,7 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
 		fileHtml +=			"<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
 	} else {
-		fileHtml +=			"<img src='/resources/img/fileicons/" + extensions[extension] + ".png'>" + "\n";
+		fileHtml +=			"<img src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
 	}
 	fileHtml += 		"</td>\n";
 	fileHtml += 		"<td colspan='3' class='text-break w-auto'>\n";
@@ -133,8 +142,8 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	fileHtml += 		"</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += 	"<tr class='text-gray'>\n";
-	fileHtml += 		"<td class='w-auto'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</td>\n";
-	fileHtml += 		"<td class='text-center w-25'>" + extensions[extension] + "</td>\n";
+	fileHtml += 		"<td class='w-auto pe-2'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</td>\n";
+	fileHtml += 		"<td class='w-auto'><div style='" + ($("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension])  + "</div></td>\n";
 	fileHtml += 		"<td class='text-center w-25'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += "</table>\n";
@@ -156,17 +165,28 @@ function fileSize(size) {
 	}
 }
 
-function setFileMenu(path, sort, order) {	
+function setFileMenu(path, sort, order) {
 	$("#path").val(path);
 	$("#sort").val(sort);
 	$("#order").val(order);
 	$("#nameSort").text("이름");
+	$("#pathSort").text("경로");
 	$("#typeSort").text("종류");
 	$("#dateSort").text("날짜");
 	$("#sizeSort").text("크기");
 
 	$("#"+sort+"Sort").attr("onClick","loadFileList('', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "')");
 	(order=='asc') ? $("#"+sort+"Sort").append("↑") : $("#"+sort+"Sort").append("↓");
+}
+
+function searchFileEnter(e) {
+	if(e.keyCode == 13){
+		loadFileList('','','');
+	}
+}
+
+function searchFileClick() {
+	loadFileList('','','');
 }
 
 $(document).on("change", ".checkFile", function(){

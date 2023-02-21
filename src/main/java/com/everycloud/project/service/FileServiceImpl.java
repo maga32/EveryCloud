@@ -23,10 +23,16 @@ public class FileServiceImpl implements FileService {
 	FileDao fileDao;
 	
 	@Override
-	public List<Map<String, Object>> fileList(String path, String sort, String order) {
+	public List<Map<String, Object>> fileList(String path, String sort, String order, String keyword) {
 		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
+		File[] files = null;
+		if(keyword.equals("")) {
+			files = fileDao.getPathFiles(path);
+		} else {
+			files = fileDao.getPathFiles(path, keyword);
+		}
 		
-		for(File i : fileDao.getPathFiles(path)) {
+		for(File i : files) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			
 			param.put("isDirectory", i.isDirectory());
@@ -47,11 +53,12 @@ public class FileServiceImpl implements FileService {
 		
 		if(sort.equals("name")) { sortParam = "getName";
 		} else if (sort.equals("type")) { sortParam = "getExtension";
+		} else if (sort.equals("path")) { sortParam = "getPath";
 		} else if (sort.equals("date")) { sortParam = "lastModified";
 		} else if (sort.equals("size")) { sortParam = "length";
 		}
 		
-		if(sort.equals("name") || sort.equals("type")) {
+		if(sort.equals("name") || sort.equals("type") || sort.equals("path")) {
 			if(order.equals("asc")) {
 				fileList.sort(
 					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))

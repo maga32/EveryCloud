@@ -6,13 +6,23 @@
 }
 	
 #fileMenuContainer {
-	margin-top: 95px;
+	margin-top: 100px;
 	background-color: var(--bs-body-bg);
 	z-index: 10;
 }
 
 #fileListContainer {
 	margin-top: var(--file-menu-height);
+}
+
+#loadingList {
+	opacity: 0;
+	transition: all 3.0s;
+}
+
+#loadingList.act {
+	opacity: 1.0;
+	height: 30px;
 }
 
 .fileTable:hover {
