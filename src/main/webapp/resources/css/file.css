@@ -6,7 +6,7 @@
 }
 	
 #fileMenuContainer {
-	margin-top: 100px;
+	margin-top: var(--file-menu-height);
 	background-color: var(--bs-body-bg);
 	z-index: 10;
 }
@@ -23,6 +23,15 @@
 #loadingList.act {
 	opacity: 1.0;
 	height: 30px;
+}
+
+#fileControlMenu {
+	width: 200px;
+	height: 400px;
+	position: fixed;
+	top: 20%;
+	right: 50px;
+	z-index: 20;
 }
 
 .inactive {

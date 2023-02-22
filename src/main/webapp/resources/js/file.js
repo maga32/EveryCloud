@@ -8,6 +8,7 @@ $(document).ready(function(){
 			$(".fileTable").removeClass("checked");
 		}
 		$(".checkFile").prop("checked", this.checked);
+		viewFileControlMenu();
 	});
 });
 
@@ -22,6 +23,8 @@ window.addEventListener('popstate', function(event) {
 function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHistory = true) {
 	$("#fileList").html("");
 	$("#loadingList").addClass("act");
+	$("#checkAllFile").prop("checked", false);
+	viewFileControlMenu();
 
 	if(!path) path = $("#path").val();
 	if(!sort) sort = $("#sort").val();
@@ -197,11 +200,27 @@ function toggleHiddenCheck() {
 	loadFileList('','','','');
 }
 
-// select file with background color
+// when select or unselect file
 $(document).on("change", ".checkFile", function(){
 	if($(this).is(":checked")) {
 		$(this).closest("table").addClass("checked");
 	} else {
 		$(this).closest("table").removeClass("checked");
 	}
+	viewFileControlMenu();	
 });
+
+// view file control menu
+function viewFileControlMenu() {
+	if($(".fileTable").hasClass("checked")) {
+		$("#fileControlMenu").removeClass("inactive");
+	} else {
+		$("#fileControlMenu").addClass("inactive");
+	}
+	makeFileControlMenu();
+}
+
+// make file control menu
+function makeFileControlMenu() {
+	$("#fileControlMenu").html($("input:checkbox[name=checkedFile]:checked").length);
+}

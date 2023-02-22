@@ -64,6 +64,11 @@
 		</div>
 	</div>
 </div>
+
+<div class="position-fixed shadow border border-secondary rounded bg-body-tertiary p-3 inactive" id="fileControlMenu">
+	테스트
+</div>
+
 <div class="col-12" id="fileListContainer">
 	<div id="fileList" class="px-2"></div>
 	<div id="loadingList" class="text-center m-2"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading... </div>
