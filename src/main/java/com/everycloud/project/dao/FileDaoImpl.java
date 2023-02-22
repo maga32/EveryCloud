@@ -24,14 +24,16 @@ public class FileDaoImpl implements FileDao {
 		if(file.isFile()) {
 			fileList.add(file);
 		} else {
-	    	list = file.listFiles(fileFilter(viewHidden));
-	    	if(!keyword.equals("")) {
-				for(File subFile : list) {
-				    if(subFile.getName().toLowerCase().contains(keyword)) fileList.add(subFile);
-				    if(subFile.isDirectory()) addFileList(subFile.getAbsolutePath(), viewHidden, keyword, fileList);
+			list = file.listFiles(fileFilter(viewHidden));
+			if(list != null) {
+		    	if(!keyword.equals("")) {
+					for(File subFile : list) {
+					    if(subFile.getName().toLowerCase().contains(keyword)) fileList.add(subFile);
+					    if(subFile.isDirectory()) addFileList(subFile.getAbsolutePath(), viewHidden, keyword, fileList);
+					}
+				} else {
+					fileList.addAll(Arrays.asList(list));
 				}
-			} else {
-				fileList.addAll(Arrays.asList(list));
 			}
 		}
 	}
