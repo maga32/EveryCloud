@@ -96,28 +96,28 @@ function pathLink(path) {
 		parentsLink += parents[i] + "/";
 		if(!parents[0]) parents[0] = "root";
 		if(parents[i+2]) {
-			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\">" + parents[i] + "</div>\n";
+			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" style='white-space:normal'>" + parents[i] + "</div>\n";
 		} else if(parents[i+1]) {
-			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></span>\n<span><i class='fa-solid fa-angle-right'></i> </span>\n";
+			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></div>\n<div><i class='fa-solid fa-angle-right'></i> </div>\n";
 		} else if(parents[i]) {
-			parentHtml += "<span class='mx-2'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></span>\n";
+			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></div>\n";
 		}
 	}
 
-	let resultHtml = "";
+	let resultHtml = "<div class='d-flex'>";
 
 	if(parents.length >2) {
 		resultHtml += 	"<div class='btn-group'>"
 					+		"<span class='dropdown-toggle pointer' data-bs-toggle='dropdown' aria-expanded='false'>"
 					+			"<i class='fa-solid fa-house'></i>"
 					+		"</span>"
-					+		"<span class='dropdown-menu dropdown-menu-start'>"
+					+		"<span class='dropdown-menu dropdown-menu-start' style='max-width:300px; word-break:break-all;'>"
 					+			parentsHtml
 					+		"</span>"
 					+	"</div>";
 	}
 
-	resultHtml += parentHtml;
+	resultHtml += parentHtml + "</div>";
 
 	return resultHtml;
 }
@@ -134,22 +134,24 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	fileHtml += "<label class='w-100 pe-2 pe-md-5'>\n";
 	fileHtml += "<table class='w-100 rounded fileTable'>\n";
 	fileHtml += 	"<tr>\n";
-	fileHtml += 		"<td rowspan='2' class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
-	fileHtml += 		"<td rowspan='2' class='text-center py-2' style='width:80px;'>\n";
+	fileHtml += 		"<td class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
+	fileHtml += 		"<td class='text-center py-2' style='width:80px;'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
 		fileHtml +=			"<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
 	} else {
 		fileHtml +=			"<img src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
 	}
 	fileHtml += 		"</td>\n";
-	fileHtml += 		"<td colspan='3' class='text-break w-auto'>\n";
-	fileHtml += 			"<span " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "" ) + ">"+ name + "</span>\n";
+	fileHtml += 		"<td class='w-auto'>\n";
+	fileHtml += 			"<div " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "" ) + " style='word-break:break-all'>"+ name + "</div>\n";
+	fileHtml += 			"<div class='text-gray d-flex align-items-center'>\n";
+	fileHtml += 				"<div class='flex-shrink-0' style='width:60px;'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</div>\n";
+	fileHtml += 				"<div class='flex-grow-1' style='word-break:break-all; flex-basis: 110px; padding: 0 10px;'>\n";
+	fileHtml += 					"<div style='min-width:55px; " + ( $("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension] )  + "</div>\n";
+	fileHtml += 				"</div>\n";
+	fileHtml += 				"<div style='word-break:keep-all; text-align:right'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</div>\n";
+	fileHtml += 			"</div>\n";
 	fileHtml += 		"</td>\n";
-	fileHtml += 	"</tr>\n";
-	fileHtml += 	"<tr class='text-gray'>\n";
-	fileHtml += 		"<td class='pe-2' style='width:80px;'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</td>\n";
-	fileHtml += 		"<td class='text-break'><div style='" + ($("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension])  + "</div></td>\n";
-	fileHtml += 		"<td class='text-center w-25'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += "</table>\n";
 	fileHtml += "</label>\n";
