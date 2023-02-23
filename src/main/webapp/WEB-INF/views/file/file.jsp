@@ -22,13 +22,16 @@
 				<tr>
 					<td class="w-auto">
 						<div class="row">
-							<div class="col-12 col-md-6">
+							<div class="col-12 col-md-8">
 								<span id="nowPath"></span>
 							</div>
-							<div class="col-12 col-md-6 text-end">
-								<input type="text" class="rounded-5 px-2 mx-1" id="keyword" name="keyword" size="10" value="${ keyword }" onkeypress="searchFileEnter(event)">
-								<span class="pointer" onClick="searchFileClick()"><i class="fa-solid fa-magnifying-glass"></i></span>
-								<span class="btn-group px-2">
+							<div class="col-12 col-md-4 row text-end">
+								<div class="col-4 d-md-none"></div>
+								<div class="col-6 col-md-8 px-2">
+									<input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" name="keyword" value="${ keyword }" onkeypress="searchFileEnter(event)">
+								</div>
+								<div class="col-1 col-md-2 pointer" onClick="searchFileClick()"><i class="fa-solid fa-magnifying-glass"></i></div>
+								<div class="col-1 col-md-2 ps-2">
 									<span class="pointer" data-bs-toggle="dropdown" aria-expanded="false">
 										<i class="fa-solid fa-wrench"></i>
 									</span>
@@ -37,7 +40,7 @@
 										<li><button class="dropdown-item" type="button">Another action</button></li>
 										<li><button class="dropdown-item" type="button">Something else here</button></li>
 									</ul>
-								</span>
+								</div>
 							</div>
 						</div>
 					</td>

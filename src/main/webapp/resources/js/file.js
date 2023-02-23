@@ -147,8 +147,8 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	fileHtml += 		"</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += 	"<tr class='text-gray'>\n";
-	fileHtml += 		"<td class='w-auto pe-2'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</td>\n";
-	fileHtml += 		"<td class='w-auto'><div style='" + ($("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension])  + "</div></td>\n";
+	fileHtml += 		"<td class='pe-2' style='width:80px;'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</td>\n";
+	fileHtml += 		"<td class='text-break'><div style='" + ($("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension])  + "</div></td>\n";
 	fileHtml += 		"<td class='text-center w-25'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</td>\n";
 	fileHtml += 	"</tr>\n";
 	fileHtml += "</table>\n";
@@ -222,5 +222,7 @@ function viewFileControlMenu() {
 
 // make file control menu
 function makeFileControlMenu() {
-	$("#fileControlMenu").html($("input:checkbox[name=checkedFile]:checked").length);
+	let fileControlHtml = "";
+	const cntSelected = $("input:checkbox[name=checkedFile]:checked").length;
+	$("#fileControlMenu").html(cntSelected);
 }

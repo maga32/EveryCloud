@@ -34,8 +34,17 @@
 	z-index: 20;
 }
 
+#keyword {
+	color: var(--bs-body-color);
+	background-color: var(--bs-form-control-bg);
+}
+
 .inactive {
 	display: none;
+}
+
+.fileTable {
+	table-layout : fixed ;
 }
 
 .fileTable:hover {
