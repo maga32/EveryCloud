@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ApiController {
 	
-	public static final int MAX_SIZE = 64;
+	public static final int MAX_SIZE = 128;
 	
 	@RequestMapping("/api/thumbnailmaker")
 	public void thumbnailMaker(String name, HttpServletResponse response) throws IOException {

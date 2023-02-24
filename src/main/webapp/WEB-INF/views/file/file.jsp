@@ -47,7 +47,7 @@
 						<span class="pointer" id="nameSort" onClick="loadFileList('', 'name', '')">이름${ sort eq 'name' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
 						<span class="pointer px-3" id="sizeSort" onClick="loadFileList('', 'size','')">크기${ sort eq 'size' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
 					</td>
-					<td class="text-center" style="width:10%">
+					<td class="text-end" style="width:15%">
 						<span class="pointer" id="typeSort" onClick="loadFileList('', 'type','')">종류${ sort eq 'type' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
 						<span class="pointer d-none" id="pathSort" onClick="loadFileList('', 'path','')">경로${ sort eq 'path' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
 					</td>

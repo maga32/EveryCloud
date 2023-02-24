@@ -137,13 +137,15 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	fileHtml += 		"<td class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
 	fileHtml += 		"<td class='text-center py-2' style='width:80px;'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml +=			"<img src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "'>\n"
+		fileHtml +=			"<img class='fileImg' src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
 	} else {
-		fileHtml +=			"<img src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
+		fileHtml +=			"<img class='fileImg' src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
 	}
 	fileHtml += 		"</td>\n";
 	fileHtml += 		"<td class='w-auto'>\n";
-	fileHtml += 			"<div " + ( extension == "folder" ? "class='pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "" ) + " style='word-break:break-all'>"+ name + "</div>\n";
+	fileHtml += 			"<div>\n";
+	fileHtml += 				"<span class='fileName " + ( extension == "folder" ? "pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "'" ) + " style='word-break:break-all'>"+ name + "</span>\n";
+	fileHtml += 			"</div>\n";
 	fileHtml += 			"<div class='text-gray d-flex align-items-center'>\n";
 	fileHtml += 				"<div class='flex-shrink-0' style='width:60px;'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</div>\n";
 	fileHtml += 				"<div class='flex-grow-1' style='word-break:break-all; flex-basis: 110px; padding: 0 10px;'>\n";
@@ -226,5 +228,32 @@ function viewFileControlMenu() {
 function makeFileControlMenu() {
 	let fileControlHtml = "";
 	const cntSelected = $("input:checkbox[name=checkedFile]:checked").length;
-	$("#fileControlMenu").html(cntSelected);
+
+	if(cntSelected > 1) {
+		fileControlHtml += "<div class='px-1'>" + cntSelected + "개의 파일 선택</div>\n";
+		fileControlHtml += "<div class='text-center px-2 py-3'><img src='/resources/img/fileicons/files.png'></div>\n";
+		fileControlHtml += "<table>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-cloud-arrow-down'></i></td>\n";
+		fileControlHtml += 			"<td class='p-1'>다운로드</td>\n";
+		fileControlHtml += 		"</tr>\n"
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share'></i></td>\n";
+		fileControlHtml += 			"<td class='p-1'>이동</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-clipboard'></i></td>\n"
+		fileControlHtml += 			"<td class='p-1'>복제</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-trash'></i></td>\n";
+		fileControlHtml += 			"<td class='p-1'>삭제</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += "</table>\n";
+	} else {
+		fileControlHtml += "<div class='px-1' style='word-break:break-all;'>" + $("table.checked .fileName").text() + "</div>\n";
+		fileControlHtml += "<div class='text-center px-2 py-3'><img src='" + $("table.checked img").attr("src") + "' style='min-width:64px;'></div>\n";
+	}
+
+	$("#fileControlMenu").html(fileControlHtml);
 }
