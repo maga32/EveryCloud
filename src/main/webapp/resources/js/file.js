@@ -253,6 +253,30 @@ function makeFileControlMenu() {
 	} else {
 		fileControlHtml += "<div class='px-1' style='word-break:break-all;'>" + $("table.checked .fileName").text() + "</div>\n";
 		fileControlHtml += "<div class='text-center px-2 py-3'><img src='" + $("table.checked img").attr("src") + "' style='min-width:64px;'></div>\n";
+		fileControlHtml += "<table>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-star'></i></td>\n";
+		fileControlHtml += 			"<td class='p-1'>즐겨찾기</td>\n";
+		fileControlHtml += 		"</tr>\n"
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-pen-to-square'></i></td>\n";
+		fileControlHtml += 			"<td class='p-1'>이름바꾸기</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share-nodes'></i></td>\n"
+		fileControlHtml += 			"<td class='p-1'>공유</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 			"<td colspan='2' class='p-2'>\n";
+		fileControlHtml += 				"<div class='btn-group'>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-share'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-clipboard'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-trash'></i></button>\n";
+		fileControlHtml += 				"</div>\n";
+		fileControlHtml += 			"</td>\n";
+		fileControlHtml += 		"</tr>\n";
+		fileControlHtml += "</table>\n";
 	}
 
 	$("#fileControlMenu").html(fileControlHtml);
