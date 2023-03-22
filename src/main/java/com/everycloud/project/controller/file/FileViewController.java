@@ -64,4 +64,16 @@ public class FileViewController {
 		
 		return map;
 	}
+	
+	@RequestMapping("/chageName")
+	@ResponseBody
+	public Map<String,Object> chageName(@RequestParam("path") String path,
+			@RequestParam("origFileName") String origFileName, @RequestParam("newFileName") String newFileName) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		fileService.changeName(path, origFileName, newFileName);
+		
+		map.put("result", "ok");
+		return map;
+	}
 }

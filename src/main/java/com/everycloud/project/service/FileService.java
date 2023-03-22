@@ -10,4 +10,6 @@ public interface FileService {
 	File getFile(String path);
 	
 	boolean isPathExist(String path);
+
+	void changeName(String path, String origFileName, String newFileName);
 }

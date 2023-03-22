@@ -59,4 +59,13 @@ public class FileDaoImpl implements FileDao {
 		return file.exists();
 	}
 
+	@Override
+	public void changeName(String path, String origFileName, String newFileName) {
+		File origFile = new File(path + File.separator + origFileName);
+		File newFile = new File(path + File.separator + newFileName);
+		if(origFile.exists()) {
+			origFile.renameTo(newFile);
+		}
+	}
+
 }

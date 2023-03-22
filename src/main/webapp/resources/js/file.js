@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(document).ready(function() {
 	loadFileList($("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
 
 	$("#checkAllFile").click(function(){
@@ -260,7 +260,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 		"</tr>\n"
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-pen-to-square'></i></td>\n";
-		fileControlHtml += 			"<td class='p-1'>이름바꾸기</td>\n";
+		fileControlHtml += 			"<td class='p-1 pointer' onclick=\"changeFileName()\" data-bs-toggle='modal' data-bs-target='#functionModal'>이름바꾸기</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share-nodes'></i></td>\n"
@@ -280,4 +280,39 @@ function makeFileControlMenu() {
 	}
 
 	$("#fileControlMenu").html(fileControlHtml);
+}
+
+// change the file name
+function changeFileName() {
+	let htmlText = "<input type='text' class='form-control' id='newFileName' value='" + $("input:checkbox[name=checkedFile]:checked").val() + "'>"
+				+ "<input type='hidden' id='functionModalAct' value='changeName'>";
+	$("#functionModalLabel").text("이름변경");
+	$("#functionModalBody").html(htmlText);
+}
+
+// execute function
+function functionModalAffect() {
+	let action = $("#functionModalAct").val();
+	let data = "";
+	let url = "";
+	
+	if(action == "changeName") {
+		data = "path=" + $("#path").val() + "&origFileName=" + $("input:checkbox[name=checkedFile]:checked").val() + "&newFileName=" + $("#newFileName").val();
+		url = "chageName";
+	}
+
+	$.ajax({
+		url: url,
+		type: "post",
+		data: data,
+		success: function(result) {
+			console.log(result);
+		},
+		error: function() {
+			console.log("error");
+		},
+		complete: function() {
+			loadFileList('','','','');
+		}
+	});
 }

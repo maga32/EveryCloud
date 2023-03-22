@@ -92,4 +92,9 @@ public class FileServiceImpl implements FileService {
 		return fileDao.isPathExist(path);
 	}
 
+	@Override
+	public void changeName(String path, String origFileName, String newFileName) {
+		fileDao.changeName(path, origFileName, newFileName);
+	}
+
 }
