@@ -235,7 +235,7 @@ function makeFileControlMenu() {
 		fileControlHtml += "<table>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-cloud-arrow-down'></i></td>\n";
-		fileControlHtml += 			"<td class='p-1'>다운로드</td>\n";
+		fileControlHtml += 			"<td class='p-1' onclick=\"downloadFiles()\">다운로드</td>\n";
 		fileControlHtml += 		"</tr>\n"
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share'></i></td>\n";
@@ -269,7 +269,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td colspan='2' class='p-2'>\n";
 		fileControlHtml += 				"<div class='btn-group'>\n";
-  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"downloadFiles()\"><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-share'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-clipboard'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-trash'></i></button>\n";
@@ -290,12 +290,20 @@ function changeFileName() {
 	$("#functionModalBody").html(htmlText);
 }
 
+// download files
+function downloadFiles() {
+	let fileNames = "";
+	$("input:checkbox[name=checkedFile]:checked").each(function() { fileNames += $(this).val() + ",";});
+	fileNames = fileNames.slice(0, -1);
+	window.open("/fileDownload?path=" + $("#path").val() + "&fileNames=" + fileNames);
+}
+
 // execute function
 function functionModalAffect() {
 	let action = $("#functionModalAct").val();
 	let data = "";
 	let url = "";
-	
+
 	if(action == "changeName") {
 		data = "path=" + $("#path").val() + "&origFileName=" + $("input:checkbox[name=checkedFile]:checked").val() + "&newFileName=" + $("#newFileName").val();
 		url = "chageName";

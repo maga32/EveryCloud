@@ -1,11 +1,22 @@
 package com.everycloud.project.controller.file;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -76,4 +87,59 @@ public class FileViewController {
 		map.put("result", "ok");
 		return map;
 	}
+	
+	@RequestMapping("/fileDownload")
+	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
+			@RequestParam("fileNames") String fileNames) throws Exception {
+		String[] fileList = fileNames.split(",");
+		File firstFile = new File(path+ File.separator + fileList[0]);
+		
+		if(fileList.length!=1 || firstFile.isDirectory()) { // when multiple files selected or selected one is folder.
+			String downName ="downloads";
+			response.setContentType("application/octet-stream");
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + new String(downName.getBytes("utf-8"),"8859_1")+".zip" + "\";");
+			ZipOutputStream out = new ZipOutputStream(response.getOutputStream());
+			
+        	for (String fileName : fileList) {
+        		File file = new File(path + File.separator + fileName);
+        		addDownloadFile(out, file, "");
+            }
+        	
+        	out.close();
+        	
+		} else {	// when selected only one file
+			if(firstFile.isFile()) {
+				byte[] fileByte = FileUtils.readFileToByteArray(firstFile);
+				
+    			response.setContentType("application/octet-stream");
+    			response.setHeader("Content-Disposition", "attachment; fileName=\"" +new String(fileList[0].getBytes("utf-8"),"8859_1") +"\";");
+    			response.setHeader("Content-Transfer-Encoding", "binary");
+    			response.setContentLength(fileByte.length);
+    			response.getOutputStream().write(fileByte);
+    			response.getOutputStream().flush();
+    			response.getOutputStream().close();
+            }
+		}
+	}
+	
+	private static void addDownloadFile(ZipOutputStream out, File file, String path) throws IOException {
+		if (file.isDirectory()) {
+			for (File f : file.listFiles()) {
+				addDownloadFile(out, f, path + file.getName() + File.separator);
+			}
+			return;
+		}
+
+		FileInputStream in = new FileInputStream(file);
+		out.putNextEntry(new ZipEntry(path + file.getName()));
+
+		int len;
+		byte[] buf = new byte[4096];
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		out.closeEntry();
+	}
+
+
 }
