@@ -12,4 +12,6 @@ public interface FileService {
 	boolean isPathExist(String path);
 
 	void changeName(String path, String origFileName, String newFileName);
+
+	Map<String, Object> deleteFiles(String path, String fileNames);
 }

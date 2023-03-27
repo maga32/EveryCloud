@@ -97,4 +97,20 @@ public class FileServiceImpl implements FileService {
 		fileDao.changeName(path, origFileName, newFileName);
 	}
 
+	@Override
+	public Map<String, Object> deleteFiles(String path, String fileNames) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		String[] fileList = fileNames.split(",");
+		for (String fileName : fileList) {
+    		File file = new File(path + File.separator + fileName);
+    		if(file.exists()) {
+    			fileDao.deleteFile(file);
+    		}
+        }
+		
+		map.put("result", "ok");
+		return map;
+	}
+
 }

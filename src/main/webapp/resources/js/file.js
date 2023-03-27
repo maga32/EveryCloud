@@ -233,7 +233,7 @@ function makeFileControlMenu() {
 		fileControlHtml += "<div class='px-1'>" + cntSelected + "개의 파일 선택</div>\n";
 		fileControlHtml += "<div class='text-center px-2 py-3'><img src='/resources/img/fileicons/files.png'></div>\n";
 		fileControlHtml += "<table>\n";
-		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-cloud-arrow-down'></i></td>\n";
 		fileControlHtml += 			"<td class='p-1' onclick=\"downloadFiles()\">다운로드</td>\n";
 		fileControlHtml += 		"</tr>\n"
@@ -245,9 +245,9 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-clipboard'></i></td>\n"
 		fileControlHtml += 			"<td class='p-1'>복제</td>\n";
 		fileControlHtml += 		"</tr>\n";
-		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-trash'></i></td>\n";
-		fileControlHtml += 			"<td class='p-1'>삭제</td>\n";
+		fileControlHtml += 			"<td class='p-1 pointer' onclick=\"deleteFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'>삭제</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += "</table>\n";
 	} else {
@@ -272,7 +272,7 @@ function makeFileControlMenu() {
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"downloadFiles()\"><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-share'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-clipboard'></i></button>\n";
-  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-trash'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"deleteFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-trash'></i></button>\n";
 		fileControlHtml += 				"</div>\n";
 		fileControlHtml += 			"</td>\n";
 		fileControlHtml += 		"</tr>\n";
@@ -290,10 +290,21 @@ function changeFileName() {
 	$("#functionModalBody").html(htmlText);
 }
 
+// delete files
+function deleteFiles() {
+	let fileNames = "";
+	$("input:checkbox[name=checkedFile]:checked").each(function() {fileNames += $(this).val() + "<br>";});
+	let htmlText = "<div class='text-danger'>아래 " + $("input:checkbox[name=checkedFile]:checked").length + "개의 파일을 삭제하시겠습니까?</div><br>"
+				+ fileNames
+				+ "<input type='hidden' id='functionModalAct' value='deleteFiles'>";
+	$("#functionModalLabel").text("파일삭제");
+	$("#functionModalBody").html(htmlText);
+}
+
 // download files
 function downloadFiles() {
 	let fileNames = "";
-	$("input:checkbox[name=checkedFile]:checked").each(function() { fileNames += $(this).val() + ",";});
+	$("input:checkbox[name=checkedFile]:checked").each(function() {fileNames += $(this).val() + ",";});
 	fileNames = fileNames.slice(0, -1);
 	window.open("/fileDownload?path=" + $("#path").val() + "&fileNames=" + fileNames);
 }
@@ -303,24 +314,35 @@ function functionModalAffect() {
 	let action = $("#functionModalAct").val();
 	let data = "";
 	let url = "";
+	let selectedFiles = "";
+	$("input:checkbox[name=checkedFile]:checked").each(function() {selectedFiles += $(this).val() + ",";});
+	selectedFiles = selectedFiles.slice(0, -1);
 
 	if(action == "changeName") {
-		data = "path=" + $("#path").val() + "&origFileName=" + $("input:checkbox[name=checkedFile]:checked").val() + "&newFileName=" + $("#newFileName").val();
+		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + $("#newFileName").val();
 		url = "chageName";
 	}
+
+	if(action == "deleteFiles") {
+		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
+		url = "deleteFiles";
+	}
+
+	$("#fileList").addClass("d-none");
+	$("#loadingList").addClass("act");
 
 	$.ajax({
 		url: url,
 		type: "post",
 		data: data,
 		success: function(result) {
-			console.log(result);
+			loadFileList('','','','');
 		},
 		error: function() {
 			console.log("error");
 		},
 		complete: function() {
-			loadFileList('','','','');
+			$("#fileList").removeClass("d-none");
 		}
 	});
 }

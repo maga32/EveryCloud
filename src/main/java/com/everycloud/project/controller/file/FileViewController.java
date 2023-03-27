@@ -141,5 +141,13 @@ public class FileViewController {
 		out.closeEntry();
 	}
 
-
+	@RequestMapping("/deleteFiles")
+	@ResponseBody
+	public Map<String,Object> deleteFiles(@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.putAll(fileService.deleteFiles(path,fileNames));
+		
+		return map;
+	}
 }

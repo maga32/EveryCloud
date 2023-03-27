@@ -71,7 +71,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="functionModal" tabindex="-1" aria-labelledby="functionModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h1 class="modal-title fs-5" id="functionModalLabel"></h1>
@@ -80,8 +80,8 @@
 			<div class="modal-body" id="functionModalBody">
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="functionModalAffect()">Save</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="functionModalAffect()">확인</button>
 			</div>
 		</div>
 	</div>

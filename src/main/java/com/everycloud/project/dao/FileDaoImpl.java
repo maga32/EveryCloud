@@ -68,4 +68,17 @@ public class FileDaoImpl implements FileDao {
 		}
 	}
 
+	@Override
+	public void deleteFile(File file) {
+		if(file.isFile()) {
+			file.delete();
+		} else {
+			File[] deleteFolderList = file.listFiles();
+			for(File deleteOne : deleteFolderList) {
+				deleteFile(deleteOne);
+			}
+			file.delete();
+		}
+	}
+
 }

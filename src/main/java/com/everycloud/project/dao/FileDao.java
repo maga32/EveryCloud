@@ -10,4 +10,6 @@ public interface FileDao {
 	boolean isPathExist(String path);
 
 	void changeName(String path, String origFileName, String newFileName);
+
+	void deleteFile(File file);
 }
