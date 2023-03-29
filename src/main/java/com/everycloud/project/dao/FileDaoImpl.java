@@ -2,6 +2,9 @@ package com.everycloud.project.dao;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +49,19 @@ public class FileDaoImpl implements FileDao {
 	        return file -> !file.isHidden();
 	    }
 	}
+
+	@Override
+	public File[] getFolderList(String path) {
+		File file = new File(path);
+	    File[] list = file.listFiles(folderFilter());
+	    
+		return list;
+	}
+	
+	// only view folder filter
+	private FileFilter folderFilter() {
+	    return file -> file.isDirectory();
+	}
 	
 	@Override
 	public File getFile(String path) {
@@ -60,11 +76,33 @@ public class FileDaoImpl implements FileDao {
 	}
 
 	@Override
+	public void newFolder(String path, String newFolderName) {
+		File newFolder = new File(path + File.separator + newFolderName);
+		newFolder.mkdir();
+	}
+
+	@Override
+	public void newFile(String path, String newFileName) throws IOException {
+		File newFile = new File(path + File.separator + newFileName);
+		newFile.createNewFile();
+	}
+
+	@Override
 	public void changeName(String path, String origFileName, String newFileName) {
 		File origFile = new File(path + File.separator + origFileName);
 		File newFile = new File(path + File.separator + newFileName);
 		if(origFile.exists()) {
 			origFile.renameTo(newFile);
+		}
+	}
+
+	@Override
+	public void moveFiles(File file, String moveToPath) {
+		File newFile = new File(moveToPath + File.separator + file.getName());
+		try {
+			Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

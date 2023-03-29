@@ -81,7 +81,25 @@ public class FileServiceImpl implements FileService {
 		}
 		return fileList;
 	}
-
+	
+	@Override
+	public List<Map<String, Object>> folderList(String path) {
+		List<Map<String, Object>> folderList = new ArrayList<Map<String,Object>>();
+		File[] files = fileDao.getFolderList(path);
+		
+		for(File i : files) {
+			Map<String, Object> param = new HashMap<String, Object>();
+			
+			param.put("getName", i.getName());
+			param.put("getPath", i.getPath());
+			param.put("lastModified", i.lastModified());
+			param.put("length", i.length());
+			
+			folderList.add(param);
+		}
+		
+		return folderList;
+	}
 	@Override
 	public File getFile(String path) {
 		return fileDao.getFile(path);
@@ -93,8 +111,50 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
+	public Map<String, Object> newFolder(String path, String newFolderName) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(fileDao.isPathExist(path + File.separator + newFolderName)) {
+			map.put("result", "이미 폴더명이 존재합니다.");
+			return map;
+		}
+		
+		fileDao.newFolder(path, newFolderName);
+		map.put("result", "ok");
+		return map;
+	}
+
+	@Override
+	public Map<String, Object> newFile(String path, String newFileName) throws IOException {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(fileDao.isPathExist(path + File.separator + newFileName)) {
+			map.put("result", "이미 파일명이 존재합니다.");
+			return map;
+		}
+		
+		fileDao.newFile(path, newFileName);
+		map.put("result", "ok");
+		return map;
+	}
+
+	@Override
 	public void changeName(String path, String origFileName, String newFileName) {
 		fileDao.changeName(path, origFileName, newFileName);
+	}
+
+	@Override
+	public Map<String, Object> moveFiles(String path, String moveToPath, String fileNames) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		String[] fileList = fileNames.split(",");
+		for (String fileName : fileList) {
+    		File file = new File(path + File.separator + fileName);
+    		if(file.exists()) {
+    			fileDao.moveFiles(file, moveToPath);
+    		}
+        }
+		
+		map.put("result", "ok");
+		return map;
 	}
 
 	@Override

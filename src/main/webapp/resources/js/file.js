@@ -237,9 +237,9 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-cloud-arrow-down'></i></td>\n";
 		fileControlHtml += 			"<td class='p-1' onclick=\"downloadFiles()\">다운로드</td>\n";
 		fileControlHtml += 		"</tr>\n"
-		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share'></i></td>\n";
-		fileControlHtml += 			"<td class='p-1'>이동</td>\n";
+		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'>이동</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-clipboard'></i></td>\n"
@@ -250,7 +250,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td class='p-1 pointer' onclick=\"deleteFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'>삭제</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += "</table>\n";
-	} else {
+	} else if(cntSelected == 1) {
 		fileControlHtml += "<div class='px-1' style='word-break:break-all;'>" + $("table.checked .fileName").text() + "</div>\n";
 		fileControlHtml += "<div class='text-center px-2 py-3'><img src='" + $("table.checked img").attr("src") + "' style='min-width:64px;'></div>\n";
 		fileControlHtml += "<table>\n";
@@ -270,7 +270,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td colspan='2' class='p-2'>\n";
 		fileControlHtml += 				"<div class='btn-group'>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"downloadFiles()\"><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
-  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-share'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"moveFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-share'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-clipboard'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"deleteFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-trash'></i></button>\n";
 		fileControlHtml += 				"</div>\n";
@@ -282,12 +282,124 @@ function makeFileControlMenu() {
 	$("#fileControlMenu").html(fileControlHtml);
 }
 
+// create new directory
+function newFolder() {
+	let htmlText = "<input type='text' class='form-control' id='newFolderName' placeholder='폴더명을 입력해주세요'>"
+				+ "<input type='hidden' id='functionModalAct' value='newFolder'>";
+	$("#functionModalLabel").text("폴더 만들기");
+	$("#functionModalBody").html(htmlText);
+}
+
+// create new file
+function newFile() {
+	let htmlText = "<input type='text' class='form-control' id='newFileName' placeholder='파일명을 입력해주세요'>"
+				+ "<input type='hidden' id='functionModalAct' value='newFile'>";
+	$("#functionModalLabel").text("파일 만들기");
+	$("#functionModalBody").html(htmlText);
+}
+
 // change the file name
 function changeFileName() {
 	let htmlText = "<input type='text' class='form-control' id='newFileName' value='" + $("input:checkbox[name=checkedFile]:checked").val() + "'>"
 				+ "<input type='hidden' id='functionModalAct' value='changeName'>";
 	$("#functionModalLabel").text("이름변경");
 	$("#functionModalBody").html(htmlText);
+}
+
+// move files
+function moveFiles(path="") {
+	if(!path) path = decodeURIComponent($("#path").val());
+	let htmlText = loadFolderList(path) 
+				+ "<input type='hidden' id='moveToPath' value='" + path + "'>"
+				+ "<input type='hidden' id='functionModalAct' value='moveFiles'>";
+	let modalLabelHtml = "이동 : " + path
+					+	"<div class='d-flex pt-4 align-items-center'>"
+					+		"<div class='d-none w-100 pe-4' id='moveFilesNewFolderOpen'>"
+					+			"<input type='text' class='form-control' id='moveFilesNewFolderName' name='moveFilesNewFolderName'>"
+					+		"</div>"
+					+		"<div class='flex-shrink-1 pointer' onclick='moveFilesNewFolder()'><i class='fa-solid fa-folder-plus'></i></div>"
+					+	"</div>";
+	$("#functionModalLabel").html(modalLabelHtml);
+	$("#functionModalBody").html(htmlText);
+}
+
+// folder lists for move files
+function loadFolderList(path) {
+	let data = "path=" + path;
+	let listHtml = "<table>";
+
+	$.ajax({
+		url: "folderList",
+		type: "post",
+		async: false,
+		data: data,
+		success: function(result) {
+			if(result.validPath) {
+				const folderList = result.folderList;
+
+				listHtml += "<tr class='pointer' onclick=moveFiles('" + path.replace(/\b\/[^/]*$|[^:/]*$/, "") + "')>\n"
+						+ 		"<td class='text-center py-2' style='width:50px;'>\n"
+						+ 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n"
+						+ 		"</td>\n"
+						+		"<td class='w-auto'>..</td>\n"
+						+ 	"</tr>\n";
+
+				for(i in folderList) {
+					listHtml += makeFolderList(folderList[i].getPath, folderList[i].getName);
+				}
+
+			} else {
+				listHtml += "<tr><td>잘못된 경로입니다.</td></tr>";
+			}
+		},
+		error: function() {
+			listHtml += "<tr><td>잘못된 접근입니다.</td></tr>";
+		},
+		complete: function() {
+			listHtml += "</table>";
+		}
+	});
+
+	return listHtml;
+}
+
+// create new folder when changing files path
+function moveFilesNewFolder() {
+	if($("#moveFilesNewFolderOpen").hasClass("d-none")) {
+		$("#moveFilesNewFolderOpen").removeClass("d-none");
+	} else {
+		$.ajax({
+			url: "newFolder",
+			type: "post",
+			data: "path=" + $("#moveToPath").val() + "&newFolderName=" + $("#moveFilesNewFolderName").val(),
+			success: function(result) {
+				if(result.result != "ok") {
+					alert(result.result);
+					return false;
+				}
+			},
+			error: function() {
+				console.log("error");
+			},
+			complete: function() {
+				moveFiles($("#moveToPath").val()+"/"+$("#moveFilesNewFolderName").val());
+			}
+		});
+	}
+}
+
+// make a folder list each line for move files
+function makeFolderList(path, name) {
+	let makeFolderListHtml = "<tr class='pointer' onclick=moveFiles('" + path.replace(/\\/g, "/") + "')>\n";
+	makeFolderListHtml += 		"<td class='text-center py-2' style='width:50px;'>\n";
+    makeFolderListHtml += 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n";
+    makeFolderListHtml += 		"</td>\n";
+    makeFolderListHtml += 		"<td class='w-auto'>\n";
+    makeFolderListHtml += 			"<div>" + name + "</div>\n";
+    makeFolderListHtml += 		"</td>\n";
+	makeFolderListHtml += "</tr>\n";
+
+	return makeFolderListHtml;
 }
 
 // delete files
@@ -304,7 +416,7 @@ function deleteFiles() {
 // download files
 function downloadFiles() {
 	let fileNames = "";
-	$("input:checkbox[name=checkedFile]:checked").each(function() {fileNames += $(this).val() + ",";});
+	$("input:checkbox[name=checkedFile]:checked").each(function() {fileNames += encodeURIComponent($(this).val()) + ",";});
 	fileNames = fileNames.slice(0, -1);
 	window.open("/fileDownload?path=" + $("#path").val() + "&fileNames=" + fileNames);
 }
@@ -315,17 +427,44 @@ function functionModalAffect() {
 	let data = "";
 	let url = "";
 	let selectedFiles = "";
-	$("input:checkbox[name=checkedFile]:checked").each(function() {selectedFiles += $(this).val() + ",";});
+	let errorMsg = "";
+
+	$("input:checkbox[name=checkedFile]:checked").each(function() {selectedFiles += encodeURIComponent($(this).val()) + ",";});
 	selectedFiles = selectedFiles.slice(0, -1);
 
-	if(action == "changeName") {
-		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + $("#newFileName").val();
-		url = "chageName";
-	}
+	if(action == "newFolder") {
+		let newFolderName = encodeURIComponent($("#newFolderName").val());
+		if(!newFolderName) errorMsg+= "폴더명을 적어주세요.";
 
-	if(action == "deleteFiles") {
+		data = "path=" + $("#path").val() + "&newFolderName=" + newFolderName;
+		url = "newFolder";
+	} else if(action == "newFile") {
+		let newFileName = encodeURIComponent($("#newFileName").val());
+		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
+
+		data = "path=" + $("#path").val() + "&newFileName=" + newFileName;
+		url = "newFile";
+	} else if(action == "changeName") {
+		let newFileName = encodeURIComponent($("#newFileName").val());
+		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
+
+		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName;
+		url = "chageName";
+	} else if(action == "deleteFiles") {
 		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
 		url = "deleteFiles";
+	} else if(action == "moveFiles") {
+		let moveToPath = encodeURIComponent($("#moveToPath").val());
+		let path = $("#path").val();
+		if(moveToPath == path) errorMsg+= "현재 위치와 동일합니다.";
+
+		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath;
+		url = "moveFiles";
+	}
+
+	if(errorMsg) {
+		alert(errorMsg);
+		return false;
 	}
 
 	$("#fileList").addClass("d-none");
@@ -336,12 +475,13 @@ function functionModalAffect() {
 		type: "post",
 		data: data,
 		success: function(result) {
-			loadFileList('','','','');
+			if(result.result != "ok") alert(result.result);
 		},
 		error: function() {
 			console.log("error");
 		},
 		complete: function() {
+			loadFileList('','','','');
 			$("#fileList").removeClass("d-none");
 		}
 	});

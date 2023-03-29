@@ -76,6 +76,47 @@ public class FileViewController {
 		return map;
 	}
 	
+	@RequestMapping("/folderList")
+	@ResponseBody
+	public Map<String,Object> folderList(@RequestParam("path") String path) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean validPath = fileService.isPathExist(path);
+
+		if(validPath) {
+			File nowPath = fileService.getFile(path);
+			// windows folder path processing
+			path = path.replaceAll("\\\\", "/");
+			
+			map.put("folderList", fileService.folderList(path));
+			map.put("nowPath", nowPath);
+		}
+		
+		map.put("path", path);
+		map.put("validPath", validPath);
+		
+		return map;
+	}
+	
+	@RequestMapping("/newFolder")
+	@ResponseBody
+	public Map<String,Object> newFolder(@RequestParam("path") String path, @RequestParam("newFolderName") String newFolderName) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.putAll(fileService.newFolder(path, newFolderName));
+		
+		return map;
+	}
+	
+	@RequestMapping("/newFile")
+	@ResponseBody
+	public Map<String,Object> newFile(@RequestParam("path") String path, @RequestParam("newFileName") String newFileName) throws IOException {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.putAll(fileService.newFile(path, newFileName));
+		
+		return map;
+	}
+	
 	@RequestMapping("/chageName")
 	@ResponseBody
 	public Map<String,Object> chageName(@RequestParam("path") String path,
@@ -141,6 +182,17 @@ public class FileViewController {
 		out.closeEntry();
 	}
 
+	@RequestMapping("/moveFiles")
+	@ResponseBody
+	public Map<String,Object> moveFiles(@RequestParam("fileNames") String fileNames,
+			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		map.putAll(fileService.moveFiles(path, moveToPath, fileNames));
+		
+		return map;
+	}
+	
 	@RequestMapping("/deleteFiles")
 	@ResponseBody
 	public Map<String,Object> deleteFiles(@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
