@@ -20,7 +20,7 @@ public interface FileService {
 
 	void changeName(String path, String origFileName, String newFileName);
 
-	Map<String, Object> moveFiles(String path, String moveToPath, String fileNames);
+	Map<String, Object> moveFiles(String path, String moveToPath, String fileNames, String type);
 
 	Map<String, Object> deleteFiles(String path, String fileNames);
 }

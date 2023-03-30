@@ -184,11 +184,11 @@ public class FileViewController {
 
 	@RequestMapping("/moveFiles")
 	@ResponseBody
-	public Map<String,Object> moveFiles(@RequestParam("fileNames") String fileNames,
+	public Map<String,Object> moveFiles(@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
 			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		map.putAll(fileService.moveFiles(path, moveToPath, fileNames));
+		map.putAll(fileService.moveFiles(path, moveToPath, fileNames, type));
 		
 		return map;
 	}

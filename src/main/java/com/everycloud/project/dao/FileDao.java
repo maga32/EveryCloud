@@ -18,7 +18,7 @@ public interface FileDao {
 
 	void changeName(String path, String origFileName, String newFileName);
 
-	void moveFiles(File file, String moveToPath);
+	void moveFiles(File file, String moveToPath, String type);
 
 	void deleteFile(File file);
 }

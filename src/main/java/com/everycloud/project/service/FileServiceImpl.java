@@ -142,14 +142,14 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
-	public Map<String, Object> moveFiles(String path, String moveToPath, String fileNames) {
+	public Map<String, Object> moveFiles(String path, String moveToPath, String fileNames, String type) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String[] fileList = fileNames.split(",");
 		for (String fileName : fileList) {
     		File file = new File(path + File.separator + fileName);
     		if(file.exists()) {
-    			fileDao.moveFiles(file, moveToPath);
+    			fileDao.moveFiles(file, moveToPath, type);
     		}
         }
 		

@@ -239,11 +239,11 @@ function makeFileControlMenu() {
 		fileControlHtml += 		"</tr>\n"
 		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share'></i></td>\n";
-		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'>이동</td>\n";
+		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles('','moveFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'>이동</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-clipboard'></i></td>\n"
-		fileControlHtml += 			"<td class='p-1'>복제</td>\n";
+		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles('','copyFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'>복사</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-trash'></i></td>\n";
@@ -270,8 +270,8 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td colspan='2' class='p-2'>\n";
 		fileControlHtml += 				"<div class='btn-group'>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"downloadFiles()\"><i class='fa-solid fa-cloud-arrow-down'></i></button>\n";
-  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"moveFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-share'></i></button>\n";
-  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary'><i class='fa-solid fa-clipboard'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"moveFiles('','moveFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-share'></i></button>\n";
+  		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"moveFiles('','copyFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-clipboard'></i></button>\n";
   		fileControlHtml += 					"<button type='button' class='btn btn-outline-secondary' onclick=\"deleteFiles()\" data-bs-toggle='modal' data-bs-target='#functionModal'><i class='fa-solid fa-trash'></i></button>\n";
 		fileControlHtml += 				"</div>\n";
 		fileControlHtml += 			"</td>\n";
@@ -288,6 +288,7 @@ function newFolder() {
 				+ "<input type='hidden' id='functionModalAct' value='newFolder'>";
 	$("#functionModalLabel").text("폴더 만들기");
 	$("#functionModalBody").html(htmlText);
+	focusById("newFolderName");
 }
 
 // create new file
@@ -296,6 +297,7 @@ function newFile() {
 				+ "<input type='hidden' id='functionModalAct' value='newFile'>";
 	$("#functionModalLabel").text("파일 만들기");
 	$("#functionModalBody").html(htmlText);
+	focusById("newFileName");
 }
 
 // change the file name
@@ -304,27 +306,38 @@ function changeFileName() {
 				+ "<input type='hidden' id='functionModalAct' value='changeName'>";
 	$("#functionModalLabel").text("이름변경");
 	$("#functionModalBody").html(htmlText);
+	focusById("newFileName");
 }
 
-// move files
-function moveFiles(path="") {
+// cursor on input box
+function focusById(id) {
+	setTimeout(()=>{
+		$("#"+id).focus();
+		$("#"+id)[0].setSelectionRange($("#"+id).val().length, $("#"+id).val().length);
+	},500)
+}
+
+/* move(or copy) files
+* type - moveFiles / copyFiles
+*/
+function moveFiles(path="", type="moveFiles") {
 	if(!path) path = decodeURIComponent($("#path").val());
-	let htmlText = loadFolderList(path) 
+	let htmlText = loadFolderList(path, type) 
 				+ "<input type='hidden' id='moveToPath' value='" + path + "'>"
-				+ "<input type='hidden' id='functionModalAct' value='moveFiles'>";
-	let modalLabelHtml = "이동 : " + path
+				+ "<input type='hidden' id='functionModalAct' value='" + type + "'>";
+	let modalLabelHtml = (type == "moveFiles" ? "이동" : "복사") + " : " + path
 					+	"<div class='d-flex pt-4 align-items-center'>"
 					+		"<div class='d-none w-100 pe-4' id='moveFilesNewFolderOpen'>"
-					+			"<input type='text' class='form-control' id='moveFilesNewFolderName' name='moveFilesNewFolderName'>"
+					+			"<input type='text' class='form-control' id='" + type + "NewFolderName' name='" + type + "NewFolderName'>"
 					+		"</div>"
-					+		"<div class='flex-shrink-1 pointer' onclick='moveFilesNewFolder()'><i class='fa-solid fa-folder-plus'></i></div>"
+					+		"<div class='flex-shrink-1 pointer' onclick=\"moveFilesNewFolder('" + type + "')\"><i class='fa-solid fa-folder-plus'></i></div>"
 					+	"</div>";
 	$("#functionModalLabel").html(modalLabelHtml);
 	$("#functionModalBody").html(htmlText);
 }
 
-// folder lists for move files
-function loadFolderList(path) {
+// folder lists for move(or copy) files
+function loadFolderList(path, type) {
 	let data = "path=" + path;
 	let listHtml = "<table>";
 
@@ -337,7 +350,7 @@ function loadFolderList(path) {
 			if(result.validPath) {
 				const folderList = result.folderList;
 
-				listHtml += "<tr class='pointer' onclick=moveFiles('" + path.replace(/\b\/[^/]*$|[^:/]*$/, "") + "')>\n"
+				listHtml += "<tr class='pointer' onclick=\"moveFiles('" + path.replace(/\b\/[^/]*$|[^:/]*$/, "") + "', '" + type + "')\">\n"
 						+ 		"<td class='text-center py-2' style='width:50px;'>\n"
 						+ 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n"
 						+ 		"</td>\n"
@@ -345,7 +358,7 @@ function loadFolderList(path) {
 						+ 	"</tr>\n";
 
 				for(i in folderList) {
-					listHtml += makeFolderList(folderList[i].getPath, folderList[i].getName);
+					listHtml += makeFolderList(folderList[i].getPath, folderList[i].getName, type);
 				}
 
 			} else {
@@ -363,8 +376,10 @@ function loadFolderList(path) {
 	return listHtml;
 }
 
-// create new folder when changing files path
-function moveFilesNewFolder() {
+/** create new folder when changing files path
+*	type - moveFiles / copyFiles
+*/
+function moveFilesNewFolder(type) {
 	if($("#moveFilesNewFolderOpen").hasClass("d-none")) {
 		$("#moveFilesNewFolderOpen").removeClass("d-none");
 	} else {
@@ -382,15 +397,15 @@ function moveFilesNewFolder() {
 				console.log("error");
 			},
 			complete: function() {
-				moveFiles($("#moveToPath").val()+"/"+$("#moveFilesNewFolderName").val());
+				moveFiles($("#moveToPath").val()+"/"+$("#moveFilesNewFolderName").val(), type);
 			}
 		});
 	}
 }
 
 // make a folder list each line for move files
-function makeFolderList(path, name) {
-	let makeFolderListHtml = "<tr class='pointer' onclick=moveFiles('" + path.replace(/\\/g, "/") + "')>\n";
+function makeFolderList(path, name, type) {
+	let makeFolderListHtml = "<tr class='pointer' onclick=\"moveFiles('" + path.replace(/\\/g, "/") + "', '" + type + "')\">\n";
 	makeFolderListHtml += 		"<td class='text-center py-2' style='width:50px;'>\n";
     makeFolderListHtml += 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n";
     makeFolderListHtml += 		"</td>\n";
@@ -451,14 +466,14 @@ function functionModalAffect() {
 		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName;
 		url = "chageName";
 	} else if(action == "deleteFiles") {
-		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
+		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;876542222222
 		url = "deleteFiles";
-	} else if(action == "moveFiles") {
+	} else if(action == "moveFiles" || action == "copyFiles") {
 		let moveToPath = encodeURIComponent($("#moveToPath").val());
 		let path = $("#path").val();
-		if(moveToPath == path) errorMsg+= "현재 위치와 동일합니다.";
+		if(moveToPath == path && action == "moveFiles") errorMsg+= "현재 위치와 동일합니다.";
 
-		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath;
+		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath + "&type=" + action;
 		url = "moveFiles";
 	}
 

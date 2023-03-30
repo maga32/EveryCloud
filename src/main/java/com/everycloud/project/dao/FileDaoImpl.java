@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -97,12 +99,34 @@ public class FileDaoImpl implements FileDao {
 	}
 
 	@Override
-	public void moveFiles(File file, String moveToPath) {
+	public void moveFiles(File file, String moveToPath, String type) {
 		File newFile = new File(moveToPath + File.separator + file.getName());
-		try {
-			Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(type.equals("moveFiles")) {
+			try {
+				Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else if(type.equals("copyFiles")) {
+			try { 
+				copyFileRegardlessExistion(file, newFile);
+			} catch (IOException e) { e.printStackTrace(); }
+		}
+	}
+	
+	// copy file to path regardlessly existion of name.
+	private void copyFileRegardlessExistion(File file, File newFile) throws IOException {
+		if(newFile.exists()) {
+			String newFileName = FilenameUtils.removeExtension(newFile.getPath());
+			newFileName += (FilenameUtils.getExtension(newFile.getPath()).equals("")) ? " (1)" : " (1)." + FilenameUtils.getExtension(newFile.getPath());
+			File newRenamedFile = new File(newFileName);
+			copyFileRegardlessExistion(file, newRenamedFile);
+		} else {
+			if(file.isFile()) {
+				Files.copy(file.toPath(), newFile.toPath());
+			} else if(file.isDirectory()) {
+				FileUtils.copyDirectory(file, newFile);
+			}
 		}
 	}
 
