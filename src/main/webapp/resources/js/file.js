@@ -241,7 +241,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share'></i></td>\n";
 		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles('','moveFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'>이동</td>\n";
 		fileControlHtml += 		"</tr>\n";
-		fileControlHtml += 		"<tr>\n";
+		fileControlHtml += 		"<tr class='pointer'>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-clipboard'></i></td>\n"
 		fileControlHtml += 			"<td class='p-1' onclick=\"moveFiles('','copyFiles')\" data-bs-toggle='modal' data-bs-target='#functionModal'>복사</td>\n";
 		fileControlHtml += 		"</tr>\n";
@@ -338,7 +338,7 @@ function moveFiles(path="", type="moveFiles") {
 
 // folder lists for move(or copy) files
 function loadFolderList(path, type) {
-	let data = "path=" + path;
+	let data = "path=" + encodeURIComponent(path);
 	let listHtml = "<table>";
 
 	$.ajax({

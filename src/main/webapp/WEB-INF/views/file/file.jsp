@@ -32,14 +32,14 @@
 						<i class="fa-solid fa-wrench"></i>
 					</span>
 					<ul class="dropdown-menu dropdown-menu-end">
-						<li><div class="dropdown-item" onClick="toggleHiddenCheck()">
+						<li><div class="dropdown-item pointer" onClick="toggleHiddenCheck()">
 							<span id="viewHiddenCheck" class="inactive"><i class="fa-solid fa-check"></i></span>
 							<i class="fa-solid fa-file-shield pe-2"></i>숨김파일보기
 						</div></li>
-						<li><div class="dropdown-item" onClick="newFolder()" data-bs-toggle="modal" data-bs-target="#functionModal">
+						<li><div class="dropdown-item pointer" onClick="newFolder()" data-bs-toggle="modal" data-bs-target="#functionModal">
 							<i class="fa-solid fa-folder-plus pe-2"></i>새폴더
 						</div></li>
-						<li><div class="dropdown-item" onClick="newFile()" data-bs-toggle="modal" data-bs-target="#functionModal">
+						<li><div class="dropdown-item pointer" onClick="newFile()" data-bs-toggle="modal" data-bs-target="#functionModal">
 							<i class="fa-solid fa-file-circle-plus pe-2"></i>새파일
 						</div></li>
 					</ul>
