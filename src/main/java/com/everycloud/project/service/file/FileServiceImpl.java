@@ -1,4 +1,4 @@
-package com.everycloud.project.service;
+package com.everycloud.project.service.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.everycloud.project.dao.FileDao;
+import com.everycloud.project.dao.file.FileDao;
 
 @Service
 public class FileServiceImpl implements FileService {
