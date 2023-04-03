@@ -17,4 +17,9 @@ public class UserDaoImpl implements UserDao {
 		return sqlSession.selectOne("userMapper.getUser", userId);
 	}
 
+	@Override
+	public String getUserPass(String userId) {
+		return  sqlSession.selectOne("userMapper.getUserPass", userId);
+	}
+
 }

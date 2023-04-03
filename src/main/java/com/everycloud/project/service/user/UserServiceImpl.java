@@ -17,4 +17,17 @@ public class UserServiceImpl implements UserService {
 		return userDao.getUser(userId);
 	}
 
+	@Override
+	public String checkUser(String userId, String userPass) {
+		String result = "";
+		
+		if(userPass.equals(userDao.getUserPass(userId))) {
+			result = "ok";
+		} else {
+			result = "id와 비밀번호를 확인해주세요.";
+		}
+		
+		return result;
+	}
+
 }

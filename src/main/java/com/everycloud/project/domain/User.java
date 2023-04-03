@@ -4,14 +4,16 @@ public class User {
 	private String userId;
 	private String userPass;
 	private String userNickname;
+	private String userEmail;
 	private String userAuthority;	
 	
 	public User() {}
 	
-	public User(String userId, String userPass, String userNickname, String userAuthority) {
+	public User(String userId, String userPass, String userNickname, String userEmail, String userAuthority) {
 		this.userId = userId;
 		this.userPass = userPass;
 		this.userNickname = userNickname;
+		this.userEmail = userEmail;
 		this.userAuthority = userAuthority;
 	}
 
@@ -37,6 +39,14 @@ public class User {
 
 	public void setUserNickname(String userNickname) {
 		this.userNickname = userNickname;
+	}
+	
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	public String getUserAuthority() {
