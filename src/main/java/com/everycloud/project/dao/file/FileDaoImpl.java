@@ -18,7 +18,7 @@ public class FileDaoImpl implements FileDao {
 	
 	@Override
 	public File[] getPathFiles(String path, boolean viewHidden, String keyword) {
-	    List<File> fileList = new ArrayList<>();
+	    List<File> fileList = new ArrayList<File>();
 	    addFileList(path, viewHidden, keyword.toLowerCase(), fileList);
 	    return fileList.toArray(new File[0]);
 	}
