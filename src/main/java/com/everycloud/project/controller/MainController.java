@@ -1,60 +1,36 @@
 package com.everycloud.project.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.everycloud.project.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.everycloud.project.domain.User;
-import com.everycloud.project.service.user.UserService;
 
 @Controller
 public class MainController {
 	
 	@Autowired
-	UserService userService;
+	UserUtil userUtil;
 
 	@RequestMapping("/")
-	String mainPage(HttpSession session) {
-		User user = (User) session.getAttribute("user");
-		
-		if(user == null ) {
-			return "/login";
-		} else if (user.getUserAuthority().equals("Y")) {
+	String mainPage(HttpSession session, Model model) {
+		int userType = userUtil.checkUserType();
+
+		if(userType == 0) {
+			return "/user/login";
+		} else if (userType == 2) {
 			return "redirect:/file";
-		} else if (user.getUserAuthority().equals("N")) {
+		} else if (userType == 1) {
 			return "redirect:/guest";
+		} else if (userType == 3) {
+			return "redirect:/updateUser?type=admin";
 		}
 		
 		return null;
 	}
-	
-	@RequestMapping(value = "/loginProcess", method = RequestMethod.POST)
-	String loginProcess(HttpSession session, HttpServletResponse response, String userId, String userPass) throws IOException {
-		String checkUser = userService.checkUser(userId, userPass);
-		
-		if(checkUser.equals("ok")) {
-			User loginUser = userService.getUser(userId);
-			session.setAttribute("user", loginUser);
-			
-			return "redirect:/";
-		} else {
-			response.setContentType("text/html; charset=utf-8");
-			PrintWriter out = response.getWriter();
-			out.println("<script>");
-			out.println("	alert('" + checkUser + "');");
-			out.println("	history.back();");
-			out.println("</script>");
-			
-			return null;
-		}
-		
-	}
-	
+
 }

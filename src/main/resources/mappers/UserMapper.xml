@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-	
+
 <mapper namespace="userMapper">
 	
 	<select id="getUser" resultMap="UserResultMap" resultType="User">
@@ -13,6 +13,37 @@
 		SELECT user_pass FROM user
 			WHERE user_id = #{userId}
 	</select>
+
+	<select id="getAdmin" resultMap="UserResultMap" resultType="User">
+		SELECT user_id, user_pass, user_nickname, user_email FROM user
+			WHERE user_authority = 'Y'
+	</select>
+
+	<update id="updateUser" parameterType="HashMap">
+		UPDATE user
+		    <set>
+				<if test="user.userId != null and !user.userId.equals('')">
+			 		user_id = #{user.userId},
+				</if>
+			    <if test="user.userPass != null and !user.userPass.equals('')">
+					user_pass = #{user.userPass},
+				</if>
+				<if test="user.userNickname != null and !user.userNickname.equals('')">
+					user_nickname = #{user.userNickname},
+				</if>
+				<if test="user.userEmail != null and !user.userEmail.equals('')">
+					user_email = #{userEmail},
+				</if>
+			</set>
+			<where>
+				<if test="userOrigId != null and !userOrigId.equals('')">
+					user_id = #{userOrigId}
+				</if>
+				<if test="userOrigId == null or userOrigId.equals('')">
+					AND user_id = #{user.userId}
+				</if>
+			</where>
+	</update>
 	
 	<resultMap type="User" id="UserResultMap">
 		<id property="userId" column="user_id" />
