@@ -45,13 +45,46 @@
 	</div>
 	
 	<div class="clearfix"></div>
-	
+
+	<c:if test="${ not empty user.userId }">
+		<div>
+			<span class="fs-1">${ user.userNickname }</span> 님
+			<div>( ${ user.userId } )</div>
+			<c:if test="${ user.userAuthority eq 'Y'}">
+				<div class="text-danger">관리자 계정</div>
+			</c:if>
+		</div>
+		<div class="d-grid gap-2 my-4">
+			<button class="btn btn-outline-secondary" onclick="location.href='/updateUser?userId=${ user.userId }&type=${ user.userAuthority == "Y" ? "admin" : "user" }'">
+				Edit Profile
+			</button>
+			<button class="btn btn-secondary" onclick="location.href='/logout'">
+				Logout
+			</button>
+		</div>
+	</c:if>
+	<c:if test="${ empty user.userId }">
+		<div class="d-grid gap-2 my-4">
+			<button class="btn btn-secondary" onclick="location.href='/login'">
+				Login
+			</button>
+		</div>
+	</c:if>
+
+	<!-- Menu start -->
 	<div class="row">
 		<div class="col-12">
 			<div class="list-group list-group-flush">
 				<a href="/file?path=/" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder"></i> 파일</a>
 			</div>
 		</div>
+		<div class="col-12">
+			<div class="list-group list-group-flush">
+				<a href="/share" class="list-group-item list-group-item-action" id="list_share"><i class="fa-solid fa-share-nodes"></i> 공유</a>
+			</div>
+		</div>
 	</div>
+	<!-- Menu end -->
+
 </div>
 

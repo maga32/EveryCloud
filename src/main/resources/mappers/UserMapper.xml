@@ -5,8 +5,9 @@
 <mapper namespace="userMapper">
 	
 	<select id="getUser" resultMap="UserResultMap" resultType="User">
-		SELECT user_id, user_nickname, user_email, user_authority FROM user
-			WHERE user_id = #{userId}
+		SELECT user_id, user_nickname, user_email, user_authority, u.group_no, group_name
+			FROM user u, group_setting g
+		WHERE user_id = #{userId} and u.group_no = g.group_no
 	</select>
 	
 	<select id="getUserPass" resultType="string">
@@ -32,7 +33,10 @@
 					user_nickname = #{user.userNickname},
 				</if>
 				<if test="user.userEmail != null and !user.userEmail.equals('')">
-					user_email = #{userEmail},
+					user_email = #{user.userEmail},
+				</if>
+				<if test="user.groupNo != null and !user.groupNo.equals('')">
+					group_no = #{user.groupNo},
 				</if>
 			</set>
 			<where>
@@ -51,6 +55,8 @@
 		<result property="userNickname" column="user_nickname" />
 		<result property="userEmail" column="user_email" />
 		<result property="userAuthority" column="user_authority" />
+		<result property="groupNo" column="group_no" />
+		<result property="groupName" column="group_name" />
 	</resultMap>
 	
 </mapper>

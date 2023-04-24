@@ -5,16 +5,21 @@ public class User {
 	private String userPass;
 	private String userNickname;
 	private String userEmail;
-	private String userAuthority;	
+	private String userAuthority;
+	private int groupNo;
+	private String groupName;
 	
 	public User() {}
 	
-	public User(String userId, String userPass, String userNickname, String userEmail, String userAuthority) {
+	public User(String userId, String userPass, String userNickname, String userEmail,
+		String userAuthority, int groupNo, String groupName) {
 		this.userId = userId;
 		this.userPass = userPass;
 		this.userNickname = userNickname;
 		this.userEmail = userEmail;
 		this.userAuthority = userAuthority;
+		this.groupNo = groupNo;
+		this.groupName = groupName;
 	}
 
 	public String getUserId() {
@@ -57,6 +62,22 @@ public class User {
 		this.userAuthority = userAuthority;
 	}
 
+	public int getGroupNo() {
+		return groupNo;
+	}
+
+	public void setGroupNo(int groupNo) {
+		this.groupNo = groupNo;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
 	@Override
 	public String toString() {
 		return "User{" +
@@ -65,6 +86,8 @@ public class User {
 				", userNickname='" + userNickname + '\'' +
 				", userEmail='" + userEmail + '\'' +
 				", userAuthority='" + userAuthority + '\'' +
+				", groupNo=" + groupNo +
+				", groupName='" + groupName + '\'' +
 				'}';
 	}
 }

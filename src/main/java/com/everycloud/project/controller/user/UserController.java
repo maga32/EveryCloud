@@ -40,15 +40,28 @@ public class UserController {
 		return resultMap;
 	}
 
+	@RequestMapping("/login")
+	String loginPage(Model model, @RequestParam(value="siteHtml", required=false, defaultValue="") String siteHtml) {
+		if(session.getAttribute("user") != null) return "redirect:/";
+		model.addAttribute("siteHtml", siteHtml);
+		return "/user/login";
+	}
+
+	@RequestMapping("/logout")
+	String logout() {
+		session.invalidate();
+		return "redirect:/";
+	}
+
 	@RequestMapping(value = "/loginProcess", method = RequestMethod.POST)
-	String loginProcess(HttpServletResponse response, String userId, String userPass) throws IOException {
+	String loginProcess(HttpServletResponse response, String userId, String userPass,
+		@RequestParam(value="siteHtml", required=false, defaultValue="/") String siteHtml) throws IOException {
 		String checkUser = userService.checkUser(userId, userPass);
 
 		if (checkUser.equals("ok")) {
 			User loginUser = userService.getUser(userId);
 			session.setAttribute("user", loginUser);
-
-			return "redirect:/";
+			return "redirect:" + siteHtml;
 		} else {
 			response.setContentType("text/html; charset=utf-8");
 			PrintWriter out = response.getWriter();
@@ -65,7 +78,6 @@ public class UserController {
 	String updateUser(Model model, String type,
 		@RequestParam(value = "userId", required = false, defaultValue = "") String userId) {
 		if(userId.equals("") && userUtil.isAdmin()) {
-			User test = userService.getAdmin();
 			model.addAttribute("user", userService.getAdmin());
 		} else if(userUtil.isAdmin() || userId.equals(((User)session.getAttribute("user")).getUserId())) {
 			model.addAttribute("user", userService.getUser(userId));
@@ -88,7 +100,7 @@ public class UserController {
 	@RequestMapping(value = "/updateUserProcess", method = RequestMethod.POST)
 	String updateUserProcess(User user,
 		@RequestParam(value = "userOrigId", required = false, defaultValue = "") String userOrigId) {
-		if(userUtil.isAdmin() || ((User)session.getAttribute("user")).getUserId().equals(user.getUserId())) {
+		if(userUtil.isAdmin() || (userUtil.isUser() && ((User)session.getAttribute("user")).getUserId().equals(user.getUserId()))) {
 			userService.updateUser(user, userOrigId);
 		}
 

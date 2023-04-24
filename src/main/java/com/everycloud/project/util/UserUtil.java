@@ -74,6 +74,18 @@ public class UserUtil {
     }
 
     /**
+     * Check userId is matching with session's userId
+     *
+     * @param userId
+     * @return boolean
+     */
+    public boolean isValidUser(String userId) {
+        User user = (User) session.getAttribute("user");
+        if(user != null && userId.equals(user.getUserId())) return true;
+        return false;
+    }
+
+    /**
      * return user type by session's user
      *
      * @return int<br>

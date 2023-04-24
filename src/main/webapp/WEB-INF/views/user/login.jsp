@@ -8,6 +8,7 @@
 <script src="${ pageContext.request.contextPath }/resources/js/login.js"></script>
 
 <form action="loginProcess" method="post" id="loginForm">
+	<input type="hidden" name="siteHtml" id="siteHtml" value="${ siteHtml }">
 	<div class="p-5">
 		<div class="row border border-secondary bg-light-subtle rounded-3">
 			<div class="col-12 text-center py-4 fs-2">
@@ -19,7 +20,7 @@
 					아이디
 				</div>
 				<div class="pb-2">
-					<input type="text" size="20" class="form-control" name="userId" id="userId">
+					<input type="text" size="20" class="form-control" name="userId" id="userId" onkeyup="pressEnter()">
 				</div>
 				<div class="py-2">
 					비밀번호
