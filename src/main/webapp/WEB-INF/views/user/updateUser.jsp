@@ -12,7 +12,7 @@
 </style>
 
 <form action="/updateUserProcess" method="post" id="updateUserForm">
-	<input type="hidden" value="${ type }">
+	<input type="hidden" name="siteHtml" id="siteHtml" value="${ siteHtml }">
 	<div class="p-5">
 		<div class="row">
 			<div class="col-12 important">
@@ -77,7 +77,8 @@
 
 			<div class="col-12 mb-4"></div>
 			<div class="col-12 col-md-6 mb-4">
-				<div class="col-12 btn btn-secondary btn-lg" onclick="updateUserForm()">확인</div>
+				<div class="col-12 btn btn-danger btn-lg mb-2" onclick="updateUserForm()">확인</div>
+				<div class="col-12 btn btn-secondary btn-lg" onclick="location.href='${ siteHtml }'">취소</div>
 			</div>
 		</div>
 	</div>

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.everycloud.project.service.user.UserService;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -74,15 +75,18 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping(value = "/updateUser", method = RequestMethod.GET)
-	String updateUser(Model model, String type,
-		@RequestParam(value = "userId", required = false, defaultValue = "") String userId) {
+	@RequestMapping(value = "/updateUser")
+	String updateUser(Model model, HttpServletRequest request, String type,
+		@RequestParam(value = "userId", required = false, defaultValue = "") String userId,
+		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
 		if(userId.equals("") && userUtil.isAdmin()) {
 			model.addAttribute("user", userService.getAdmin());
 		} else if(userUtil.isAdmin() || userId.equals(((User)session.getAttribute("user")).getUserId())) {
 			model.addAttribute("user", userService.getUser(userId));
 		}
+
 		model.addAttribute("type",type);
+		model.addAttribute("siteHtml",siteHtml);
 
 		return "/user/updateUser";
 	}
@@ -99,11 +103,13 @@ public class UserController {
 
 	@RequestMapping(value = "/updateUserProcess", method = RequestMethod.POST)
 	String updateUserProcess(User user,
-		@RequestParam(value = "userOrigId", required = false, defaultValue = "") String userOrigId) {
+		@RequestParam(value = "userOrigId", required = false, defaultValue = "") String userOrigId,
+		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
 		if(userUtil.isAdmin() || (userUtil.isUser() && ((User)session.getAttribute("user")).getUserId().equals(user.getUserId()))) {
 			userService.updateUser(user, userOrigId);
+			session.setAttribute("user", userService.getUser((userOrigId.equals("") ? user.getUserId() : userOrigId)));
 		}
 
-		return "redirect:/";
+		return "redirect:" + siteHtml;
 	}
 }

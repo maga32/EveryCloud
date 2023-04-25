@@ -19,6 +19,19 @@ function setTheme(theme) {	// html 컬러변경
     } else if(theme === "dark") { $("#theme-icon").addClass("fa-moon");
     } else if(theme === "auto") { $("#theme-icon").addClass(["fa-wand-magic-sparkles", "text-success"]); }
 }
+
+function goToPost(data){
+	data.params.siteHtml = location.pathname + location.search;
+
+	let inputHtml = "";
+	Object.entries(data.params).forEach(([key, value]) => {
+		inputHtml += "<input type='hidden' name='" + key + "' value='" + value + "'>";
+	});
+
+	$("#goPostForm").attr("action", data.url);
+	$("#goPostForm").html(inputHtml);
+	$("#goPostForm").submit();
+}
 	
 $(document).ready(function(){
 	setTheme(getPreferredTheme());

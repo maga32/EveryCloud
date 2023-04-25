@@ -6,13 +6,13 @@ public class User {
 	private String userNickname;
 	private String userEmail;
 	private String userAuthority;
-	private int groupNo;
+	private Integer groupNo;
 	private String groupName;
 	
 	public User() {}
 	
 	public User(String userId, String userPass, String userNickname, String userEmail,
-		String userAuthority, int groupNo, String groupName) {
+		String userAuthority, Integer groupNo, String groupName) {
 		this.userId = userId;
 		this.userPass = userPass;
 		this.userNickname = userNickname;
@@ -62,11 +62,11 @@ public class User {
 		this.userAuthority = userAuthority;
 	}
 
-	public int getGroupNo() {
+	public Integer getGroupNo() {
 		return groupNo;
 	}
 
-	public void setGroupNo(int groupNo) {
+	public void setGroupNo(Integer groupNo) {
 		this.groupNo = groupNo;
 	}
 

@@ -55,7 +55,8 @@
 			</c:if>
 		</div>
 		<div class="d-grid gap-2 my-4">
-			<button class="btn btn-outline-secondary" onclick="location.href='/updateUser?userId=${ user.userId }&type=${ user.userAuthority == "Y" ? "admin" : "user" }'">
+			<button class="btn btn-outline-secondary"
+				onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.userId }", type:"${ user.userAuthority == "Y" ? "admin" : "user" }" } })'>
 				Edit Profile
 			</button>
 			<button class="btn btn-secondary" onclick="location.href='/logout'">
@@ -85,6 +86,8 @@
 		</div>
 	</div>
 	<!-- Menu end -->
+
+	<form action="" method="post" id="goPostForm"></form>
 
 </div>
 
