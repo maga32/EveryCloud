@@ -79,6 +79,8 @@ public class UserController {
 	String updateUser(Model model, HttpServletRequest request, String type,
 		@RequestParam(value = "userId", required = false, defaultValue = "") String userId,
 		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
+
+		if(userUtil.checkUserType() == 0) return "redirect:/";
 		if(userId.equals("") && userUtil.isAdmin()) {
 			model.addAttribute("user", userService.getAdmin());
 		} else if(userUtil.isAdmin() || userId.equals(((User)session.getAttribute("user")).getUserId())) {

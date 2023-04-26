@@ -17,7 +17,7 @@
 <div class="row fixed-top" id="fileMenuContainer">
 	<div class="col-0 col-md-3"></div>
 	<div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
-		<div class="row rounded border p-2">
+		<div class="row rounded border p-2 m-0 bg-light-subtle">
 			<div class="col-12 col-md-8">
 				<div id="nowPath"></div>
 			</div>

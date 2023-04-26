@@ -2,13 +2,8 @@ package com.everycloud.project.controller.file;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -16,6 +11,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.everycloud.project.util.UserUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,7 +27,10 @@ public class FileViewController {
 	
 	@Autowired
 	FileService fileService;
-	
+
+	@Autowired
+	UserUtil userUtil;
+
 	@RequestMapping("/file")
 	public String file(@RequestParam(value="path", required=false, defaultValue="/") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
@@ -45,15 +44,22 @@ public class FileViewController {
 		
 		return "/file/file";
 	}
-	
+
 	@RequestMapping("/fileList")
 	@ResponseBody
 	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
+			@RequestParam(value="sharePath", required=false, defaultValue="") String sharePath,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
 			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
 			@RequestParam(value="viewHidden", required=false) boolean viewHidden) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
+
+		if(sharePath.equals("") && !userUtil.isAdmin()) {
+			map.put("invalidAuth", "관리자만 접근할 수 있습니다.");
+			return map;
+		}
+
 		boolean validPath = fileService.isPathExist(path);
 
 		if(validPath) {

@@ -48,6 +48,11 @@ function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHist
 		type: "post",
 		data: data,
 		success: function(result) {
+			if(result.invalidAuth) {
+				alert(result.invalidAuth);
+				return false;
+			}
+
 			if(result.realPath) {
 				loadFileList(result.realPath,'','','',true,false);
 				return false;

@@ -34,6 +34,8 @@ function goToPost(data){
 }
 	
 $(document).ready(function(){
+	const pathname = window.location.pathname.split("/")[1];
+
 	setTheme(getPreferredTheme());
 	
 	$(".change-theme").click(function(){
@@ -60,6 +62,8 @@ $(document).ready(function(){
 		$(this).css("display", "none");
 	});
 
+	if (pathname == "updateUser") $("#wingUserInfo").addClass("d-none");
+
 	// select wing menu
-	$("#list_" + window.location.pathname.split("/")[1]).addClass("active");
+	$("#list_" + pathname).addClass("active");
 });

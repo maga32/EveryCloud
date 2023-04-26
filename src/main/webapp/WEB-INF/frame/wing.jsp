@@ -43,7 +43,7 @@
 			</li>
 		</ul>
 	</div>
-	
+
 	<div class="clearfix"></div>
 
 	<c:if test="${ not empty user.userId }">
@@ -54,7 +54,7 @@
 				<div class="text-danger">관리자 계정</div>
 			</c:if>
 		</div>
-		<div class="d-grid gap-2 my-4">
+		<div class="d-grid gap-2 my-4" id="wingUserInfo">
 			<button class="btn btn-outline-secondary"
 				onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.userId }", type:"${ user.userAuthority == "Y" ? "admin" : "user" }" } })'>
 				Edit Profile
@@ -73,7 +73,7 @@
 	</c:if>
 
 	<!-- Menu start -->
-	<div class="row">
+	<div class="row my-3">
 		<div class="col-12">
 			<div class="list-group list-group-flush">
 				<a href="/file?path=/" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder"></i> 파일</a>
