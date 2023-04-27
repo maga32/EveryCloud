@@ -14,7 +14,7 @@ public class AdminInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         User admin = (User) request.getSession().getAttribute("user");
-        if(admin == null || !admin.getUserAuthority().equals("Y")) {
+        if(admin == null || !admin.getAuth().equals("Y")) {
             response.setContentType("text/html; charset=utf-8");
             PrintWriter out = response.getWriter();
             out.println("<script>");

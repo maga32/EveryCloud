@@ -16,13 +16,13 @@ public class UserDaoImpl implements UserDao {
 	SqlSession sqlSession;
 	
 	@Override
-	public User getUser(String userId) {
-		return sqlSession.selectOne("userMapper.getUser", userId);
+	public User getUser(String id) {
+		return sqlSession.selectOne("userMapper.getUser", id);
 	}
 
 	@Override
-	public String getUserPass(String userId) {
-		return  sqlSession.selectOne("userMapper.getUserPass", userId);
+	public String getUserPass(String id) {
+		return  sqlSession.selectOne("userMapper.getUserPass", id);
 	}
 
 	@Override

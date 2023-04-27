@@ -4,9 +4,9 @@ import com.everycloud.project.domain.User;
 
 public interface UserDao {
 
-	User getUser(String userId);
+	User getUser(String id);
 
-	String getUserPass(String userId);
+	String getUserPass(String id);
 
     User getAdmin();
 

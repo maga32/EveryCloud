@@ -34,7 +34,7 @@ public class UserUtil {
      * @return boolean
      */
     public boolean isAdmin(String userId) {
-        if(isUser(userId) && userService.getUser(userId).getUserAuthority().equals("Y")) return true;
+        if(isUser(userId) && userService.getUser(userId).getAuth().equals("Y")) return true;
         return false;
     }
 
@@ -81,7 +81,7 @@ public class UserUtil {
      */
     public boolean isValidUser(String userId) {
         User user = (User) session.getAttribute("user");
-        if(user != null && userId.equals(user.getUserId())) return true;
+        if(user != null && userId.equals(user.getId())) return true;
         return false;
     }
 
@@ -100,12 +100,12 @@ public class UserUtil {
         User admin = userService.getAdmin();
 
         if(user != null) {
-            if(user.getUserId().equals(admin.getUserId())) {
+            if(user.getId().equals(admin.getId())) {
                 userType = 2;
             } else {
                 userType = 1;
             }
-        } else if(admin.getUserPass().equals("admin")) {
+        } else if(admin.getPass().equals("admin")) {
             userType = 3;
         }
 

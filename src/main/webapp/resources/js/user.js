@@ -1,11 +1,11 @@
 const emailRegex = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/;
 
 function checkPassword() {
-    if($("#userPass").val() && $("#userPass").val().length < 8){
+    if($("#pass").val() && $("#pass").val().length < 8){
         $("#warningPassLength").removeClass("d-none");
     } else {
         $("#warningPassLength").addClass("d-none");
-        if ($("#userPass").val() == $("#confirmUserPass").val()) {
+        if ($("#pass").val() == $("#confirmPass").val()) {
             $("#warningPassCheck").addClass("d-none");
         } else {
             $("#warningPassCheck").removeClass("d-none");
@@ -14,8 +14,8 @@ function checkPassword() {
 }
 
 function checkOverlapId() {
-    if(!$("#userId").val()) return reject("userId", "아이디를 입력해주세요.");
-    let data = "userId=" + $("#userId").val();
+    if(!$("#id").val()) return reject("id", "아이디를 입력해주세요.");
+    let data = "id=" + $("#id").val();
 
     $.ajax({
         url: "/checkOverlapId",
@@ -37,13 +37,13 @@ function checkOverlapId() {
 }
 
 function updateUserForm() {
-    if(!$("#userId").val()) return reject("userId", "아이디를 입력해주세요.");
-    if($("#duplicateChecked").val() == "false") return reject("userId", "아이디 중복확인을 해주세요.");
-    if($("#userPass").val() && $("#userPass").val().length < 8) return reject("userPass", "비밀번호는 8자이상 설정해주세요.");
-    if($("#userPass").val() != $("#confirmUserPass").val()) return reject("confirmUserPass", "비밀번호 일치여부를 확인해주세요.");
-    if(!$("#userNickname").val()) return reject("userNickname", "닉네임을 입력해주세요.");
-    if(!$("#userEmail").val()) return reject("userEmail", "이메일을 입력해주세요.");
-    if(!emailRegex.test($("#userEmail").val())) return reject("userEmail", "올바른 이메일을 입력해주세요.");
+    if(!$("#id").val()) return reject("id", "아이디를 입력해주세요.");
+    if($("#duplicateChecked").val() == "false") return reject("id", "아이디 중복확인을 해주세요.");
+    if($("#pass").val() && $("#pass").val().length < 8) return reject("pass", "비밀번호는 8자이상 설정해주세요.");
+    if($("#pass").val() != $("#confirmPass").val()) return reject("confirmPass", "비밀번호 일치여부를 확인해주세요.");
+    if(!$("#nickname").val()) return reject("nickname", "닉네임을 입력해주세요.");
+    if(!$("#email").val()) return reject("email", "이메일을 입력해주세요.");
+    if(!emailRegex.test($("#email").val())) return reject("email", "올바른 이메일을 입력해주세요.");
     $("#updateUserForm").submit();
 }
 

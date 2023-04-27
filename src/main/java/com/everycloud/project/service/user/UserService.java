@@ -4,13 +4,13 @@ import com.everycloud.project.domain.User;
 
 public interface UserService {
 	
-	User getUser(String userId);
+	User getUser(String id);
 
 	User getAdmin();
 
-	String getUserPass(String userId);
+	String getUserPass(String id);
 
-	String checkUser(String userId, String userPass);
+	String checkUser(String id, String pass);
 
 	void updateUser(User user, String userOrigId);
 }

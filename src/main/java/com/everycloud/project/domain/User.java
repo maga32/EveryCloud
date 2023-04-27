@@ -1,65 +1,65 @@
 package com.everycloud.project.domain;
 
 public class User {
-	private String userId;
-	private String userPass;
-	private String userNickname;
-	private String userEmail;
-	private String userAuthority;
+	private String id;
+	private String pass;
+	private String nickname;
+	private String email;
+	private String auth;
 	private Integer groupNo;
 	private String groupName;
 	
 	public User() {}
 	
-	public User(String userId, String userPass, String userNickname, String userEmail,
-		String userAuthority, Integer groupNo, String groupName) {
-		this.userId = userId;
-		this.userPass = userPass;
-		this.userNickname = userNickname;
-		this.userEmail = userEmail;
-		this.userAuthority = userAuthority;
+	public User(String id, String pass, String nickname, String email,
+		String auth, Integer groupNo, String groupName) {
+		this.id = id;
+		this.pass = pass;
+		this.nickname = nickname;
+		this.email = email;
+		this.auth = auth;
 		this.groupNo = groupNo;
 		this.groupName = groupName;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getId() {
+		return id;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getUserPass() {
-		return userPass;
+	public String getPass() {
+		return pass;
 	}
 
-	public void setUserPass(String userPass) {
-		this.userPass = userPass;
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 
-	public String getUserNickname() {
-		return userNickname;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setUserNickname(String userNickname) {
-		this.userNickname = userNickname;
-	}
-	
-	public String getUserEmail() {
-		return userEmail;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
-	public void setUserEmail(String userEmail) {
-		this.userEmail = userEmail;
+	public String getEmail() {
+		return email;
 	}
 
-	public String getUserAuthority() {
-		return userAuthority;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public void setUserAuthority(String userAuthority) {
-		this.userAuthority = userAuthority;
+	public String getAuth() {
+		return auth;
+	}
+
+	public void setAuth(String auth) {
+		this.auth = auth;
 	}
 
 	public Integer getGroupNo() {
@@ -81,11 +81,11 @@ public class User {
 	@Override
 	public String toString() {
 		return "User{" +
-				"userId='" + userId + '\'' +
-				", userPass='" + userPass + '\'' +
-				", userNickname='" + userNickname + '\'' +
-				", userEmail='" + userEmail + '\'' +
-				", userAuthority='" + userAuthority + '\'' +
+				"id='" + id + '\'' +
+				", pass='" + pass + '\'' +
+				", nickname='" + nickname + '\'' +
+				", email='" + email + '\'' +
+				", auth='" + auth + '\'' +
 				", groupNo=" + groupNo +
 				", groupName='" + groupName + '\'' +
 				'}';

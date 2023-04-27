@@ -34,9 +34,9 @@ public class UserController {
 	UserUtil userUtil;
 	
 	@RequestMapping("/getUser")
-	public Map<String, Object> getUser(@RequestParam("userId") String userId) {
+	public Map<String, Object> getUser(@RequestParam("id") String id) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		resultMap.put("user", userService.getUser(userId));
+		resultMap.put("user", userService.getUser(id));
 		
 		return resultMap;
 	}
@@ -55,12 +55,12 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/loginProcess", method = RequestMethod.POST)
-	String loginProcess(HttpServletResponse response, String userId, String userPass,
+	String loginProcess(HttpServletResponse response, String id, String pass,
 		@RequestParam(value="siteHtml", required=false, defaultValue="/") String siteHtml) throws IOException {
-		String checkUser = userService.checkUser(userId, userPass);
+		String checkUser = userService.checkUser(id, pass);
 
 		if (checkUser.equals("ok")) {
-			User loginUser = userService.getUser(userId);
+			User loginUser = userService.getUser(id);
 			session.setAttribute("user", loginUser);
 			return "redirect:" + siteHtml;
 		} else {
@@ -77,14 +77,14 @@ public class UserController {
 
 	@RequestMapping(value = "/updateUser")
 	String updateUser(Model model, HttpServletRequest request, String type,
-		@RequestParam(value = "userId", required = false, defaultValue = "") String userId,
+		@RequestParam(value = "id", required = false, defaultValue = "") String id,
 		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
 
 		if(userUtil.checkUserType() == 0) return "redirect:/";
-		if(userId.equals("") && userUtil.isAdmin()) {
+		if(id.equals("") && userUtil.isAdmin()) {
 			model.addAttribute("user", userService.getAdmin());
-		} else if(userUtil.isAdmin() || userId.equals(((User)session.getAttribute("user")).getUserId())) {
-			model.addAttribute("user", userService.getUser(userId));
+		} else if(userUtil.isAdmin() || id.equals(((User)session.getAttribute("user")).getId())) {
+			model.addAttribute("user", userService.getUser(id));
 		}
 
 		model.addAttribute("type",type);
@@ -95,9 +95,9 @@ public class UserController {
 
 	@RequestMapping(value = "/checkOverlapId", method = RequestMethod.POST)
 	@ResponseBody
-	Map<String, String> checkOverlapId(String userId) {
+	Map<String, String> checkOverlapId(String id) {
 		Map<String, String> map = new HashMap<String, String>();
-		String result = (userService.getUser(userId) == null) ? "ok" : "fail";
+		String result = (userService.getUser(id) == null) ? "ok" : "fail";
 		map.put("result", result);
 
 		return map;
@@ -107,9 +107,9 @@ public class UserController {
 	String updateUserProcess(User user,
 		@RequestParam(value = "userOrigId", required = false, defaultValue = "") String userOrigId,
 		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
-		if(userUtil.isAdmin() || (userUtil.isUser() && ((User)session.getAttribute("user")).getUserId().equals(user.getUserId()))) {
+		if(userUtil.isAdmin() || (userUtil.isUser() && ((User)session.getAttribute("user")).getId().equals(user.getId()))) {
 			userService.updateUser(user, userOrigId);
-			session.setAttribute("user", userService.getUser((userOrigId.equals("") ? user.getUserId() : userOrigId)));
+			session.setAttribute("user", userService.getUser((userOrigId.equals("") ? user.getId() : userOrigId)));
 		}
 
 		return "redirect:" + siteHtml;

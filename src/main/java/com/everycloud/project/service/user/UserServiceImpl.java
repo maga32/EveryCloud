@@ -18,13 +18,13 @@ public class UserServiceImpl implements UserService {
 	UserUtil userUtil;
 	
 	@Override
-	public User getUser(String userId) {
-		return userDao.getUser(userId);
+	public User getUser(String id) {
+		return userDao.getUser(id);
 	}
 
 	@Override
-	public String getUserPass(String userId) {
-		return userDao.getUserPass(userId);
+	public String getUserPass(String id) {
+		return userDao.getUserPass(id);
 	}
 
 	@Override
@@ -33,10 +33,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public String checkUser(String userId, String userPass) {
+	public String checkUser(String id, String pass) {
 		String result = "";
 		
-		if(userUtil.isUser(userId, userPass)) {
+		if(userUtil.isUser(id, pass)) {
 			result = "ok";
 		} else {
 			result = "id와 비밀번호를 확인해주세요.";
@@ -47,9 +47,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void updateUser(User user, String userOrigId) {
-		if(user.getUserPass() != null && !user.getUserPass().equals("")) {
+		if(user.getPass() != null && !user.getPass().equals("")) {
 			BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
-			user.setUserPass(pass.encode(user.getUserPass()));
+			user.setPass(pass.encode(user.getPass()));
 		}
 		userDao.updateUser(user, userOrigId);
 	}

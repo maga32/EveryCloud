@@ -5,56 +5,56 @@
 <mapper namespace="userMapper">
 	
 	<select id="getUser" resultMap="UserResultMap" resultType="User">
-		SELECT user_id, user_nickname, user_email, user_authority, u.group_no, group_name
+		SELECT id, nickname, email, auth, g.no, g.name
 			FROM user u, group_setting g
-		WHERE user_id = #{userId} and u.group_no = g.group_no
+		WHERE id = #{id} and u.group_no = g.no
 	</select>
 	
 	<select id="getUserPass" resultType="string">
-		SELECT user_pass FROM user
-			WHERE user_id = #{userId}
+		SELECT pass FROM user
+			WHERE id = #{id}
 	</select>
 
 	<select id="getAdmin" resultMap="UserResultMap" resultType="User">
-		SELECT user_id, user_pass, user_nickname, user_email FROM user
-			WHERE user_authority = 'Y'
+		SELECT id, pass, nickname, email FROM user
+			WHERE auth = 'Y'
 	</select>
 
 	<update id="updateUser" parameterType="HashMap">
 		UPDATE user
 		    <set>
-				<if test="user.userId != null and !user.userId.equals('')">
-			 		user_id = #{user.userId},
+				<if test="user.id != null and !user.id.equals('')">
+			 		id = #{user.id},
 				</if>
-			    <if test="user.userPass != null and !user.userPass.equals('')">
-					user_pass = #{user.userPass},
+			    <if test="user.pass != null and !user.pass.equals('')">
+					pass = #{user.pass},
 				</if>
-				<if test="user.userNickname != null and !user.userNickname.equals('')">
-					user_nickname = #{user.userNickname},
+				<if test="user.nickname != null and !user.nickname.equals('')">
+					nickname = #{user.nickname},
 				</if>
-				<if test="user.userEmail != null and !user.userEmail.equals('')">
-					user_email = #{user.userEmail},
+				<if test="user.email != null and !user.email.equals('')">
+					email = #{user.email},
 				</if>
 				<if test="user.groupNo != null and !user.groupNo.equals('')">
-					group_no = #{user.groupNo},
+					no = #{user.no},
 				</if>
 			</set>
 			<where>
 				<if test="userOrigId != null and !userOrigId.equals('')">
-					user_id = #{userOrigId}
+					id = #{userOrigId}
 				</if>
 				<if test="userOrigId == null or userOrigId.equals('')">
-					AND user_id = #{user.userId}
+					AND id = #{user.id}
 				</if>
 			</where>
 	</update>
 	
 	<resultMap type="User" id="UserResultMap">
-		<id property="userId" column="user_id" />
-		<result property="userPass" column="user_pass" />
-		<result property="userNickname" column="user_nickname" />
-		<result property="userEmail" column="user_email" />
-		<result property="userAuthority" column="user_authority" />
+		<id property="id" column="id" />
+		<result property="pass" column="pass" />
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="auth" column="auth" />
 		<result property="groupNo" column="group_no" />
 		<result property="groupName" column="group_name" />
 	</resultMap>

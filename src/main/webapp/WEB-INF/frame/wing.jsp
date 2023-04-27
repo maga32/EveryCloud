@@ -46,17 +46,17 @@
 
 	<div class="clearfix"></div>
 
-	<c:if test="${ not empty user.userId }">
+	<c:if test="${ not empty user.id }">
 		<div>
-			<span class="fs-1">${ user.userNickname }</span> 님
-			<div>( ${ user.userId } )</div>
-			<c:if test="${ user.userAuthority eq 'Y'}">
+			<span class="fs-1">${ user.nickname }</span> 님
+			<div>( ${ user.id } )</div>
+			<c:if test="${ user.auth eq 'Y'}">
 				<div class="text-danger">관리자 계정</div>
 			</c:if>
 		</div>
 		<div class="d-grid gap-2 my-4" id="wingUserInfo">
 			<button class="btn btn-outline-secondary"
-				onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.userId }", type:"${ user.userAuthority == "Y" ? "admin" : "user" }" } })'>
+				onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.id }", type:"${ user.auth == "Y" ? "admin" : "user" }" } })'>
 				Edit Profile
 			</button>
 			<button class="btn btn-secondary" onclick="location.href='/logout'">
@@ -64,7 +64,7 @@
 			</button>
 		</div>
 	</c:if>
-	<c:if test="${ empty user.userId }">
+	<c:if test="${ empty user.id }">
 		<div class="d-grid gap-2 my-4">
 			<button class="btn btn-secondary" onclick="location.href='/login'">
 				Login

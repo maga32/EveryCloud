@@ -20,13 +20,13 @@
 					아이디
 				</div>
 				<div class="pb-2">
-					<input type="text" size="20" class="form-control" name="userId" id="userId" onkeyup="pressEnter()">
+					<input type="text" size="20" class="form-control" name="id" id="id" onkeyup="pressEnter()">
 				</div>
 				<div class="py-2">
 					비밀번호
 				</div>
 				<div class="pb-2">
-					<input type="password" size="20" class="form-control" name="userPass" id="userPass" onkeyup="pressEnter()">
+					<input type="password" size="20" class="form-control" name="pass" id="pass" onkeyup="pressEnter()">
 				</div>
 			</div>
 			<div class="col-5 col-sm-3 col-lg-2 d-grid gap-2">

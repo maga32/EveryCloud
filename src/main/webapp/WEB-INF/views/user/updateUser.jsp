@@ -20,21 +20,21 @@
 			</div>
 			<div class="col-12 col-md-6 mb-4">
 				<c:choose>
-					<c:when test="${ type eq null || user.userId eq null }">
+					<c:when test="${ type eq null || user.id eq null }">
 						<script>
 							alert("잘못된 접근방식입니다.");
 							window.location.href = "/";
 						</script>
 					</c:when>
 					<c:when test="${ type == 'admin'}">
-						<input type="hidden" id="userOrigId" name="userOrigId" value="${ user.userId }">
-						<input type="text" size="20" class="form-control" name="userId" id="userId" value="${ user.userId == 'admin' ? '' : user.userId }" onkeyup="$('#duplicateChecked').val('false')">
+						<input type="hidden" id="userOrigId" name="userOrigId" value="${ user.id }">
+						<input type="text" size="20" class="form-control" name="id" id="id" value="${ user.id == 'admin' ? '' : user.id }" onkeyup="$('#duplicateChecked').val('false')">
 						<input type="hidden" id="duplicateChecked" value="true">
 						<div class="col-12 btn btn-secondary btn-lg mt-2" onclick="checkOverlapId()">중복확인</div>
 					</c:when>
 					<c:when test="${ type == 'user'}">
-						<input type="hidden" size="20" class="form-control" name="userId" id="userId" value="${ user.userId }">
-						${ user.userId }
+						<input type="hidden" size="20" class="form-control" name="id" id="id" value="${ user.id }">
+						${ user.id }
 					</c:when>
 				</c:choose>
 			</div>
@@ -43,8 +43,8 @@
 				새 비밀번호
 			</div>
 			<div class="col-12 col-md-6 mb-4">
-				<input type="password" size="20" class="form-control" name="userPass" id="userPass" onkeyup="checkPassword()">
-					${ user.userPass == "admin" ? "<span class='text-danger'>* 첫실행시 비밀번호 변경은 필수입니다.</span>" : "" }
+				<input type="password" size="20" class="form-control" name="pass" id="pass" onkeyup="checkPassword()">
+					${ user.pass == "admin" ? "<span class='text-danger'>* 첫실행시 비밀번호 변경은 필수입니다.</span>" : "" }
 				<div class="text-danger d-none" id="warningPassLength">
 					* 비밀번호는 8자이상 설정해주세요.
 				</div>
@@ -54,7 +54,7 @@
 				비밀번호 확인
 			</div>
 			<div class="col-12 col-md-6 mb-4">
-				<input type="password" size="20" class="form-control" name="confirmUserPass" id="confirmUserPass" onkeyup="checkPassword()">
+				<input type="password" size="20" class="form-control" name="confirmPass" id="confirmPass" onkeyup="checkPassword()">
 				<div class="text-danger d-none" id="warningPassCheck">
 					* 비밀번호가 일치하지 않습니다.
 				</div>
@@ -64,7 +64,7 @@
 				닉네임
 			</div>
 			<div class="col-12 col-md-6 mb-4">
-				<input type="text" size="20" class="form-control" name="userNickname" id="userNickname" value="${ user.userNickname }">
+				<input type="text" size="20" class="form-control" name="nickname" id="nickname" value="${ user.nickname }">
 			</div>
 
 			<div class="col-12 important">
@@ -72,7 +72,7 @@
 				<span class="text-danger">(비밀번호 찾기시 필요)</span>
 			</div>
 			<div class="col-12 col-md-6 mb-4">
-				<input type="text" size="20" class="form-control" name="userEmail" id="userEmail" value="${ user.userEmail }">
+				<input type="text" size="20" class="form-control" name="email" id="email" value="${ user.email }">
 			</div>
 
 			<div class="col-12 mb-4"></div>
