@@ -9,6 +9,7 @@
 <script src="${ pageContext.request.contextPath }/resources/js/file.js"></script>
 <link href="${ pageContext.request.contextPath }/resources/css/file.css" rel="stylesheet">
 
+<input type="hidden" id="shareLink" name="shareLink" value="${ shareLink }">
 <input type="hidden" id="path" name="path" value="${ fn:replace(path, '+', '%20') }">
 <input type="hidden" id="sort" name="sort" value="${ sort }">
 <input type="hidden" id="order" name="order" value="${ order }">

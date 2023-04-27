@@ -1,8 +1,10 @@
 package com.everycloud.project.controller.file;
 
+import com.everycloud.project.domain.Settings;
 import com.everycloud.project.domain.Share;
 import com.everycloud.project.service.file.FileService;
 import com.everycloud.project.service.file.ShareService;
+import com.everycloud.project.service.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 @Controller
 public class ShareFileController {
+    @Autowired
+    SettingsService settingsService;
 
     @Autowired
     ShareService shareService;
@@ -42,7 +46,7 @@ public class ShareFileController {
             if(sharedFile == null) sharedFile = shareService.createShare(realPath);
 
             map.put("sharedFile", sharedFile);
-            map.put("sharedFullLink", sharedFile.getLink());
+            map.put("sharedFullLink", addSlash(settingsService.getSettings("admin").getExternalUrl()) + "file?shareLink=" + sharedFile.getLink());
             map.put("result", "ok");
         } else {
             map.put("result", "잘못된 경로입니다.");
@@ -50,4 +54,10 @@ public class ShareFileController {
 
         return map;
     }
+
+    private String addSlash(String url) {
+        if(!url.endsWith("/")) url += "/";
+        return url;
+    }
+
 }
