@@ -1,3 +1,5 @@
+let shareFileList = new Array() ;
+
 $(document).ready(function() {
 	loadFileList($("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
 
@@ -269,7 +271,7 @@ function makeFileControlMenu() {
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td class='p-1'><i class='fa-solid fa-share-nodes'></i></td>\n"
-		fileControlHtml += 			"<td class='p-1'>공유</td>\n";
+		fileControlHtml += 			"<td class='p-1 pointer' onclick=\"shareFile()\" data-bs-toggle='modal' data-bs-target='#functionModal'>공유</td>\n";
 		fileControlHtml += 		"</tr>\n";
 		fileControlHtml += 		"<tr>\n";
 		fileControlHtml += 			"<td colspan='2' class='p-2'>\n";
@@ -314,6 +316,37 @@ function changeFileName() {
 	focusById("newFileName");
 }
 
+// share file
+function shareFile() {
+	let htmlText = "";
+	let sharedFullLink = "";
+
+	$.ajax({
+		url: "/shareNewFile",
+		type: "post",
+		async: false,
+		data: "path=" + $("#path").val() + "&fileName=" + $("input:checkbox[name=checkedFile]:checked").val(),
+		success: function(result) {
+			if(result.result != "ok") {
+				alert(result.result);
+				return false;
+			} else {
+				sharedFullLink = result.sharedFullLink;
+				shareFileList[0] = result.sharedFile;
+				console.log(shareFileList);
+			}
+		},
+		error: function() {
+			console.log("error");
+		}
+	});
+
+	htmlText = "<input type='text' class='form-control' id='sharedLink' value='" + (sharedFullLink || "링크생성오류") + "'>"
+		+ "<input type='hidden' id='functionModalAct' value='shareFile'>";
+	$("#functionModalLabel").text("공유");
+	$("#functionModalBody").html(htmlText);
+}
+
 // cursor on input box
 function focusById(id) {
 	setTimeout(()=>{
@@ -347,7 +380,7 @@ function loadFolderList(path, type) {
 	let listHtml = "<table>";
 
 	$.ajax({
-		url: "folderList",
+		url: "/folderList",
 		type: "post",
 		async: false,
 		data: data,
@@ -389,7 +422,7 @@ function moveFilesNewFolder(type) {
 		$("#moveFilesNewFolderOpen").removeClass("d-none");
 	} else {
 		$.ajax({
-			url: "newFolder",
+			url: "/newFolder",
 			type: "post",
 			data: "path=" + $("#moveToPath").val() + "&newFolderName=" + $("#moveFilesNewFolderName").val(),
 			success: function(result) {
@@ -457,29 +490,34 @@ function functionModalAffect() {
 		if(!newFolderName) errorMsg+= "폴더명을 적어주세요.";
 
 		data = "path=" + $("#path").val() + "&newFolderName=" + newFolderName;
-		url = "newFolder";
+		url = "/newFolder";
 	} else if(action == "newFile") {
 		let newFileName = encodeURIComponent($("#newFileName").val());
 		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
 
 		data = "path=" + $("#path").val() + "&newFileName=" + newFileName;
-		url = "newFile";
+		url = "/newFile";
 	} else if(action == "changeName") {
 		let newFileName = encodeURIComponent($("#newFileName").val());
 		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
 
 		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName;
-		url = "chageName";
+		url = "/chageName";
 	} else if(action == "deleteFiles") {
-		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;876542222222
-		url = "deleteFiles";
+		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
+		url = "/deleteFiles";
 	} else if(action == "moveFiles" || action == "copyFiles") {
 		let moveToPath = encodeURIComponent($("#moveToPath").val());
 		let path = $("#path").val();
 		if(moveToPath == path && action == "moveFiles") errorMsg+= "현재 위치와 동일합니다.";
 
 		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath + "&type=" + action;
-		url = "moveFiles";
+		url = "/moveFiles";
+	} else if(action == "shareFile") {
+		$("#sharedLink").select();
+		document.execCommand("copy");
+		alert("링크가 복사되었습니다");
+		return false;
 	}
 
 	if(errorMsg) {

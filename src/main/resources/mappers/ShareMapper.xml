@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="shareMapper">
+	
+	<select id="getShareByLink" resultType="Share">
+		SELECT link, path, date, method, pass, auth
+			FROM share
+		WHERE link = #{link}
+	</select>
+
+	<select id="getShareByPath" resultType="Share">
+		SELECT link, path, date, method, pass, auth
+			FROM share
+		WHERE path = #{path}
+	</select>
+
+	<insert id="createShare" parameterType="Share">
+		INSERT INTO share VALUES (#{link}, #{path}, #{date}, #{method}, #{pass}, #{auth})
+	</insert>
+	
+	<resultMap type="Share" id="ShareResultMap">
+		<id property="link" column="link" />
+		<result property="path" column="path" />
+		<result property="date" column="date" />
+		<result property="method" column="method" />
+		<result property="pass" column="pass" />
+		<result property="auth" column="auth" />
+	</resultMap>
+	
+</mapper>

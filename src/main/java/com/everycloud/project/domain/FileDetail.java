@@ -2,16 +2,7 @@ package com.everycloud.project.domain;
 
 import java.util.Date;
 
-import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
-
-@AutoProperty
 public class FileDetail {
-	
-	public String toString() {
-		return Pojomatic.toString(this);
-	}
-	
 	private String fileName, fileExtension, fileType;
 	private Date fileMakeDate, fileModifyDate, fileUseDate;
 	private int fileSize;
@@ -69,5 +60,17 @@ public class FileDetail {
 	public void setFileSize(int fileSize) {
 		this.fileSize = fileSize;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "FileDetail{" +
+				"fileName='" + fileName + '\'' +
+				", fileExtension='" + fileExtension + '\'' +
+				", fileType='" + fileType + '\'' +
+				", fileMakeDate=" + fileMakeDate +
+				", fileModifyDate=" + fileModifyDate +
+				", fileUseDate=" + fileUseDate +
+				", fileSize=" + fileSize +
+				'}';
+	}
 }
