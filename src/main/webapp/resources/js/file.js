@@ -56,11 +56,6 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
 				return false;
 			}
 
-			if(result.realPath) {
-				loadFileList(shareLink, result.realPath,'','','',true,false);
-				return false;
-			}
-
 			if(result.validPath) {
 				$("#nowPath").html(pathLink(shareLink, result.nowPath));
 

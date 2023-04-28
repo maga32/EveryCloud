@@ -54,8 +54,8 @@ public class FileViewController {
 
 	@RequestMapping("/fileList")
 	@ResponseBody
-	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
-			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+	public Map<String,Object> fileList(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
 			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
@@ -75,6 +75,7 @@ public class FileViewController {
 			sharePath = share.getPath();
 			path = sharePath + (path.equals("/") ? "" : path);
 		}
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 
 		boolean validPath = fileService.isPathExist(path);
 
@@ -85,11 +86,10 @@ public class FileViewController {
 			String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
 
 			if(!realPath.equals(path)) {
-				map.put("realPath", URLEncoder.encode(realPath.replace(sharePath, ""),"utf-8"));
+				fileList(shareLink, realPath.replace(sharePath, ""), sort, order, keyword, viewHidden);
 				return map;
 			}
 
-			String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
 			map.put("fileList", fileService.fileList(sharePath, path, sort, order, keyword, viewHidden));
 		}
