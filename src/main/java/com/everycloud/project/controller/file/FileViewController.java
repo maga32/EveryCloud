@@ -86,8 +86,7 @@ public class FileViewController {
 			String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
 
 			if(!realPath.equals(path)) {
-				fileList(shareLink, realPath.replace(sharePath, ""), sort, order, keyword, viewHidden);
-				return map;
+				return fileList(shareLink, realPath.replace(sharePath, ""), sort, order, keyword, viewHidden);
 			}
 
 			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
