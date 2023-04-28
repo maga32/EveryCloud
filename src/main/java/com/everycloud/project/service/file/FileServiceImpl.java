@@ -23,25 +23,26 @@ public class FileServiceImpl implements FileService {
 	FileDao fileDao;
 	
 	@Override
-	public List<Map<String, Object>> fileList(String path, String sort, String order, String keyword, boolean viewHidden) {
+	public List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
 		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
 		File[] files = null;
 		files = fileDao.getPathFiles(path, viewHidden, keyword);
-		
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
 		for(File i : files) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			
 			param.put("isDirectory", i.isDirectory());
 			param.put("isFile", i.isFile());
 			param.put("isHidden", i.isHidden());
-			param.put("getAbsolutePath", i.getAbsolutePath());
+			param.put("getAbsolutePath", i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
 			param.put("getName", i.getName());
 			param.put("getExtension", FilenameUtils.getExtension(i.getName()).toLowerCase());
-			param.put("getParent", i.getParent());
-			param.put("getPath", i.getPath());
+			param.put("getParent", i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
+			param.put("getPath", i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
 			param.put("lastModified", i.lastModified());
 			param.put("length", i.length());
-			try { param.put("getCanonicalPath", i.getCanonicalPath());
+			try { param.put("getCanonicalPath", i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
 			} catch (IOException e) { e.printStackTrace(); }
 			
 			fileList.add(param);

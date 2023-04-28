@@ -11,6 +11,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.everycloud.project.domain.Share;
+import com.everycloud.project.service.file.ShareService;
 import com.everycloud.project.util.UserUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +31,19 @@ public class FileViewController {
 	FileService fileService;
 
 	@Autowired
+	ShareService shareService;
+
+	@Autowired
 	UserUtil userUtil;
 
 	@RequestMapping("/file")
-	public String file(@RequestParam(value="path", required=false, defaultValue="/") String path,
+	public String file(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
 			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
 			Model model) throws IOException {
+		model.addAttribute("shareLink", shareLink);
 		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
 		model.addAttribute("sort", sort);
 		model.addAttribute("order",order);
@@ -48,16 +55,25 @@ public class FileViewController {
 	@RequestMapping("/fileList")
 	@ResponseBody
 	public Map<String,Object> fileList(@RequestParam(value="path", required=false, defaultValue="") String path,
-			@RequestParam(value="sharePath", required=false, defaultValue="") String sharePath,
+			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
 			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
 			@RequestParam(value="viewHidden", required=false) boolean viewHidden) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		if(sharePath.equals("") && !userUtil.isAdmin()) {
+		map.put("shareLink",shareLink);
+		String sharePath = "";
+
+		if(path.equals("") && shareLink.equals("")) path += "/";
+
+		if(shareLink.equals("") && !userUtil.isAdmin()) {
 			map.put("invalidAuth", "관리자만 접근할 수 있습니다.");
 			return map;
+		} else if(!shareLink.equals("")) {
+			Share share = shareService.getShareByLink(shareLink);
+			sharePath = share.getPath();
+			path = sharePath + (path.equals("/") ? "" : path);
 		}
 
 		boolean validPath = fileService.isPathExist(path);
@@ -67,16 +83,18 @@ public class FileViewController {
 			// windows folder path processing
 			path = path.replaceAll("\\\\", "/");
 			String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
-			
+
 			if(!realPath.equals(path)) {
-				map.put("realPath", URLEncoder.encode(realPath,"utf-8"));
+				map.put("realPath", URLEncoder.encode(realPath.replace(sharePath, ""),"utf-8"));
 				return map;
 			}
-			map.put("fileList", fileService.fileList(path, sort, order, keyword, viewHidden));
-			map.put("nowPath", nowPath);
+
+			String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+			map.put("fileList", fileService.fileList(sharePath, path, sort, order, keyword, viewHidden));
 		}
-		
-		map.put("path", path);
+
+		map.put("path", path.replace(sharePath, ""));
 		map.put("validPath", validPath);
 		
 		return map;

@@ -1,7 +1,7 @@
 let shareFileList = new Array() ;
 
 $(document).ready(function() {
-	loadFileList($("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
+	loadFileList($("#shareLink").val(),$("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
 
 	$("#checkAllFile").click(function(){
 		if(this.checked) {
@@ -17,17 +17,18 @@ $(document).ready(function() {
 // when history back clicked
 window.addEventListener('popstate', function(event) {
 	if (event.state != null) {
-		loadFileList(event.state.path, event.state.sort, event.state.order, event.state.keyword, false, false);
+		loadFileList(event.state.shareLink, event.state.path, event.state.sort, event.state.order, event.state.keyword, false, false);
     }
 });
 
 // loading FileList
-function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHistory = true) {
+function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = false, saveHistory = true) {
 	$("#fileList").html("");
 	$("#loadingList").addClass("act");
 	$("#checkAllFile").prop("checked", false);
 	viewFileControlMenu();
 
+	if(!shareLink) shareLink = $("#shareLink").val();
 	if(!path) path = $("#path").val();
 	if(!sort) sort = $("#sort").val();
 	if(!order) order = $("#order").val();
@@ -42,11 +43,11 @@ function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHist
 		$("#pathSort").addClass("d-none");
 	}
 
-	let data = "path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword;
+	let data = "shareLink=" + shareLink + "&path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword;
 	if(!$("#viewHiddenCheck").hasClass("inactive")) data += "&viewHidden=true	";
 
 	$.ajax({
-		url: "fileList",
+		url: "/fileList",
 		type: "post",
 		data: data,
 		success: function(result) {
@@ -56,18 +57,18 @@ function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHist
 			}
 
 			if(result.realPath) {
-				loadFileList(result.realPath,'','','',true,false);
+				loadFileList(shareLink, result.realPath,'','','',true,false);
 				return false;
 			}
 
 			if(result.validPath) {
-				$("#nowPath").html(pathLink(result.nowPath));
+				$("#nowPath").html(pathLink(shareLink, result.nowPath));
 
 				const fileList = result.fileList;
 				let listHtml = "";
 
 				for(i in fileList) {
-					listHtml += makeList(fileList[i].isDirectory, fileList[i].isHidden, fileList[i].getPath, fileList[i].getName, fileList[i].getExtension, fileList[i].lastModified, fileList[i].length);
+					listHtml += makeList(fileList[i].isDirectory, fileList[i].isHidden, shareLink, fileList[i].getPath, fileList[i].getName, fileList[i].getExtension, fileList[i].lastModified, fileList[i].length);
 				}
 
 				listHtml += "</table>";
@@ -86,14 +87,14 @@ function loadFileList(path, sort, order, keyword, resetKeyword = false, saveHist
 		complete: function() {
 			$("#loadingList").removeClass("act");
 			if(saveHistory) {
-				history.pushState({"path":path, "sort":sort, "order":order, "keyword":keyword}, null, "file?path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword);
+				history.pushState({"shareLink":shareLink , "path":path, "sort":sort, "order":order, "keyword":keyword}, null, "file?shareLink=" + shareLink + "&path=" + path + "&sort=" + sort + "&order=" + order + "&keyword=" + keyword);
 			}
 		}
 	});
 }
 
 // define link of #nowPath
-function pathLink(path) {
+function pathLink(shareLink, path) {
 	const parents = path.replace(/\\/g, "/").split("/");
 	let parentsHtml = "";
 	let parentHtml = "";
@@ -103,11 +104,11 @@ function pathLink(path) {
 		parentsLink += parents[i] + "/";
 		if(!parents[0]) parents[0] = "root";
 		if(parents[i+2]) {
-			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" style='white-space:normal'>" + parents[i] + "</div>\n";
+			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + shareLink + "','" + encodeURIComponent(parentsLink) + "','','','',true)\" style='white-space:normal'>" + parents[i] + "</div>\n";
 		} else if(parents[i+1]) {
-			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></div>\n<div><i class='fa-solid fa-angle-right'></i> </div>\n";
+			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + shareLink + "','" + encodeURIComponent(parentsLink) + "','','','',true)\">" + parents[i] + "</span></div>\n<div><i class='fa-solid fa-angle-right'></i> </div>\n";
 		} else if(parents[i]) {
-			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></div>\n";
+			parentHtml += "<div class='px-2 text-truncate'><span class='pointer' onclick=\"loadFileList('" + shareLink + "','" + encodeURIComponent(parentsLink) + "','','','',true)\" id='parent'>" + parents[i] + "</span></div>\n";
 		}
 	}
 
@@ -130,7 +131,7 @@ function pathLink(path) {
 }
 
 // make a file list each line
-function makeList(isDirectory, isHidden, path, name, extension, date, size) {
+function makeList(isDirectory, isHidden, shareLink, path, name, extension, date, size) {
 	if(isDirectory) {
 		extension = "folder";
 	} else if(!extensions.hasOwnProperty(extension)) {
@@ -144,19 +145,19 @@ function makeList(isDirectory, isHidden, path, name, extension, date, size) {
 	fileHtml += 		"<td class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
 	fileHtml += 		"<td class='text-center py-2' style='width:80px;'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml +=			"<img class='fileImg' src='/api/thumbnailmaker?name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
+		fileHtml +=			"<img class='fileImg' src='/api/thumbnailmaker?shareLink=" + shareLink + "&name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
 	} else {
 		fileHtml +=			"<img class='fileImg' src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
 	}
 	fileHtml += 		"</td>\n";
 	fileHtml += 		"<td class='w-auto'>\n";
 	fileHtml += 			"<div>\n";
-	fileHtml += 				"<span class='fileName " + ( extension == "folder" ? "pointer' onClick=\"loadFileList('" + encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "'" ) + " style='word-break:break-all'>"+ name + "</span>\n";
+	fileHtml += 				"<span class='fileName " + ( extension == "folder" ? "pointer' onClick=\"loadFileList('" + shareLink + "','"+ encodeURIComponent(path.replace(/\\/g, "/")) + "','','','',true)\" " : "'" ) + " style='word-break:break-all'>"+ name + "</span>\n";
 	fileHtml += 			"</div>\n";
 	fileHtml += 			"<div class='text-gray d-flex align-items-center'>\n";
 	fileHtml += 				"<div class='flex-shrink-0' style='width:60px;'>" + ( extension == "folder" ? "-" : fileSize(size) ) + "</div>\n";
 	fileHtml += 				"<div class='flex-grow-1' style='word-break:break-all; flex-basis: 110px; padding: 0 10px;'>\n";
-	fileHtml += 					"<div style='min-width:55px; " + ( $("#keyword").val() ? "font-size:10px;'>" + path : "text-align: right;'>" + extensions[extension] )  + "</div>\n";
+	fileHtml += 					"<div style='min-width:55px; " + ( $("#keyword").val() ? "font-size:10px;'>" + (shareLink ? "shareLink : " + shareLink + " / " : "") + path : "text-align: right;'>" + extensions[extension] )  + "</div>\n";
 	fileHtml += 				"</div>\n";
 	fileHtml += 				"<div style='word-break:keep-all; text-align:right'>" + moment(date, "x").format("YY/MM/DD HH:mm") + "</div>\n";
 	fileHtml += 			"</div>\n";
@@ -192,7 +193,7 @@ function setFileMenu(path, sort, order) {
 	$("#dateSort").text("날짜");
 	$("#sizeSort").text("크기");
 
-	$("#"+sort+"Sort").attr("onClick","loadFileList('', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "', '')");
+	$("#"+sort+"Sort").attr("onClick","loadFileList('', '', '" + sort + "', '" + (order=='asc'?'desc':'asc') + "', '')");
 	(order=='asc') ? $("#"+sort+"Sort").append("↑") : $("#"+sort+"Sort").append("↓");
 }
 

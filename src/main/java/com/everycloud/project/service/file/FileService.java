@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface FileService {
-	List<Map<String, Object>> fileList(String path, String sort, String order, String keyword, boolean viewHidden);
+	List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden);
 	
 	List<Map<String, Object>> folderList(String path);
 	
