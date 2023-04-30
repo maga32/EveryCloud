@@ -12,9 +12,12 @@
 	<script src="${ pageContext.request.contextPath }/resources/js/bootstrap.bundle.min.js"></script>
 	<script src="${ pageContext.request.contextPath }/resources/js/jquery-3.6.3.min.js"></script>
 	<script src="${ pageContext.request.contextPath }/resources/js/moment.min.js"></script>
-	<script src="https://kit.fontawesome.com/2adeaa7ee7.js" crossorigin="anonymous"></script>
-	
-	<link href="${ pageContext.request.contextPath }/resources/css/index.css" rel="stylesheet">	
+
+	<link href="${ pageContext.request.contextPath }/resources/fontawesome/css/fontawesome.min.css" rel="stylesheet">
+	<link href="${ pageContext.request.contextPath }/resources/fontawesome/css/brands.min.css" rel="stylesheet">
+	<link href="${ pageContext.request.contextPath }/resources/fontawesome/css/solid.min.css" rel="stylesheet">
+
+	<link href="${ pageContext.request.contextPath }/resources/css/index.css" rel="stylesheet">
 	<script src="${ pageContext.request.contextPath }/resources/js/index.js"></script>
 </head>
 <body>
