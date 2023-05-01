@@ -19,6 +19,18 @@
 	<insert id="createShare" parameterType="Share">
 		INSERT INTO share VALUES (#{link}, #{path}, #{date}, #{method}, #{pass}, #{auth})
 	</insert>
+
+	<select id="getShareGroup" resultType="ShareGroup" parameterType="HashMap">
+		SELECT share_link, group_no, auth FROM share_group
+			<where>
+				<if test="shareLink != null and !shareLink.equals('')">
+					share_link = #{shareLink}
+				</if>
+				<if test="groupNo != null and !groupNo.equals('')">
+					AND group_no = #{groupNo}
+				</if>
+			</where>
+	</select>
 	
 	<resultMap type="Share" id="ShareResultMap">
 		<id property="link" column="link" />
@@ -28,5 +40,11 @@
 		<result property="pass" column="pass" />
 		<result property="auth" column="auth" />
 	</resultMap>
-	
+
+	<resultMap type="ShareGroup" id="ShareGroupResultMap">
+		<id property="shareLink" column="share_link" />
+		<id property="groupNo" column="group_no" />
+		<result property="auth" column="auth" />
+	</resultMap>
+
 </mapper>

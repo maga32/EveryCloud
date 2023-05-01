@@ -97,7 +97,7 @@ function pathLink(shareLink, path) {
 
 	for(let i=0; i < parents.length; i++) {
 		parentsLink += parents[i] + "/";
-		if(!parents[0]) parents[0] = "root";
+		if(!parents[0]) parents[0] = "<i class='fa-solid fa-house'></i>";
 		if(parents[i+2]) {
 			parentsHtml += "<div class='pointer dropdown-item' onclick=\"loadFileList('" + shareLink + "','" + encodeURIComponent(parentsLink) + "','','','',true)\" style='white-space:normal'>" + parents[i] + "</div>\n";
 		} else if(parents[i+1]) {
@@ -140,7 +140,7 @@ function makeList(isDirectory, isHidden, shareLink, path, name, extension, date,
 	fileHtml += 		"<td class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
 	fileHtml += 		"<td class='text-center py-2' style='width:80px;'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml +=			"<img class='fileImg' src='/api/thumbnailmaker?shareLink=" + shareLink + "&name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
+		fileHtml +=			"<img class='fileImg' src='/api/thumbnailMaker?shareLink=" + shareLink + "&name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
 	} else {
 		fileHtml +=			"<img class='fileImg' src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
 	}

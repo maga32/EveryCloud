@@ -1,9 +1,13 @@
 package com.everycloud.project.dao.file;
 
 import com.everycloud.project.domain.Share;
+import com.everycloud.project.domain.ShareGroup;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Repository
 public class ShareDaoImpl implements ShareDao {
@@ -24,5 +28,13 @@ public class ShareDaoImpl implements ShareDao {
     @Override
     public void createShare(Share newShare) {
         sqlSession.insert("shareMapper.createShare", newShare);
+    }
+
+    @Override
+    public ShareGroup getShareGroup(String shareLink, Integer groupNo) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("shareLink", shareLink);
+        map.put("groupNo", groupNo);
+        return sqlSession.selectOne("shareMapper.getShareGroup", map);
     }
 }

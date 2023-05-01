@@ -43,7 +43,7 @@ public class UserController {
 
 	@RequestMapping("/login")
 	String loginPage(Model model, @RequestParam(value="siteHtml", required=false, defaultValue="") String siteHtml) {
-		if(session.getAttribute("user") != null) return "redirect:/";
+		if(userUtil.checkUserType() != 0) return "redirect:/";
 		model.addAttribute("siteHtml", siteHtml);
 		return "/user/login";
 	}

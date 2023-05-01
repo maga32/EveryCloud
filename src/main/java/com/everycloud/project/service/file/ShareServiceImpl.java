@@ -2,6 +2,7 @@ package com.everycloud.project.service.file;
 
 import com.everycloud.project.dao.file.ShareDao;
 import com.everycloud.project.domain.Share;
+import com.everycloud.project.domain.ShareGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +35,10 @@ public class ShareServiceImpl implements ShareService {
         shareDao.createShare(newShare);
 
         return newShare;
+    }
+
+    @Override
+    public ShareGroup getShareGroup(String shareLink, Integer groupNo) {
+        return shareDao.getShareGroup(shareLink, groupNo);
     }
 }

@@ -15,7 +15,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             String siteHtml = "";
             if(!request.getRequestURI().equals("")) {
                 siteHtml += "?siteHtml=" + request.getRequestURI();
-                if (!request.getQueryString().equals("")) {
+                if (request.getQueryString() != null && !request.getQueryString().equals("")) {
                     siteHtml += URLEncoder.encode("?" + request.getQueryString(),"UTF-8");
                 }
             }
