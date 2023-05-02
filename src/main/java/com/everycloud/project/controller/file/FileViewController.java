@@ -68,7 +68,7 @@ public class FileViewController {
 		String sharePath = "";
 
 		if(path.equals("") && shareLink.equals("")) path += "/";
-		if(shareMap.get("invalidAuth") != null || shareMap.get("needPassword") != null) {
+		if(shareMap.get("invalidString") != null) {
 			return map;
 		} else if(!shareLink.equals("")) {
 			sharePath = shareMap.get("sharePath");
@@ -121,9 +121,21 @@ public class FileViewController {
 	
 	@RequestMapping("/newFolder")
 	@ResponseBody
-	public Map<String,Object> newFolder(@RequestParam("path") String path, @RequestParam("newFolderName") String newFolderName) {
+	public Map<String,Object> newFolder(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam("path") String path, @RequestParam("newFolderName") String newFolderName) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+
 		map.putAll(fileService.newFolder(path, newFolderName));
 		
 		return map;
@@ -131,9 +143,21 @@ public class FileViewController {
 	
 	@RequestMapping("/newFile")
 	@ResponseBody
-	public Map<String,Object> newFile(@RequestParam("path") String path, @RequestParam("newFileName") String newFileName) throws IOException {
+	public Map<String,Object> newFile(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam("path") String path, @RequestParam("newFileName") String newFileName) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+
 		map.putAll(fileService.newFile(path, newFileName));
 		
 		return map;
@@ -141,10 +165,22 @@ public class FileViewController {
 	
 	@RequestMapping("/chageName")
 	@ResponseBody
-	public Map<String,Object> chageName(@RequestParam("path") String path,
-			@RequestParam("origFileName") String origFileName, @RequestParam("newFileName") String newFileName) {
+	public Map<String,Object> chageName(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam("path") String path, @RequestParam("origFileName") String origFileName,
+			@RequestParam("newFileName") String newFileName) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+
 		fileService.changeName(path, origFileName, newFileName);
 		
 		map.put("result", "ok");
@@ -158,14 +194,13 @@ public class FileViewController {
 		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
 		String sharePath = "";
 
-		String invalid = "" + (shareMap.get("invalidAuth") != null ? shareMap.get("invalidAuth") : "")
-				+ (shareMap.get("needPassword") != null ? shareMap.get("needPassword") : "");
+		String invalidString = "" + (shareMap.get("invalidString") != null ? shareMap.get("invalidString") : "");
 
-		if(!invalid.equals("")) {
+		if(!invalidString.equals("")) {
 			response.setContentType("text/html; charset=utf-8");
 			PrintWriter out = response.getWriter();
 			out.println("<script>");
-			out.println("	alert('" + invalid + "');");
+			out.println("	alert('" + invalidString + "');");
 			out.println("	window.close();");
 			out.println("</script>");
 			out.close();

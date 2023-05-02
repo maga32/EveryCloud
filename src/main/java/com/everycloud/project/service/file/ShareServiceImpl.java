@@ -57,14 +57,21 @@ public class ShareServiceImpl implements ShareService {
         Map<String, String> shareMap = new HashMap<String, String>();
         shareMap.put("shareLink", shareLink);
         int hasValidAuth = fileUtil.hasValidAuth(shareLink, authType);
+        String invalidString = "";
 
         if(shareLink.equals("") && !userUtil.isAdmin()) {
-            shareMap.put("invalidAuth", "관리자만 접근할 수 있습니다.");
+            invalidString = "관리자만 접근할 수 있습니다.";
+            shareMap.put("invalidAuth", invalidString);
+            shareMap.put("invalidString", invalidString);
         } else if(!shareLink.equals("")) {
             if(hasValidAuth == 0) {
-                shareMap.put("invalidAuth", "공유링크가 잘못되었거나 접근 권한이 없습니다.");
+                invalidString = "공유링크가 잘못되었거나 접근 권한이 없습니다.";
+                shareMap.put("invalidAuth", invalidString);
+                shareMap.put("invalidString", invalidString);
             } else if(hasValidAuth == 2) {
-                shareMap.put("needPassword", "패스워드 입력이 필요한 서비스입니다.");
+                invalidString = "패스워드 입력이 필요한 서비스입니다.";
+                shareMap.put("needPassword", invalidString);
+                shareMap.put("invalidString", invalidString);
             } else if(hasValidAuth == 1) {
                 shareMap.put("sharePath", shareDao.getShareByLink(shareLink).getPath());
             }

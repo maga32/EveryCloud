@@ -499,19 +499,19 @@ function functionModalAffect() {
 		let newFolderName = encodeURIComponent($("#newFolderName").val());
 		if(!newFolderName) errorMsg+= "폴더명을 적어주세요.";
 
-		data = "path=" + $("#path").val() + "&newFolderName=" + newFolderName;
+		data = "path=" + $("#path").val() + "&newFolderName=" + newFolderName + "&shareLink=" + $("#shareLink").val();
 		url = "/newFolder";
 	} else if(action == "newFile") {
 		let newFileName = encodeURIComponent($("#newFileName").val());
 		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
 
-		data = "path=" + $("#path").val() + "&newFileName=" + newFileName;
+		data = "path=" + $("#path").val() + "&newFileName=" + newFileName + "&shareLink=" + $("#shareLink").val();
 		url = "/newFile";
 	} else if(action == "changeName") {
 		let newFileName = encodeURIComponent($("#newFileName").val());
 		if(!newFileName) errorMsg+= "파일명을 적어주세요.";
 
-		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName;
+		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName + "&shareLink=" + $("#shareLink").val();
 		url = "/chageName";
 	} else if(action == "deleteFiles") {
 		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
