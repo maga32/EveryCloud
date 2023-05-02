@@ -39,7 +39,7 @@ public class ApiController {
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) throws IOException {
 		if(!userUtil.isAdmin()) {
 			if (shareLink.equals("")) return;
-			if (!fileUtil.isValidAuth(shareLink)) return;
+			if (fileUtil.hasValidAuth(shareLink,0) != 1) return;
 		}
 
 		Share share = shareService.getShareByLink(shareLink);

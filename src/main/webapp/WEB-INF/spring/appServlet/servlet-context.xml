@@ -27,6 +27,7 @@
 	<beans:bean id="loginInterceptor" class="com.everycloud.project.interceptor.LoginInterceptor"/>
 	<beans:bean id="adminInterceptor" class="com.everycloud.project.interceptor.AdminInterceptor"/>
 
+	<!--
 	<interceptors>
 		<interceptor>
 			<mapping path="/file" />
@@ -37,6 +38,6 @@
 			<beans:ref bean="adminInterceptor"/>
 		</interceptor>
 	</interceptors>
-	
+	-->
 	
 </beans:beans>

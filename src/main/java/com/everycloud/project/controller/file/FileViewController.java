@@ -3,6 +3,7 @@ package com.everycloud.project.controller.file;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,18 +62,16 @@ public class FileViewController {
 			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
 			@RequestParam(value="viewHidden", required=false) boolean viewHidden) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+		map.putAll(shareMap);
 
-		map.put("shareLink",shareLink);
 		String sharePath = "";
 
 		if(path.equals("") && shareLink.equals("")) path += "/";
-
-		if(shareLink.equals("") && !userUtil.isAdmin()) {
-			map.put("invalidAuth", "관리자만 접근할 수 있습니다.");
+		if(shareMap.get("invalidAuth") != null || shareMap.get("needPassword") != null) {
 			return map;
 		} else if(!shareLink.equals("")) {
-			Share share = shareService.getShareByLink(shareLink);
-			sharePath = share.getPath();
+			sharePath = shareMap.get("sharePath");
 			path = sharePath + (path.equals("/") ? "" : path);
 		}
 		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
@@ -154,9 +153,30 @@ public class FileViewController {
 	
 	@RequestMapping("/fileDownload")
 	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
+			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("fileNames") String fileNames) throws Exception {
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+		String sharePath = "";
+
+		String invalid = "" + (shareMap.get("invalidAuth") != null ? shareMap.get("invalidAuth") : "")
+				+ (shareMap.get("needPassword") != null ? shareMap.get("needPassword") : "");
+
+		if(!invalid.equals("")) {
+			response.setContentType("text/html; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.println("<script>");
+			out.println("	alert('" + invalid + "');");
+			out.println("	window.close();");
+			out.println("</script>");
+			out.close();
+			return;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+
 		String[] fileList = fileNames.split(",");
-		File firstFile = new File(path+ File.separator + fileList[0]);
+		File firstFile = new File(path + File.separator + fileList[0]);
 		
 		if(fileList.length!=1 || firstFile.isDirectory()) { // when multiple files selected or selected one is folder.
 			String downName ="downloads";
@@ -225,4 +245,5 @@ public class FileViewController {
 		
 		return map;
 	}
+
 }

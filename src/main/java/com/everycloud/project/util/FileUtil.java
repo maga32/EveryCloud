@@ -25,27 +25,44 @@ public class FileUtil {
     @Autowired
     HttpSession session;
 
+    @Autowired
+    UserUtil userUtil;
+
     /**
      * Check user's authentication for shareLink
      *
-     * @return boolean
+     * @param shareLink shareLink
+     * @param authType 0: read<br>1: write
+     * @return int<br>
+     * 0: invalid authorization<br>
+     * 1: valid authorization<br>
+     * 2: need password for authorization
      */
-    public boolean isValidAuth(String shareLink) {
+    public int hasValidAuth(String shareLink, int authType) {
         Share share = shareService.getShareByLink(shareLink);
-        if(share.getMethod() == 0) {
-            return true;
-        } else if(share.getMethod() == 1) {
-            if(pass.matches((String) session.getAttribute("sharePass"), share.getPass())) {
-                return true;
-            }
-        } else if (share.getMethod() == 2) {
-            User user = (User) session.getAttribute("user");
-            if(user != null) {
-                ShareGroup shareGroup = shareService.getShareGroup(shareLink, user.getGroupNo());
-                if (shareGroup != null) return true;
+
+        if(share != null) { // if share link is valid
+            if(userUtil.isAdmin()) {
+                return 1;
+            } else {
+                if (share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {    // share for who has the link
+                    return 1;
+                } else if (share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) { // share for who know the password
+                    String sharePass = (String) session.getAttribute("sharePass");
+                    if(sharePass == null || sharePass.equals("") || !pass.matches(sharePass, share.getPass())) return 2;
+                    return 1;
+                } else if (share.getMethod() == 2) {    // share for group who has authority
+                    User user = (User) session.getAttribute("user");
+                    if (user != null) {
+                        ShareGroup shareGroup = shareService.getShareGroup(shareLink, user.getGroupNo());
+                        if (shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
+                            return 1;
+                        }
+                    }
+                }
             }
         }
-        return false;
+        return 0;
     }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -58,6 +59,17 @@ public class ShareFileController {
     private String addSlash(String url) {
         if(!url.endsWith("/")) url += "/";
         return url;
+    }
+
+    @RequestMapping(value="/inputSharePass", method= RequestMethod.POST)
+    @ResponseBody
+    public Map<String,Object> shareNewFile(HttpSession session,
+            @RequestParam("sharePass") String sharePass) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        session.setAttribute("sharePass", sharePass);
+
+        map.put("result", "ok");
+        return map;
     }
 
 }

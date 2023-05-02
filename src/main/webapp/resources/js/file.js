@@ -54,6 +54,10 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
 			if(result.invalidAuth) {
 				alert(result.invalidAuth);
 				return false;
+			} else if (result.needPassword) {
+				alert(result.needPassword);
+				needPassword();
+				return false;
 			}
 
 			if(result.validPath) {
@@ -467,7 +471,17 @@ function downloadFiles() {
 	let fileNames = "";
 	$("input:checkbox[name=checkedFile]:checked").each(function() {fileNames += encodeURIComponent($(this).val()) + ",";});
 	fileNames = fileNames.slice(0, -1);
-	window.open("/fileDownload?path=" + $("#path").val() + "&fileNames=" + fileNames);
+	window.open("/fileDownload?path=" + $("#path").val() + "&fileNames=" + fileNames + "&shareLink=" + $("#shareLink").val());
+}
+
+// input password
+function needPassword() {
+	let htmlText = "<input type='password' class='form-control' id='sharePass' placeholder='비밀번호를 입력해주세요'>"
+		+ "<input type='hidden' id='functionModalAct' value='needPassword'>";
+	$("#functionModalLabel").text("비밀번호 입력");
+	$("#functionModalBody").html(htmlText);
+	focusById("sharePass");
+	$("#functionModal").modal("show");
 }
 
 // execute function
@@ -514,6 +528,12 @@ function functionModalAffect() {
 		document.execCommand("copy");
 		alert("링크가 복사되었습니다");
 		return false;
+	} else if(action == "needPassword") {
+		let sharePass = $("#sharePass").val();
+		if(!sharePass) errorMsg+= "비밀번호를 입력해주세요.";
+
+		data = "sharePass=" + sharePass;
+		url = "/inputSharePass";
 	}
 
 	if(errorMsg) {
