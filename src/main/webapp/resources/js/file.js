@@ -368,7 +368,7 @@ function moveFiles(path="", type="moveFiles") {
 					+		"<div class='d-none w-100 pe-4' id='moveFilesNewFolderOpen'>"
 					+			"<input type='text' class='form-control' id='" + type + "NewFolderName' name='" + type + "NewFolderName'>"
 					+		"</div>"
-					+		"<div class='flex-shrink-1 pointer' onclick=\"moveFilesNewFolder('" + type + "')\"><i class='fa-solid fa-folder-plus'></i></div>"
+					+		"<div class='flex-shrink-1 pointer' id='moveFilesNewFolderButton' onclick=\"moveFilesNewFolder('" + type + "')\"><i class='fa-solid fa-folder-plus'></i></div>"
 					+	"</div>";
 	$("#functionModalLabel").html(modalLabelHtml);
 	$("#functionModalBody").html(htmlText);
@@ -376,7 +376,8 @@ function moveFiles(path="", type="moveFiles") {
 
 // folder lists for move(or copy) files
 function loadFolderList(path, type) {
-	let data = "path=" + encodeURIComponent(path);
+	let shareLink = $("#shareLink").val();
+	let data = "path=" + encodeURIComponent(path) + "&shareLink=" + shareLink;
 	let listHtml = "<table>";
 
 	$.ajax({
@@ -385,10 +386,15 @@ function loadFolderList(path, type) {
 		async: false,
 		data: data,
 		success: function(result) {
-			if(result.validPath) {
-				const folderList = result.folderList;
+			if(result.invalidString) {
+				listHtml += "<tr><td>" + result.invalidString + "</td></tr>";
+				return false;
+			}
 
-				listHtml += "<tr class='pointer' onclick=\"moveFiles('" + path.replace(/\b\/[^/]*$|[^:/]*$/, "") + "', '" + type + "')\">\n"
+			if(result.validPath) {
+				console.log(result);
+				const folderList = result.folderList;
+				listHtml += "<tr class='pointer' onclick=\"moveFiles('" + (result.parentPath || "/") + "', '" + type + "')\">\n"
 						+ 		"<td class='text-center py-2' style='width:50px;'>\n"
 						+ 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n"
 						+ 		"</td>\n"
@@ -421,21 +427,25 @@ function moveFilesNewFolder(type) {
 	if($("#moveFilesNewFolderOpen").hasClass("d-none")) {
 		$("#moveFilesNewFolderOpen").removeClass("d-none");
 	} else {
+		if(!$("#" + type + "NewFolderName").val()) {
+			alert("폴더 이름을 작성해주세요.");
+			return false;
+		}
+
 		$.ajax({
 			url: "/newFolder",
 			type: "post",
-			data: "path=" + $("#moveToPath").val() + "&newFolderName=" + $("#moveFilesNewFolderName").val(),
+			data: "path=" + $("#moveToPath").val() + "&newFolderName=" + $("#moveFilesNewFolderName").val() + "&shareLink=" + $("#shareLink").val(),
 			success: function(result) {
-				if(result.result != "ok") {
+				if(result.result == "ok") {
+					moveFiles($("#moveToPath").val()+"/"+$("#moveFilesNewFolderName").val(), type);
+				} else {
 					alert(result.result);
 					return false;
 				}
 			},
 			error: function() {
 				console.log("error");
-			},
-			complete: function() {
-				moveFiles($("#moveToPath").val()+"/"+$("#moveFilesNewFolderName").val(), type);
 			}
 		});
 	}
@@ -521,7 +531,7 @@ function functionModalAffect() {
 		let path = $("#path").val();
 		if(moveToPath == path && action == "moveFiles") errorMsg+= "현재 위치와 동일합니다.";
 
-		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath + "&type=" + action;
+		data = "path=" + path + "&fileNames=" + selectedFiles + "&moveToPath=" + moveToPath + "&type=" + action + "&shareLink=" + $("#shareLink").val();
 		url = "/moveFiles";
 	} else if(action == "shareFile") {
 		$("#sharedLink").select();

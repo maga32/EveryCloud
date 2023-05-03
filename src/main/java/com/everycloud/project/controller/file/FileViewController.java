@@ -100,20 +100,35 @@ public class FileViewController {
 	
 	@RequestMapping("/folderList")
 	@ResponseBody
-	public Map<String,Object> folderList(@RequestParam("path") String path) {
+	public Map<String,Object> folderList(@RequestParam("path") String path,
+			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
 		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+		map.putAll(shareMap);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
 		boolean validPath = fileService.isPathExist(path);
 
 		if(validPath) {
 			File nowPath = fileService.getFile(path);
 			// windows folder path processing
 			path = path.replaceAll("\\\\", "/");
-			
-			map.put("folderList", fileService.folderList(path));
-			map.put("nowPath", nowPath);
+			String parentPath = nowPath.getPath().replaceAll("\\\\", "/").length() > sharePath.length() ? nowPath.getParent().replaceAll("\\\\", "/").replace(sharePath, "") : "/";
+			map.put("folderList", fileService.folderList(sharePath, path));
+			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+			map.put("parentPath", parentPath);
 		}
 		
-		map.put("path", path);
+		map.put("path", path.replace(sharePath, ""));
 		map.put("validPath", validPath);
 		
 		return map;
@@ -262,10 +277,23 @@ public class FileViewController {
 
 	@RequestMapping("/moveFiles")
 	@ResponseBody
-	public Map<String,Object> moveFiles(@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
+	public Map<String,Object> moveFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
 			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+			moveToPath = sharePath + (moveToPath.equals("/") ? "" : moveToPath);
+		}
+
 		map.putAll(fileService.moveFiles(path, moveToPath, fileNames, type));
 		
 		return map;

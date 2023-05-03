@@ -84,15 +84,16 @@ public class FileServiceImpl implements FileService {
 	}
 	
 	@Override
-	public List<Map<String, Object>> folderList(String path) {
+	public List<Map<String, Object>> folderList(String sharePath, String path) {
 		List<Map<String, Object>> folderList = new ArrayList<Map<String,Object>>();
 		File[] files = fileDao.getFolderList(path);
-		
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
 		for(File i : files) {
 			Map<String, Object> param = new HashMap<String, Object>();
 			
 			param.put("getName", i.getName());
-			param.put("getPath", i.getPath());
+			param.put("getPath", i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
 			param.put("lastModified", i.lastModified());
 			param.put("length", i.length());
 			
