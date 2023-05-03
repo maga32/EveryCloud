@@ -1,6 +1,5 @@
 package com.everycloud.project.controller.file;
 
-import com.everycloud.project.domain.Settings;
 import com.everycloud.project.domain.Share;
 import com.everycloud.project.service.file.FileService;
 import com.everycloud.project.service.file.ShareService;

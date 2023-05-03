@@ -524,7 +524,7 @@ function functionModalAffect() {
 		data = "path=" + $("#path").val() + "&origFileName=" + selectedFiles + "&newFileName=" + newFileName + "&shareLink=" + $("#shareLink").val();
 		url = "/chageName";
 	} else if(action == "deleteFiles") {
-		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles;
+		data = "path=" + $("#path").val() + "&fileNames=" + selectedFiles + "&shareLink=" + $("#shareLink").val();
 		url = "/deleteFiles";
 	} else if(action == "moveFiles" || action == "copyFiles") {
 		let moveToPath = encodeURIComponent($("#moveToPath").val());

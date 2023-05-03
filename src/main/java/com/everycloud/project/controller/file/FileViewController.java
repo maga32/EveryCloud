@@ -301,9 +301,21 @@ public class FileViewController {
 	
 	@RequestMapping("/deleteFiles")
 	@ResponseBody
-	public Map<String,Object> deleteFiles(@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
+	public Map<String,Object> deleteFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+			@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+
 		map.putAll(fileService.deleteFiles(path,fileNames));
 		
 		return map;
