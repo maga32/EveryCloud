@@ -46,9 +46,3 @@ function updateUserForm() {
     if(!emailRegex.test($("#email").val())) return reject("email", "올바른 이메일을 입력해주세요.");
     $("#updateUserForm").submit();
 }
-
-function reject(pointer, reason) {
-    alert(reason);
-    $("#"+pointer).focus();
-    return false;
-}

@@ -19,6 +19,7 @@
 
 	<link href="${ pageContext.request.contextPath }/resources/css/index.css" rel="stylesheet">
 	<script src="${ pageContext.request.contextPath }/resources/js/index.js"></script>
+	<script src="${ pageContext.request.contextPath }/resources/js/functions.js"></script>
 </head>
 <body>
 	<div class="row">
