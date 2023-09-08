@@ -1,4 +1,4 @@
-let shareFileList = new Array() ;
+let shareFileList = new Array();
 
 $(document).ready(function() {
 	loadFileList($("#shareLink").val(),$("#path").val(),$("#sort").val(),$("#order").val(),$("#keyword").val());
@@ -144,9 +144,9 @@ function makeList(isDirectory, isHidden, shareLink, path, name, extension, date,
 	fileHtml += 		"<td class='text-center' style='width:35px;'><input type='checkbox' class='form-check-input checkFile' name='checkedFile' value='" + name + "'></td>\n";
 	fileHtml += 		"<td class='text-center py-2' style='width:80px;'>\n";
 	if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-		fileHtml +=			"<img class='fileImg' src='/api/thumbnailMaker?shareLink=" + shareLink + "&name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px'>\n"
+		fileHtml +=			"<img class='fileImg' src='/api/thumbnailMaker?shareLink=" + shareLink + "&name=" + encodeURIComponent(path.replace(/\\/g, "/")) + "' width='64px' loading='lazy'>\n"
 	} else {
-		fileHtml +=			"<img class='fileImg' src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + ">" + "\n";
+		fileHtml +=			"<img class='fileImg' src='/resources/img/fileicons/" + extensions[extension] + ".png' " + (isHidden ? "style='opacity:0.3;'" : "") + " loading='lazy'>" + "\n";
 	}
 	fileHtml += 		"</td>\n";
 	fileHtml += 		"<td class='w-auto'>\n";
@@ -383,7 +383,7 @@ function loadFolderList(path, type) {
 				const folderList = result.folderList;
 				listHtml += "<tr class='pointer' onclick=\"moveFiles('" + (result.parentPath || "/") + "', '" + type + "')\">\n"
 						+ 		"<td class='text-center py-2' style='width:50px;'>\n"
-						+ 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n"
+						+ 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' loading='lazy'>\n"
 						+ 		"</td>\n"
 						+		"<td class='w-auto'>..</td>\n"
 						+ 	"</tr>\n";
@@ -442,7 +442,7 @@ function moveFilesNewFolder(type) {
 function makeFolderList(path, name, type) {
 	let makeFolderListHtml = "<tr class='pointer' onclick=\"moveFiles('" + path.replace(/\\/g, "/") + "', '" + type + "')\">\n";
 	makeFolderListHtml += 		"<td class='text-center py-2' style='width:50px;'>\n";
-    makeFolderListHtml += 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' >\n";
+    makeFolderListHtml += 			"<img class='fileImg' src='/resources/img/fileicons/" + extensions["folder"] + ".png' loading='lazy'>\n";
     makeFolderListHtml += 		"</td>\n";
     makeFolderListHtml += 		"<td class='w-auto'>\n";
     makeFolderListHtml += 			"<div>" + name + "</div>\n";
