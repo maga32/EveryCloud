@@ -55,10 +55,20 @@ dbcpdatasource.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# Intellij
-.idea/
-*.iml
+### IntelliJ IDEA ###
+.idea
 *.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+
+# frontend files
+node_modules
+/dist
+src/main/resources/static/
 
 # Mac
 .DS_Store
@@ -66,6 +76,14 @@ dbcpdatasource.properties
 ### Maven ###
 target/
 log/
+
+## Gradle ##
+HELP.md
+.gradle
+build/*
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # Code Recommenders
 .recommenders/

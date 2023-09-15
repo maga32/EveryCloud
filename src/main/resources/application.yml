@@ -1,0 +1,16 @@
+server:
+  port: 11024
+
+spring:
+  ##db settings
+  datasource:
+    url: jdbc:sqlite::resource:datasource/db/EveryCloud.db
+    driver-class-name: org.sqlite.JDBC
+
+## mybatis
+mybatis:
+  type-aliases-package: com.project.everycloud.model
+  mapper-locations: classpath:mapper/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
