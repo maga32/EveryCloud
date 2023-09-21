@@ -1,13 +1,19 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.file.FileDetailDTO;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public interface FileService {
 	List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden);
-	
+
+	AppList<FileDetailDTO> getFileList(HashMap<String, Object> paramMap);
+
 	List<Map<String, Object>> folderList(String sharePath, String path);
 	
 	File getFile(String path);

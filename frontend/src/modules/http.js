@@ -2,11 +2,12 @@ import axios from 'axios'
 // import Utils from '@/modules/utils'
 import Swal from 'sweetalert2'
 import Const from '@/const'
+const { VITE_SERVER_BASE_URL } = import.meta.env
 
 const HttpModule = {
   install (Vue) {
     const http = axios.create({
-      baseURL: process.env.SERVER_BASE_URL,
+      baseURL: VITE_SERVER_BASE_URL,
       // crossDomain: true,
       // withCredentials: true
     })

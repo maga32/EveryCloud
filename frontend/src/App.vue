@@ -29,7 +29,6 @@ export default {
 </script>
 
 <style>
-@import "@/assets/css/common.css";
 @import "@/assets/lib/bootstrap/css/bootstrap.min.css";
 @import "@/assets/lib/fontawesome/css/fontawesome.min.css";
 @import "@/assets/lib/fontawesome/css/brands.min.css";

@@ -1,5 +1,9 @@
 package com.project.everycloud.controller.file;
 
+import com.project.everycloud.common.type.ResponseType;
+import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.AppResponse;
+import com.project.everycloud.model.file.FileDetailDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
 import com.project.everycloud.common.util.UserUtil;
@@ -10,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -22,7 +27,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1")
 public class FileViewController {
 	
@@ -51,8 +56,8 @@ public class FileViewController {
 		return "/file/file";
 	}
 
-	@RequestMapping("/fileList")
-	@ResponseBody
+
+	@RequestMapping("/fileList2")
 	public Map<String,Object> fileList(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
@@ -95,9 +100,20 @@ public class FileViewController {
 		
 		return map;
 	}
+
+
+	@RequestMapping("/fileList")
+	public AppResponse<AppList<FileDetailDTO>> getFileList(@RequestParam HashMap<String, Object> paramMap) {
+
+		AppList<FileDetailDTO> fileList = fileService.getFileList(paramMap);
+
+		return new AppResponse<AppList<FileDetailDTO>>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(fileList);
+	}
 	
 	@RequestMapping("/folderList")
-	@ResponseBody
 	public Map<String,Object> folderList(@RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -133,7 +149,6 @@ public class FileViewController {
 	}
 	
 	@RequestMapping("/newFolder")
-	@ResponseBody
 	public Map<String,Object> newFolder(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("newFolderName") String newFolderName) {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -155,7 +170,6 @@ public class FileViewController {
 	}
 	
 	@RequestMapping("/newFile")
-	@ResponseBody
 	public Map<String,Object> newFile(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("newFileName") String newFileName) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -177,7 +191,6 @@ public class FileViewController {
 	}
 	
 	@RequestMapping("/chageName")
-	@ResponseBody
 	public Map<String,Object> chageName(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("origFileName") String origFileName,
 			@RequestParam("newFileName") String newFileName) {
@@ -274,7 +287,6 @@ public class FileViewController {
 	}
 
 	@RequestMapping("/moveFiles")
-	@ResponseBody
 	public Map<String,Object> moveFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
 			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
@@ -298,7 +310,6 @@ public class FileViewController {
 	}
 	
 	@RequestMapping("/deleteFiles")
-	@ResponseBody
 	public Map<String,Object> deleteFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
 		Map<String, Object> map = new HashMap<String, Object>();

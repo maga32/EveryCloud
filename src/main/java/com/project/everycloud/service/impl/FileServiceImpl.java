@@ -1,5 +1,7 @@
 package com.project.everycloud.service.impl;
 
+import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.file.FileDetailDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.mapper.FileDao;
 import org.apache.commons.io.FilenameUtils;
@@ -78,7 +80,12 @@ public class FileServiceImpl implements FileService {
 		}
 		return fileList;
 	}
-	
+
+	@Override
+	public AppList<FileDetailDTO> getFileList(HashMap<String, Object> paramMap) {
+		return null;
+	}
+
 	@Override
 	public List<Map<String, Object>> folderList(String sharePath, String path) {
 		List<Map<String, Object>> folderList = new ArrayList<Map<String,Object>>();

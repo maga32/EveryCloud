@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-const Sample = () => import(/* webpackChunkName: "Sample" */ '@/pages/Sample')
-const File = () => import(/* webpackChunkName: "File" */ '@/pages/File')
+const Sample = () => import(/* webpackChunkName: "Sample" */ '@/pages/Sample.vue')
+const File = () => import(/* webpackChunkName: "File" */ '@/pages/File.vue')
 
 const router = createRouter({
   history: createWebHistory(),

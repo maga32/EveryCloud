@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     getApi() {
-      this.$http.get('/api/v1/fileList')
+      this.$http.get('/fileList')
         .then((response) => {
           console.log("$http response : ")
           alert(JSON.stringify(response))
