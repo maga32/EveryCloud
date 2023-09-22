@@ -1,6 +1,6 @@
 <template>
   <!-- wing button -->
-  <span id="wingButton" class="d-block d-md-none pointer">
+  <span id="wingButton" class="d-block d-md-none pointer" @click="openWing">
     <span class="fa-stack fa-lg">
       <i class="fa fa-circle fa-stack-2x headerColor"></i>
       <i class="fa fa-bars fa-stack-1x fa-inverse"></i>
@@ -8,19 +8,16 @@
   </span>
 
   <!-- wing mask -->
-  <div id="wingMask" style="display:none;"></div>
+  <div id="wingMask" :style="{display: (minWingOpened ? 'block' : 'none')}" @click="closeWing"></div>
 
   <!-- wing -->
-  <div id="wing" class="border-end">
+  <div id="wing" class="border-end" :class="(!minWingOpened || 'open')" style="overflow:visible;">
+    <!-- theme select -->
     <div class="float-end" data-bs-toggle="dropdown" aria-expanded="false">
-      <div class="pointer" data-bs-auto-close="inside">
-        <i class="fa-solid fa-gear"></i>
-        테마&nbsp;
-        <i class="fa-solid fa-caret-right"></i>
-        &nbsp;
-        <i class="fa-solid" id="theme-icon"></i>
+      <div class="pointer" @click="openThemeSelect">
+        <i class="fa-solid fa-gear" /> 테마&nbsp;<i class="fa-solid fa-caret-right" /> <i class="fa-solid" id="theme-icon" />
       </div>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu show" v-if="themeSelectOpened" v-on-click-outside="closeThemeSelect">
         <li>
           <button type="button" class="dropdown-item d-flex align-items-center text-warning change-theme" data-bs-theme-value="light">
             <i class="fa-solid fa-sun"></i>&nbsp;Light
@@ -68,15 +65,15 @@
     </c:if>
 
     <!-- Menu start -->
-    <div class="row my-3">
+    <div class="row my-3" @click="closeWing">
       <div class="col-12">
         <div class="list-group list-group-flush">
-          <a href="/file?path=/" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder"></i> 파일</a>
+          <router-link :to="{path:'/file', query:{path:'/'}}" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder" /> 파일</router-link>
         </div>
       </div>
       <div class="col-12">
         <div class="list-group list-group-flush">
-          <a href="/share" class="list-group-item list-group-item-action" id="list_share"><i class="fa-solid fa-share-nodes"></i> 공유</a>
+          <router-link to="/share" class="list-group-item list-group-item-action" id="list_share"><i class="fa-solid fa-share-nodes" /> 공유</router-link>
         </div>
       </div>
     </div>
@@ -88,14 +85,91 @@
 </template>
 
 <script>
+import { vOnClickOutside } from '@vueuse/components'
+
 export default {
   name: 'WingMenu',
-  props: {
-    msg: String
+  data() {
+    return {
+      minWingOpened: false,
+      themeSelectOpened: false,
+    }
+  },
+  methods: {
+    openWing() {
+      this.minWingOpened = true
+    },
+    closeWing() {
+      this.minWingOpened = false
+    },
+    openThemeSelect() {
+      this.themeSelectOpened = true
+    },
+    closeThemeSelect() {
+      this.themeSelectOpened = false
+    }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
+#wing {
+  position: fixed;
+  z-index: 100;
+  top: 100px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  display:block;
+  transform: translateX(0px);
+  transition: 0.3s all ease;
+  transition: 0.2s all;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+}
+
+#wing::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+}
+
+@media (max-width: 767px){
+  #wing {
+    width: 300px;
+    transform: translateX(-300px);
+  }
+
+  #wing.open {
+    top: 0;
+    background: var(--bs-body-bg);
+    transform: translateX(0px);
+  }
+
+  #wingMask {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: black;
+    height: 100vh;
+    opacity: 0.3;
+    z-index: 90;
+  }
+}
+
+@media (min-width: 767px){
+  #wing {
+    width: 23%;
+  }
+}
+
+#wingButton {
+  position: fixed;
+  z-index: 80;
+  top: 50px;
+  left: -32px;
+  width: 70px;
+}
 </style>

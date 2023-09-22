@@ -1,11 +1,11 @@
 @charset "UTF-8";
 
 a {
-	text-decoration: none;
-	color: var(--bs-body-color);
+	text-decoration: none !important;
+	color: var(--bs-body-color) !important;
 }
 
-a:hover { text-decoration: underline; }
+a:hover { text-decoration: underline !important;}
 
 .pointer {
 	cursor: pointer;
@@ -31,66 +31,6 @@ a:hover { text-decoration: underline; }
 /*---------------- header end ----------------*/
 
 /*---------------- wing start ----------------*/
-#wing {
-	position: fixed;
-	z-index: 100;
-	top: 100px;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 100vh;
-	display:block;
-	transform: translateX(0px);
-	transition: 0.3s all ease;
-	transition: 0.2s all;
-	overflow-y: scroll;
-	-ms-overflow-style: none;
-}
-
-#wing::-webkit-scrollbar {
-	display: none;
-	width: 0 !important;
-}
-
-@media (max-width: 767px){
-	#wing {
-		width: 300px;
-		transform: translateX(-300px);
-	}
-	
-	#wing.open {
-		top: 0;
-		background: var(--bs-body-bg);
-		transform: translateX(0px);
-	}
-	
-	#wingMask {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		background: black;
-		height: 100vh;
-		opacity: 0.3;
-		z-index: 90;
-	}
-}
-
-@media (min-width: 768px){
-	#wing {
-		width: 23%;
-	}
-}
-
-#wingButton {
-	position: fixed;
-	z-index: 80;
-	top: 50px;
-	left: -32px;
-	width: 70px;
-}
-
 #theme-list {
 	display: none;
 }
