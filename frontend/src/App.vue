@@ -33,4 +33,5 @@ export default {
 @import "@/assets/lib/fontawesome/css/fontawesome.min.css";
 @import "@/assets/lib/fontawesome/css/brands.min.css";
 @import "@/assets/lib/fontawesome/css/solid.min.css";
+@import "@/assets/lib/fontawesome/css/regular.min.css";
 </style>

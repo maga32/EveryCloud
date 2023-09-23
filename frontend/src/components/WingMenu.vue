@@ -8,38 +8,33 @@
   </span>
 
   <!-- wing mask -->
-  <div id="wingMask" :style="{display: (minWingOpened ? 'block' : 'none')}" @click="closeWing"></div>
+  <div id="wingMask" :style="{display: (minWing ? 'block' : 'none')}" @click="closeWing"></div>
 
   <!-- wing -->
-  <div id="wing" class="border-end" :class="(!minWingOpened || 'open')" style="overflow:visible;">
+  <div id="wing" class="border-end" :class="(!minWing || 'open')" style="overflow:visible;">
+
     <!-- theme select -->
-    <div class="float-end" data-bs-toggle="dropdown" aria-expanded="false">
-      <div class="pointer" @click="openThemeSelect">
-        <i class="fa-solid fa-gear" /> 테마&nbsp;<i class="fa-solid fa-caret-right" /> <i class="fa-solid" id="theme-icon" />
-      </div>
-      <ul class="dropdown-menu show" v-if="themeSelectOpened" v-on-click-outside="closeThemeSelect">
-        <li>
-          <button type="button" class="dropdown-item d-flex align-items-center text-warning change-theme" data-bs-theme-value="light">
-            <i class="fa-solid fa-sun"></i>&nbsp;Light
-          </button>
-        </li>
-        <li>
-          <button type="button" class="dropdown-item d-flex align-items-center change-theme" data-bs-theme-value="dark">
-            <i class="fa-solid fa-moon"></i>&nbsp;&nbsp;Dark
-          </button>
-        </li>
-        <li>
-          <button type="button" class="dropdown-item d-flex align-items-center text-success change-theme" data-bs-theme-value="auto">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp;Auto
-          </button>
-        </li>
-      </ul>
+    <div class="float-end pointer my-2">
+      <!--
+      <i v-if="!userDark" @click="userDark=true" class="fa-regular fa-sun text-warning"/>
+      <i v-if="userDark" @click="userDark=false" class="fa-solid fa-moon text-warning"/>
+      -->
+      <span v-if="userDark" @click="userDark=false" class="fa-stack fa-2x" style="font-size: 1rem">
+        <i class="fa-solid fa-toggle-on fa-stack-2x text-black fa-rotate-180"></i>
+        <i class="fa-solid fa-circle fa-stack-1x pe-2 text-black" style="font-size: 1rem"></i>
+        <i class="fa-solid fa-moon fa-stack-1x pe-2 text-warning" style="font-size: 1rem"></i>
+      </span>
+      <span v-if="!userDark" @click="userDark=true" class="fa-stack fa-2x" style="font-size: 1rem">
+        <i class="fa-solid fa-toggle-on fa-stack-2x text-gray"></i>
+        <i class="fa-solid fa-circle fa-stack-1x ps-2 text-gray" style="font-size: 1rem"></i>
+        <i class="fa-solid fa-sun fa-stack-1x ps-2 text-white" style="font-size: 1rem"></i>
+      </span>
     </div>
 
     <div class="clearfix"></div>
 
     <c:if test="${ not empty user.id }">
-      <div>
+      <div class="text-break">
         <span class="fs-1">${ user.nickname }</span> 님
         <div>( ${ user.id } )</div>
         <c:if test="${ user.auth eq 'Y'}">
@@ -68,12 +63,16 @@
     <div class="row my-3" @click="closeWing">
       <div class="col-12">
         <div class="list-group list-group-flush">
-          <router-link :to="{path:'/file', query:{path:'/'}}" class="list-group-item list-group-item-action" id="list_file"><i class="fa-solid fa-folder" /> 파일</router-link>
+          <router-link :to="{path:'/file', query:{path:'/'}}" class="list-group-item list-group-item-action" active-class="bg-body-secondary">
+            <i class="fa-solid fa-folder" /> 파일
+          </router-link>
         </div>
       </div>
       <div class="col-12">
         <div class="list-group list-group-flush">
-          <router-link to="/share" class="list-group-item list-group-item-action" id="list_share"><i class="fa-solid fa-share-nodes" /> 공유</router-link>
+          <router-link to="/share" class="list-group-item list-group-item-action" active-class="bg-body-secondary">
+            <i class="fa-solid fa-share-nodes" /> 공유
+          </router-link>
         </div>
       </div>
     </div>
@@ -84,31 +83,31 @@
   </div>
 </template>
 
-<script>
-import { vOnClickOutside } from '@vueuse/components'
+<script setup>
+import { ref } from 'vue'
+import { useDark } from '@vueuse/core'
 
-export default {
-  name: 'WingMenu',
-  data() {
-    return {
-      minWingOpened: false,
-      themeSelectOpened: false,
-    }
-  },
-  methods: {
-    openWing() {
-      this.minWingOpened = true
-    },
-    closeWing() {
-      this.minWingOpened = false
-    },
-    openThemeSelect() {
-      this.themeSelectOpened = true
-    },
-    closeThemeSelect() {
-      this.themeSelectOpened = false
-    }
-  }
+const userDark = useDark({
+  selector: 'html',
+  attribute: 'data-bs-theme',
+  valueDark: 'dark',
+  valueLight: 'light',
+})
+
+const minWing = ref(false)
+const themeSelect = ref(false)
+const test = ref('')
+
+function openWing() {
+  minWing.value = true
+}
+
+function closeWing() {
+  minWing.value = false
+}
+
+function closeThemeSelect() {
+  themeSelect.value = false
 }
 </script>
 
