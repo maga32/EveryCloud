@@ -1,6 +1,6 @@
 import axios from 'axios'
 // import Utils from '@/modules/utils'
-import Swal from 'vue-sweetalert2'
+import Swal from 'sweetalert2'
 import Const from '@/const'
 const { VITE_SERVER_BASE_URL } = import.meta.env
 
