@@ -8,19 +8,14 @@ const HttpModule = {
   install (Vue) {
     const http = axios.create({
       baseURL: VITE_SERVER_BASE_URL,
-      // crossDomain: true,
-      // withCredentials: true
     })
 
     /*------------- request ------------- */
     http.interceptors.request.use((config) => {
       // window.$loading.show()
 
-      config.headers.Authorization = window.$store.getters['User/getToken']
-      config.headers.Authorization = localStorage.getItem('token')
-
       // header 에 menuId를 저장한다.
-      config.headers ["MENU_ID"] = window.$store.getters['Menu/getCurMenuId']
+      // config.headers ["MENU_ID"] = window.$store.getters['Menu/getCurMenuId']
 
       return config
     }, (error) => {
@@ -51,7 +46,8 @@ const HttpModule = {
         if (error.response.status == 401) {
           window.$store.dispatch('User/setToken', '')
         }
-        Swal.fire({ icon: 'error', text: error.response.data.message })
+        Swal.fire({ icon: 'error', text: error.response.status + ' : ' + error.response.statusText })
+        console.log(error.response)
       } else {
         Swal.fire({ icon: 'error', text: error })
       }

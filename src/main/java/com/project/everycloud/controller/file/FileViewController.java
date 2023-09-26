@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,6 +40,9 @@ public class FileViewController {
 
 	@Autowired
 	UserUtil userUtil;
+
+	@Autowired
+	HttpSession session;
 
 	@RequestMapping("/file")
 	public String file(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
@@ -117,7 +121,7 @@ public class FileViewController {
 	public Map<String,Object> folderList(@RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
 		map.putAll(shareMap);
 
 		String sharePath = "";
@@ -152,7 +156,7 @@ public class FileViewController {
 	public Map<String,Object> newFolder(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("newFolderName") String newFolderName) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
 		String sharePath = "";
 
@@ -173,7 +177,7 @@ public class FileViewController {
 	public Map<String,Object> newFile(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("newFileName") String newFileName) throws IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
 		String sharePath = "";
 
@@ -195,7 +199,7 @@ public class FileViewController {
 			@RequestParam("path") String path, @RequestParam("origFileName") String origFileName,
 			@RequestParam("newFileName") String newFileName) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
 		String sharePath = "";
 
@@ -217,7 +221,7 @@ public class FileViewController {
 	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("fileNames") String fileNames) throws Exception {
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
 		String sharePath = "";
 
 		String invalidString = "" + (shareMap.get("invalidString") != null ? shareMap.get("invalidString") : "");
@@ -291,7 +295,7 @@ public class FileViewController {
 			@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
 			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
 		String sharePath = "";
 
@@ -313,7 +317,7 @@ public class FileViewController {
 	public Map<String,Object> deleteFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
 		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1);
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
 		String sharePath = "";
 

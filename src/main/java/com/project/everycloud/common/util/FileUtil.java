@@ -38,11 +38,11 @@ public class FileUtil {
      * 1: valid authorization<br>
      * 2: need password for authorization
      */
-    public int hasValidAuth(String shareLink, int authType) {
+    public int hasValidAuth(String shareLink, int authType, HttpSession session) {
         ShareDTO share = shareService.getShareByLink(shareLink);
 
         if(share != null) { // if share link is valid
-            if(userUtil.isAdmin()) {
+            if(userUtil.isAdmin(session)) {
                 return 1;
             } else {
                 if (share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {    // share for who has the link

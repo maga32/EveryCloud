@@ -3,6 +3,7 @@ package com.project.everycloud.service;
 import com.project.everycloud.model.share.ShareDTO;
 import com.project.everycloud.model.share.ShareGroupDTO;
 
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 public interface ShareService {
@@ -26,5 +27,5 @@ public interface ShareService {
      * (String) invalidString : if there is any reason of reject, invalidString is exist<br>
      * (String) sharePath : if user has valid auth, returns share path
      */
-    Map<String, String> getShareAuth(String shareLink, int authType);
+    Map<String, String> getShareAuth(String shareLink, int authType, HttpSession session);
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,13 +56,13 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public Map<String, String> getShareAuth(String shareLink, int authType) {
+    public Map<String, String> getShareAuth(String shareLink, int authType, HttpSession session) {
         Map<String, String> shareMap = new HashMap<String, String>();
         shareMap.put("shareLink", shareLink);
-        int hasValidAuth = fileUtil.hasValidAuth(shareLink, authType);
+        int hasValidAuth = fileUtil.hasValidAuth(shareLink, authType, session);
         String invalidString = "";
 
-        if(shareLink.equals("") && !userUtil.isAdmin()) {
+        if(shareLink.equals("") && !userUtil.isAdmin(session)) {
             invalidString = "관리자만 접근할 수 있습니다.";
             shareMap.put("invalidAuth", invalidString);
             shareMap.put("invalidString", invalidString);
