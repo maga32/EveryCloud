@@ -85,16 +85,16 @@ public class UserUtil {
     /**
      * return user type by session's user
      *
+     * @param user
+     * @param admin
      * @return int<br>
      * 0. not logged in<br>
      * 1. user<br>
      * 2. admin<br>
      * 3. admin (who needs to change the password)
      */
-    public int checkUserType(HttpSession session) {
+    public int checkUserType(UserDTO user, UserDTO admin) {
         int userType = 0;
-        UserDTO user = (UserDTO) session.getAttribute("user");
-        UserDTO admin = userService.getAdmin();
 
         if(user != null) {
             if(user.getId().equals(admin.getId())) {

@@ -1,5 +1,8 @@
 package com.project.everycloud.controller.user;
 
+import com.project.everycloud.common.type.ResponseType;
+import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.common.util.UserUtil;
@@ -28,6 +31,20 @@ public class UserController {
 	@Autowired
 	UserUtil userUtil;
 
+	@RequestMapping("/getSessionUser")
+	public AppResponse<UserDTO> getSessionUser() {
+		UserDTO user = (UserDTO) session.getAttribute("user");
+		UserDTO admin = userService.getAdmin();
+		if(userUtil.checkUserType(user, admin) == 3) {
+			throw new
+		}
+
+		return new AppResponse<UserDTO>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(user);
+	}
+
 	@PostMapping("/getUser")
 	public Map<String, Object> getUser(@RequestParam("id") String id) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -38,7 +55,9 @@ public class UserController {
 
 	@RequestMapping("/login")
 	String loginPage(Model model, @RequestParam(value="siteHtml", required=false, defaultValue="") String siteHtml) {
-		if(userUtil.checkUserType(session) != 0) return "redirect:/";
+		UserDTO user = (UserDTO) session.getAttribute("user");
+		UserDTO admin = userService.getAdmin();
+		if(userUtil.checkUserType(user, admin) != 0) return "redirect:/";
 		model.addAttribute("siteHtml", siteHtml);
 		return "/user/login";
 	}
@@ -75,7 +94,10 @@ public class UserController {
 		@RequestParam(value = "id", required = false, defaultValue = "") String id,
 		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
 
-		if(userUtil.checkUserType(session) == 0) return "redirect:/";
+		UserDTO user = (UserDTO) session.getAttribute("user");
+		UserDTO admin = userService.getAdmin();
+
+		if(userUtil.checkUserType(user, admin) == 0) return "redirect:/";
 		if(id.equals("") && userUtil.isAdmin(session)) {
 			model.addAttribute("user", userService.getAdmin());
 		} else if(userUtil.isAdmin(session) || id.equals(((UserDTO)session.getAttribute("user")).getId())) {
