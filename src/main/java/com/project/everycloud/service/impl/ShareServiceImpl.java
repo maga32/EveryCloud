@@ -1,8 +1,10 @@
 package com.project.everycloud.service.impl;
 
+import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.share.ShareDTO;
 import com.project.everycloud.model.share.ShareGroupDTO;
 import com.project.everycloud.service.ShareService;
+import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.ShareMapper;
 import com.project.everycloud.common.util.FileUtil;
 import com.project.everycloud.common.util.UserUtil;
@@ -20,6 +22,9 @@ public class ShareServiceImpl implements ShareService {
 
     @Autowired
     ShareMapper shareMapper;
+
+    @Autowired
+    UserService userService;
 
     @Lazy
     UserUtil userUtil;
@@ -62,7 +67,9 @@ public class ShareServiceImpl implements ShareService {
         int hasValidAuth = fileUtil.hasValidAuth(shareLink, authType, session);
         String invalidString = "";
 
-        if(shareLink.equals("") && !userUtil.isAdmin(session)) {
+        UserDTO user = (UserDTO)session.getAttribute("user");
+
+        if(shareLink.equals("") && !userService.isAdmin(user)) {
             invalidString = "관리자만 접근할 수 있습니다.";
             shareMap.put("invalidAuth", invalidString);
             shareMap.put("invalidString", invalidString);

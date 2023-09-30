@@ -13,12 +13,19 @@
   <!-- wing -->
   <div id="wing" class="border-end" :class="(!minWing || 'open')" style="overflow:visible;">
 
+    <!-- language select -->
+    <div class="d-flex flex-wrap pt-2">
+      <select v-model="state.language" class="form-select-sm flex-grow-1" @change="languageSelect(this.value)">
+        <option disabled value="">Select</option>
+        <option value="en">English</option>
+        <option value="ko">Korean</option>
+      </select>
+      <i class="fa-solid fa-language ps-1" style="font-size: 2rem"/>
+    </div>
+    <div class="clearfix"/>
+
     <!-- theme select -->
     <div class="float-end pointer my-2">
-      <!--
-      <i v-if="!userDark" @click="userDark=true" class="fa-regular fa-sun text-warning"/>
-      <i v-if="userDark" @click="userDark=false" class="fa-solid fa-moon text-warning"/>
-      -->
       <span v-if="userDark" @click="userDark=false" class="fa-stack fa-2x" style="font-size: 1rem">
         <i class="fa-solid fa-toggle-on fa-stack-2x text-black fa-rotate-180"></i>
         <i class="fa-solid fa-circle fa-stack-1x pe-2 text-black" style="font-size: 1rem"></i>
@@ -31,7 +38,8 @@
       </span>
     </div>
 
-    <div class="clearfix"></div>
+
+    <div class="clearfix"/>
 
     <c:if test="${ not empty user.id }">
       <div class="text-break">
@@ -43,7 +51,7 @@
       </div>
       <div class="d-grid gap-2 my-4" id="wingUserInfo">
         <button class="btn btn-outline-secondary"
-                onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.id }", type:"${ user.auth == "Y" ? "admin" : "user" }" } })'>
+            onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.id }", type:"${ user.auth == "Y" ? "admin" : "user" }" } })'>
           Edit Profile
         </button>
         <button class="btn btn-secondary" onclick="location.href='/logout'">
@@ -84,8 +92,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useDark } from '@vueuse/core'
+import { ref, onMounted, reactive } from 'vue'
+import { useDark, useStorage, usePreferredLanguages } from '@vueuse/core'
+import { setLocale } from '@vee-validate/i18n'
+import router from '@/router'
+
+const form = reactive({
+  user: {
+    id: '',
+    pass: '',
+    nickname: '',
+    email: '',
+    auth: '',
+    groupNo: '',
+    groupName: '',
+  },
+  languages: ['en', 'ko'],
+})
+
+onMounted(()=> {
+  languageSelect()
+
+  $http.post('/getSessionUser')
+    .then((response) => {
+      if (response.code === '402') {
+        router.push({
+          path: '/updateUserForm',
+          state: {
+            params : {
+              type: 'admin',
+            }
+          }
+        })
+      } else {
+        form.user = response.data
+      }
+    })
+})
+
+/*------- theme & wing -------*/
+const state = useStorage('my-state', {language: ''})
 
 const userDark = useDark({
   selector: 'html',
@@ -96,7 +142,6 @@ const userDark = useDark({
 
 const minWing = ref(false)
 const themeSelect = ref(false)
-const test = ref('')
 
 function openWing() {
   minWing.value = true
@@ -108,6 +153,12 @@ function closeWing() {
 
 function closeThemeSelect() {
   themeSelect.value = false
+}
+
+function languageSelect(language='') {
+  language = language || (state.value.language || (form.languages.includes(usePreferredLanguages()) || 'en'))
+  state.value.language = language
+  setLocale(language)
 }
 </script>
 
@@ -171,4 +222,9 @@ function closeThemeSelect() {
   left: -32px;
   width: 70px;
 }
+
+.swal2-container, .swal2-popup {
+   color: var(--bs-body-color);
+   background-color: var(--bs-body-bg);
+ }
 </style>

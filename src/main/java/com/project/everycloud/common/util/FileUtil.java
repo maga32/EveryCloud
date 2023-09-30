@@ -23,9 +23,6 @@ public class FileUtil {
     ShareService shareService;
 
     @Autowired
-    HttpSession session;
-
-    @Autowired
     UserUtil userUtil;
 
     /**
@@ -41,8 +38,10 @@ public class FileUtil {
     public int hasValidAuth(String shareLink, int authType, HttpSession session) {
         ShareDTO share = shareService.getShareByLink(shareLink);
 
+        UserDTO user = (UserDTO) session.getAttribute("user");
+
         if(share != null) { // if share link is valid
-            if(userUtil.isAdmin(session)) {
+            if(userService.isAdmin(user)) {
                 return 1;
             } else {
                 if (share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {    // share for who has the link
@@ -52,7 +51,6 @@ public class FileUtil {
                     if(sharePass == null || sharePass.equals("") || !pass.matches(sharePass, share.getPass())) return 2;
                     return 1;
                 } else if (share.getMethod() == 2) {    // share for group who has authority
-                    UserDTO user = (UserDTO) session.getAttribute("user");
                     if (user != null) {
                         ShareGroupDTO shareGroup = shareService.getShareGroup(shareLink, user.getGroupNo());
                         if (shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {

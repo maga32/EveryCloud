@@ -4,9 +4,9 @@
       <header-menu/>
     </div>
 
-    <div class="col-d-none col-md-3"></div>
     <wing-menu/>
 
+    <div class="col-d-none col-md-3"></div>
     <div class="col-12 col-md-9 px-4 px-md-0" id="body">
       <router-view/>
     </div>

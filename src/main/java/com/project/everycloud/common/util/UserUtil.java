@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
-
 @Component
 public class UserUtil {
     @Autowired
@@ -16,10 +14,12 @@ public class UserUtil {
     /**
      * Check whether admin or not by session
      *
+     * @param user
+     * @param admin
      * @return boolean
      */
-    public boolean isAdmin(HttpSession session) {
-        int userType = checkUserType(session);
+    public boolean isAdmin(UserDTO user, UserDTO admin) {
+        int userType = checkUserType(user, admin);
         if(userType == 2 || userType == 3) return true;
         return false;
     }
@@ -40,8 +40,8 @@ public class UserUtil {
      *
      * @return boolean
      */
-    public boolean isUser(HttpSession session) {
-        int userType = checkUserType(session);
+    public boolean isUser(UserDTO user, UserDTO admin) {
+        int userType = checkUserType(user, admin);
         if(userType != 0) return true;
         return false;
     }
@@ -76,8 +76,7 @@ public class UserUtil {
      * @param userId
      * @return boolean
      */
-    public boolean isValidUser(HttpSession session, String userId) {
-        UserDTO user = (UserDTO) session.getAttribute("user");
+    public boolean isValidUser(UserDTO user, String userId) {
         if(user != null && userId.equals(user.getId())) return true;
         return false;
     }

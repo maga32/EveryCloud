@@ -5,7 +5,7 @@
 <mapper namespace="com.project.everycloud.service.mapper.UserMapper">
 	
 	<select id="getUser" resultType="UserDTO">
-		SELECT id, nickname, email, auth, g.no, g.name
+		SELECT id, nickname, email, auth, g.no group_no, g.name group_name
 			FROM user u, group_setting g
 		WHERE id = #{id} and u.group_no = g.no
 	</select>
@@ -16,7 +16,7 @@
 	</select>
 
 	<select id="getAdmin" resultType="UserDTO">
-		SELECT id, pass, nickname, email FROM user
+		SELECT id, nickname, email FROM user
 			WHERE auth = 'Y'
 	</select>
 

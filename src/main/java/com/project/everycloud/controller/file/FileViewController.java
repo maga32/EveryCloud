@@ -1,19 +1,17 @@
 package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
+import com.project.everycloud.common.util.UserUtil;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.file.FileDetailDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
-import com.project.everycloud.common.util.UserUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +60,7 @@ public class FileViewController {
 
 
 	@RequestMapping("/fileList2")
-	public Map<String,Object> fileList(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+	public AppResponse<HashMap<String,Object>> fileList(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam(value="path", required=false, defaultValue="") String path,
 			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
 			@RequestParam(value="order", required=false, defaultValue="asc") String order,
@@ -101,8 +99,11 @@ public class FileViewController {
 
 		map.put("path", path.replace(sharePath, ""));
 		map.put("validPath", validPath);
-		
-		return map;
+
+		return new AppResponse<HashMap<String, Object>>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData((HashMap<String, Object>) map);
 	}
 
 
