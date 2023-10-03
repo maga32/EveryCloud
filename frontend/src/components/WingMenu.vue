@@ -38,34 +38,29 @@
       </span>
     </div>
 
-
     <div class="clearfix"/>
 
-    <c:if test="${ not empty user.id }">
-      <div class="text-break">
-        <span class="fs-1">${ user.nickname }</span> 님
-        <div>( ${ user.id } )</div>
-        <c:if test="${ user.auth eq 'Y'}">
-          <div class="text-danger">관리자 계정</div>
-        </c:if>
-      </div>
-      <div class="d-grid gap-2 my-4" id="wingUserInfo">
-        <button class="btn btn-outline-secondary"
-            onclick='goToPost({ url:"/updateUser", params:{ userId:"${ user.id }", type:"${ user.auth == "Y" ? "admin" : "user" }" } })'>
-          Edit Profile
-        </button>
-        <button class="btn btn-secondary" onclick="location.href='/logout'">
-          Logout
-        </button>
-      </div>
-    </c:if>
-    <c:if test="${ empty user.id }">
+    <div v-if="!$store.state.user.user.id">
       <div class="d-grid gap-2 my-4">
         <button class="btn btn-secondary" onclick="location.href='/login'">
           Login
         </button>
       </div>
-    </c:if>
+    </div>
+
+    <div v-else>
+      <div class="text-break">
+        <span class="fs-1">{{ $store.state.user.user.nickname }}</span> 님
+        <div>( {{ $store.state.user.user.id }} )</div>
+      </div>
+      <div class="d-grid gap-2 my-4" id="wingUserInfo">
+        <router-link :to="{path:'/updateUserForm', state:{params:{type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user' }}}"
+            @click="$store.dispatch('link/addSiteHtml')" class="btn btn-outline-secondary">Edit Profile</router-link>
+        <button class="btn btn-secondary" onclick="location.href='/logout'">
+          Logout
+        </button>
+      </div>
+    </div>
 
     <!-- Menu start -->
     <div class="row my-3" @click="closeWing">
@@ -86,8 +81,6 @@
     </div>
     <!-- Menu end -->
 
-    <form action="" method="post" id="goPostForm"></form>
-
   </div>
 </template>
 
@@ -95,39 +88,14 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useDark, useStorage, usePreferredLanguages } from '@vueuse/core'
 import { setLocale } from '@vee-validate/i18n'
-import router from '@/router'
 
 const form = reactive({
-  user: {
-    id: '',
-    pass: '',
-    nickname: '',
-    email: '',
-    auth: '',
-    groupNo: '',
-    groupName: '',
-  },
   languages: ['en', 'ko'],
 })
 
 onMounted(()=> {
   languageSelect()
-
-  $http.post('/getSessionUser')
-    .then((response) => {
-      if (response.code === '402') {
-        router.push({
-          path: '/updateUserForm',
-          state: {
-            params : {
-              type: 'admin',
-            }
-          }
-        })
-      } else {
-        form.user = response.data
-      }
-    })
+  $store.dispatch('user/updateUser')
 })
 
 /*------- theme & wing -------*/

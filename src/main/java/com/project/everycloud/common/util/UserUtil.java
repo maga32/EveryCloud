@@ -53,7 +53,7 @@ public class UserUtil {
      * @return boolean
      */
     public boolean isUser(String userId) {
-        if(userService.getUser(userId) != null) return true;
+        if(userService.getUserInfo(userId) != null) return true;
         return false;
     }
 

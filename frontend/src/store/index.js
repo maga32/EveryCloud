@@ -1,12 +1,14 @@
 import { createStore } from 'vuex'
-// import Menu from './modules/Menu'
-// import User from './modules/User'
+import link from './modules/link'
+import user from './modules/user'
 
 const store = createStore({
   modules: {
-    // Menu,
-    // User
+    link,
+    user
   }
 })
+
+window.$store = store
 
 export default store

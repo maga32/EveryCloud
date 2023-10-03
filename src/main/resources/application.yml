@@ -7,6 +7,11 @@ spring:
     url: jdbc:sqlite::resource:datasource/db/EveryCloud.db
     driver-class-name: org.sqlite.JDBC
 
+logging:
+  level:
+    root: info
+    com.project.everycloud.service.mapper: debug
+
 ## mybatis
 mybatis:
   type-aliases-package: com.project.everycloud.model

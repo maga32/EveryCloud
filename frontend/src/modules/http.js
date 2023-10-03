@@ -14,7 +14,7 @@ const HttpModule = {
       // window.$loading.show()
 
       config.headers = config.headers ?? {}
-      config.headers["Content-Type"] = config.data instanceof FormData ? 'multipart/form-data' : 'application/json'
+      config.headers['Content-Type'] = config.data instanceof FormData ? 'multipart/form-data' : 'application/json'
 
       // header 에 menuId및 토큰 저장.
       // config.headers ["MENU_ID"] = window.$store.getters['Menu/getCurMenuId']

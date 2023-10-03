@@ -6,12 +6,10 @@ import HttpModule from './modules/http'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import './modules/vee-validation'
 
-/* vuex */
-window.$store = store
-
 createApp(App)
   .use(HttpModule)                          // axios
   .use(router)                              // router
+  .use(store)                               // store
   .component("Form", Form)                  // validation form
   .component("Field", Field)                // validation field
   .component("ErrorMessage", ErrorMessage)  // validation error

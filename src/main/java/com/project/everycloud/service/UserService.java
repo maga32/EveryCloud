@@ -23,6 +23,14 @@ public interface UserService {
 	UserDTO getUser(String id);
 
 	/**
+	 * return UserDTO(id,nickname,email,auth) by user id
+	 *
+	 * @param id
+	 * @return UserDTO
+	 */
+	UserDTO getUserInfo(String id);
+
+	/**
 	 * return user password by user id
 	 *
 	 * @param id
@@ -34,7 +42,13 @@ public interface UserService {
 
 	UserDTO updateUserForm(HashMap<String,Object> paramMap);
 
-	void updateUser(UserDTO user, String userOrigId);
+	/**
+	 * update user and retern updated user info
+	 *
+	 * @param paramMap
+	 * @return UserDTO
+	 */
+	UserDTO updateUser(HashMap<String, Object> paramMap);
 
 	/**
 	 * return user type by session's user

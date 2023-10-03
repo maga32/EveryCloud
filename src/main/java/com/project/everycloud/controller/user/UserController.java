@@ -50,9 +50,8 @@ public class UserController {
 
 	@PostMapping(value = "/checkOverlapId")
 	public AppResponse<Boolean> checkOverlapId(@RequestParam String id) throws Exception {
-
 		if(!StringUtils.hasText(id)) throw new Exception();
-		Boolean result = (userService.getUser(id) == null);
+		Boolean result = (userService.getUserInfo(id) == null);
 
 		return new AppResponse<Boolean>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -60,16 +59,17 @@ public class UserController {
 				.setData(result);
 	}
 
-	/*
-	@PostMapping(value = "/checkOverlapId")
-	Map<String, String> checkOverlapId(String id) {
-		Map<String, String> map = new HashMap<String, String>();
-		String result = (userService.getUser(id) == null) ? "ok" : "fail";
-		map.put("result", result);
+	@PostMapping("/updateUser")
+	public AppResponse<Boolean> updateUser(@RequestBody HashMap<String, Object> paramMap) {
 
-		return map;
+		paramMap.put("sessionUser", (UserDTO) session.getAttribute("user"));
+		session.setAttribute("user", userService.updateUser(paramMap));
+
+		return new AppResponse<Boolean>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(true);
 	}
-	*/
 
 	/* ----------------- 수정필요 -----------------*/
 	@GetMapping("/getUser")
@@ -100,7 +100,7 @@ public class UserController {
 		String checkUser = userService.checkUser(id, pass);
 
 		if (checkUser.equals("ok")) {
-			UserDTO loginUser = userService.getUser(id);
+			UserDTO loginUser = userService.getUserInfo(id);
 			session.setAttribute("user", loginUser);
 			return "redirect:" + siteHtml;
 		} else {
@@ -116,18 +116,4 @@ public class UserController {
 	}
 
 
-	@RequestMapping(value = "/updateUserProcess", method = RequestMethod.POST)
-	String updateUserProcess(UserDTO user,
-		@RequestParam(value = "userOrigId", required = false, defaultValue = "") String userOrigId,
-		@RequestParam(value = "siteHtml", required = false, defaultValue = "/") String siteHtml) {
-
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-
-		if(userService.isAdmin(sessionUser) || (userService.isUser(sessionUser) && sessionUser.getId().equals(user.getId()))) {
-			userService.updateUser(user, userOrigId);
-			session.setAttribute("user", userService.getUser((userOrigId.equals("") ? user.getId() : userOrigId)));
-		}
-
-		return "redirect:" + siteHtml;
-	}
 }

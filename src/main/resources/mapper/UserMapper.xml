@@ -9,7 +9,12 @@
 			FROM user u, group_setting g
 		WHERE id = #{id} and u.group_no = g.no
 	</select>
-	
+
+	<select id="getUserInfo" resultType="UserDTO">
+		SELECT id, nickname, email, auth FROM user
+			WHERE id = #{id}
+	</select>
+
 	<select id="getUserPass" resultType="string">
 		SELECT pass FROM user
 			WHERE id = #{id}
@@ -20,7 +25,7 @@
 			WHERE auth = 'Y'
 	</select>
 
-	<update id="updateUser" parameterType="HashMap">
+	<update id="updateUser">
 		UPDATE user
 		    <set>
 				<if test="user.id != null and !user.id.equals('')">
@@ -40,10 +45,10 @@
 				</if>
 			</set>
 			<where>
-				<if test="userOrigId != null and !userOrigId.equals('')">
-					id = #{userOrigId}
+				<if test="origId != null and !origId.equals('')">
+					id = #{origId}
 				</if>
-				<if test="userOrigId == null or userOrigId.equals('')">
+				<if test="origId == null or origId.equals('')">
 					AND id = #{user.id}
 				</if>
 			</where>
