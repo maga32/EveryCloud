@@ -60,6 +60,21 @@
 </Form>
 </template>
 
+<script>
+import router from '@/router'
+import Swal from 'sweetalert2'
+
+export default {
+  beforeMount(to, from, next) {
+    if(!history.state.params?.type) {
+      $store.dispatch('user/getSession')
+      router.replace($store.getters['link/siteHtml'])
+      Swal.fire({icon: 'error', text: '잘못된 접근방식입니다.'})
+    }
+  }
+}
+</script>
+
 <script setup>
 import { onMounted, ref, reactive } from 'vue'
 import Swal from 'sweetalert2'

@@ -50,8 +50,9 @@
       <div class="text-break">
         <span class="fs-1">{{ $store.state.user.user.nickname }}</span> 님
         <div>( {{ $store.state.user.user.id }} )</div>
+        <div v-if="$store.state.user.user.auth=='Y'" class="text-danger">관리자 계정</div>
       </div>
-      <div class="d-grid gap-2 my-4" id="wingUserInfo">
+      <div class="d-grid gap-2 my-4">
         <router-link :to="{path:'/updateUserForm', state:{params:{type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user' }}}"
             class="btn btn-outline-secondary">Edit Profile</router-link>
         <router-link class="btn btn-secondary" to="/" @click="logout">

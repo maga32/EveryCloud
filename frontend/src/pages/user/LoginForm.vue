@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive } from "vue"
+import { onMounted, reactive } from 'vue'
 import Swal from 'sweetalert2'
 import router from '@/router'
 

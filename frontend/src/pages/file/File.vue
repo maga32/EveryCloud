@@ -1,25 +1,17 @@
 <template>
-<!--  <script src="${ pageContext.request.contextPath }/resources/setting/extensions.json"></script>-->
-<!--  <script src="${ pageContext.request.contextPath }/resources/js/file.js"></script>-->
-<!--  <link href="${ pageContext.request.contextPath }/resources/css/file.css" rel="stylesheet">-->
-
-  <input type="hidden" id="shareLink" name="shareLink" value="${ shareLink }">
-  <input type="hidden" id="path" name="path" value="${ fn:replace(path, '+', '%20') }">
-  <input type="hidden" id="sort" name="sort" value="${ sort }">
-  <input type="hidden" id="order" name="order" value="${ order }">
-  <input type="hidden" id="viewHidden" name="viewHidden" value="${ viewHidden }">
-
   <div class="row fixed-top" id="fileMenuContainer">
     <div class="col-0 col-md-3"></div>
     <div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
       <div class="row rounded border p-2 m-0 bg-light-subtle">
+
         <div class="col-12 col-md-8">
           <div id="nowPath"></div>
         </div>
+
         <div class="col-12 col-md-4 row text-end">
           <div class="col-4 d-md-none"></div>
           <div class="col-6 col-md-8 px-2">
-            <input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" name="keyword" value="${ keyword }" onkeypress="searchFileEnter(event)">
+            <input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" name="keyword" v-model="form.keyword">
           </div>
           <div class="col-1 col-md-2 pointer" onClick="searchFileClick()"><i class="fa-solid fa-magnifying-glass"></i></div>
           <div class="col-1 col-md-2 ps-2">
@@ -46,18 +38,19 @@
             <td class="text-center" style="width:35px;"><input id="checkAllFile" type="checkbox" class="form-check-input"></td>
             <td style="width:80px;"></td>
             <td class="w-auto d-flex">
-              <span class="pointer" id="nameSort" onClick="loadFileList('', '', 'name', '')">이름${ sort eq 'name' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
-              <span class="pointer px-3" id="sizeSort" onClick="loadFileList('', '', 'size','')">크기${ sort eq 'size' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+              <span class="pointer" id="nameSort" @click="loadFileList('', '', 'name', '')">이름{{sortArrow('name')}}</span>
+              <span class="pointer px-3" id="sizeSort" @click="loadFileList('', '', 'size','')">크기{{sortArrow('size')}}</span>
             </td>
             <td class="text-end" style="width:15%">
-              <span class="pointer" id="typeSort" onClick="loadFileList('', '', 'type','')">종류${ sort eq 'type' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
-              <span class="pointer d-none" id="pathSort" onClick="loadFileList('', '', 'path','')">경로${ sort eq 'path' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+              <span class="pointer" id="typeSort" @click="loadFileList('', '', 'type','')">종류{{sortArrow('type')}}</span>
+              <span class="pointer d-none" id="pathSort" @click="loadFileList('', '', 'path','')">경로{{sortArrow('path')}}</span>
             </td>
             <td class="text-center" style="width:20%">
-              <span class="pointer" id="dateSort"  onClick="loadFileList('', '', 'date','')">날짜${ sort eq 'date' ? (order eq 'asc' ? '↑' : '↓' ) : '' }</span>
+              <span class="pointer" id="dateSort" @click="loadFileList('', '', 'date','')">날짜{{sortArrow('date')}}</span>
             </td>
           </tr>
         </table>
+
       </div>
     </div>
   </div>
@@ -66,10 +59,10 @@
     테스트
   </div>
 
-  <div class="col-12" id="fileListContainer">
-    <div id="fileList" class="px-2"></div>
-    <div id="loadingList" class="text-center m-2"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading... </div>
-  </div>
+  <FileList
+      :form="form"
+      :loadingList="loadingList"
+  />
 
   <!-- Modal -->
   <div class="modal fade" id="functionModal" tabindex="-1" aria-labelledby="functionModalLabel" aria-hidden="true">
@@ -91,11 +84,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { imageThumbnail, extensions } from '@/assets/extensions'
+import FileList from './FileList.vue'
+
+const form = reactive({
+    shareLink: '',
+    path: '',
+    sort: 'name',
+    order: 'asc',
+    keyword: '',
+    viewHidden: false,
+})
+
+const loadingList = ref(false)
 
 onMounted(()=> {
   $store.dispatch('link/addSiteHtml')
 })
+
+function sortArrow(sort) {
+  return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : ''
+}
+
+function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = false, saveHistory = true) {
+  loadingList.value = true
+  form.sort = sort
+  form.order = (form.order == 'asc') ? 'desc' : 'asc'
+  loadingList.value = false
+}
 </script>
 
 <style>

@@ -1,7 +1,6 @@
 package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
-import com.project.everycloud.common.util.UserUtil;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.file.FileDetailDTO;
@@ -35,9 +34,6 @@ public class FileViewController {
 
 	@Autowired
 	ShareService shareService;
-
-	@Autowired
-	UserUtil userUtil;
 
 	@Autowired
 	HttpSession session;
