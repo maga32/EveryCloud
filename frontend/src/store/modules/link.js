@@ -5,7 +5,7 @@ const link = {
   }),
   getters: {
     siteHtml: (state) => {
-      return state.siteHtml
+      return (state.siteHtml == '/') ? localStorage.getItem('siteHtml') : state.siteHtml
     }
   },
   mutations: {
@@ -15,7 +15,10 @@ const link = {
   },
   actions: {
     addSiteHtml: ({commit}) => {
-      commit('addSiteHtml', window.location.pathname + window.location.search)
+      const siteHtml = window.location.pathname + window.location.search
+      localStorage.setItem('siteHtml', siteHtml)
+
+      commit('addSiteHtml', siteHtml)
     }
   }
 }

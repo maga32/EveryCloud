@@ -12,7 +12,7 @@ public interface UserMapper {
 
 	UserDTO getUserInfo(String id);
 
-	String getUserPass(String id);
+	String getPass(String id);
 
     UserDTO getAdmin();
 

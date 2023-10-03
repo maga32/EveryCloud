@@ -3,6 +3,7 @@ package com.project.everycloud.common.config;
 import com.project.everycloud.common.exception.BadRequestException;
 import com.project.everycloud.common.exception.NeedAdminException;
 import com.project.everycloud.common.exception.NeedLoginException;
+import com.project.everycloud.common.exception.WrongLoginException;
 import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppResponse;
 import org.springframework.dao.DuplicateKeyException;
@@ -55,6 +56,10 @@ public class GlobalExceptionHandler {
         } else if(e instanceof NeedLoginException) {
             apiResponseType = ResponseType.NEED_LOGIN;
             apiResponseMessage = ResponseType.NEED_LOGIN.message();
+        // WrongLogin
+        } else if(e instanceof WrongLoginException) {
+            apiResponseType = ResponseType.WRONG_LOGIN;
+            apiResponseMessage = ResponseType.WRONG_LOGIN.message();
         // BadRequest
         } else if(e instanceof BadRequestException) {
             apiResponseType = ResponseType.BAD_REQUEST;

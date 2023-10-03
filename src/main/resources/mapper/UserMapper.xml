@@ -15,7 +15,7 @@
 			WHERE id = #{id}
 	</select>
 
-	<select id="getUserPass" resultType="string">
+	<select id="getPass" resultType="string">
 		SELECT pass FROM user
 			WHERE id = #{id}
 	</select>

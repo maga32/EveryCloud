@@ -90,23 +90,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'FilePage',
-  props: {
-    msg: String
-  },
-  data() {
-    return {
-    }
-  },
-  mounted() {
+<script setup>
+import { ref, onMounted, reactive } from 'vue'
 
-  },
-  methods : {
-
-  }
-}
+onMounted(()=> {
+  $store.dispatch('link/addSiteHtml')
+})
 </script>
 
 <style>

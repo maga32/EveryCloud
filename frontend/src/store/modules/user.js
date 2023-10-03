@@ -15,25 +15,21 @@ const user = {
     }
   },
   mutations: {
-    updateUser: (state, payload) => {
+    getSession: (state, payload) => {
       state.user = payload
     }
   },
   actions: {
-    updateUser: ({commit}) => {
+    getSession: ({commit}) => {
       $http.post('/getSessionUser')
         .then((response) => {
           if (response.code === '402') {
             router.push({
               path: '/updateUserForm',
-              state: {
-                params : {
-                  type: 'admin',
-                }
-              }
+              state: {params: {type: 'admin'}}
             })
           } else {
-            commit('updateUser', response.data)
+            commit('getSession', response.data)
           }
         })
     }

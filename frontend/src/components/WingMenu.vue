@@ -2,7 +2,7 @@
   <!-- wing button -->
   <span id="wingButton" class="d-block d-md-none pointer" @click="openWing">
     <span class="fa-stack fa-lg">
-      <i class="fa fa-circle fa-stack-2x headerColor"></i>
+      <i class="fa fa-circle fa-stack-2x text-secondary"></i>
       <i class="fa fa-bars fa-stack-1x fa-inverse"></i>
     </span>
   </span>
@@ -40,11 +40,9 @@
 
     <div class="clearfix"/>
 
-    <div v-if="!$store.state.user.user.id">
+    <div v-if="!$store.state.user.user">
       <div class="d-grid gap-2 my-4">
-        <button class="btn btn-secondary" onclick="location.href='/login'">
-          Login
-        </button>
+        <router-link to="/loginForm" class="btn btn-secondary">Login</router-link>
       </div>
     </div>
 
@@ -55,10 +53,10 @@
       </div>
       <div class="d-grid gap-2 my-4" id="wingUserInfo">
         <router-link :to="{path:'/updateUserForm', state:{params:{type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user' }}}"
-            @click="$store.dispatch('link/addSiteHtml')" class="btn btn-outline-secondary">Edit Profile</router-link>
-        <button class="btn btn-secondary" onclick="location.href='/logout'">
+            class="btn btn-outline-secondary">Edit Profile</router-link>
+        <router-link class="btn btn-secondary" to="/" @click="logout">
           Logout
-        </button>
+        </router-link>
       </div>
     </div>
 
@@ -95,8 +93,14 @@ const form = reactive({
 
 onMounted(()=> {
   languageSelect()
-  $store.dispatch('user/updateUser')
+  $store.dispatch('user/getSession')
 })
+
+function logout() {
+  $http.post('/logout').then(()=>
+    $store.dispatch('user/getSession')
+  )
+}
 
 /*------- theme & wing -------*/
 const state = useStorage('my-state', {language: ''})

@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive } from "vue"
+import { onMounted, ref, reactive } from 'vue'
 import Swal from 'sweetalert2'
 import router from '@/router'
 
@@ -81,16 +81,14 @@ const form = reactive({
   },
 })
 
-onMounted( () => {
+onMounted(() => {
   form.type = params.type
   $http.post('/updateUserForm',{params:params}, null)
     .then((response) => {
       if(!form.type || !response.data.id) {
+        $store.dispatch('user/getSession')
+        router.replace($store.getters['link/siteHtml'])
         Swal.fire({ icon: 'error', text: '잘못된 접근방식입니다.' })
-          .then(() => {
-            $store.dispatch('user/getUser')
-            router.replace($store.getters['link/siteHtml'])
-          })
       } else {
         form.user.id = response.data.id
         form.user.nickname = response.data.nickname
@@ -112,6 +110,7 @@ function checkOverlapId() {
     Swal.fire({ icon: 'error', text: '아이디를 입력해주세요.', showConfirmButton: false, timer: 1500})
     return false
   } else if (form.user.id === form.origId) {
+    Swal.fire({ icon: 'success', text: '사용 가능한 아이디입니다.', showConfirmButton: false, timer: 1500})
     duplicateChecked.value = true
     return false
   }
@@ -131,7 +130,7 @@ function submit() {
   $http.post('/updateUser', form, null)
     .then((response) => {
       if(response.data) {
-        $store.dispatch('user/updateUser')
+        $store.dispatch('user/getSession')
         router.replace($store.getters['link/siteHtml'])
       }
     })
@@ -139,9 +138,5 @@ function submit() {
 }
 </script>
 
-<style scoped>
-.important:before{
-  color: red;
-  content: "*";
-}
+<style>
 </style>

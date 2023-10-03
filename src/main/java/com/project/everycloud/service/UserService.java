@@ -38,7 +38,14 @@ public interface UserService {
 	 */
 	String getUserPass(String id);
 
-	String checkUser(String id, String pass);
+
+	/**
+	 * Login user and return UserDTO
+	 *
+	 * @param paramMap
+	 * @return UserDTO
+	 */
+	UserDTO login(HashMap<String, Object> paramMap);
 
 	UserDTO updateUserForm(HashMap<String,Object> paramMap);
 
@@ -73,19 +80,19 @@ public interface UserService {
 	/**
 	 * Check whether user or not by userId
 	 *
-	 * @param userId
+	 * @param id
 	 * @return boolean
 	 */
-	boolean isUser(String userId);
+	boolean isUser(String id);
 
 	/**
 	 * Check whether user or not by matching userId and userPass
 	 *
-	 * @param userId
-	 * @param userPass
+	 * @param id
+	 * @param pass
 	 * @return boolean
 	 */
-	boolean isUser(String userId, String userPass);
+	boolean isUser(String id, String pass);
 
 	/**
 	 * Check whether admin or not by session
@@ -98,8 +105,9 @@ public interface UserService {
 	/**
 	 * Check whether admin or not by userId
 	 *
-	 * @param userId
+	 * @param id
 	 * @return boolean
 	 */
-	public boolean isAdmin(String userId);
+	public boolean isAdmin(String id);
+
 }

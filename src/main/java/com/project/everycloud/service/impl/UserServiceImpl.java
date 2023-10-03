@@ -3,6 +3,7 @@ package com.project.everycloud.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.everycloud.common.exception.NeedAdminException;
 import com.project.everycloud.common.exception.NeedLoginException;
+import com.project.everycloud.common.exception.WrongLoginException;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.UserMapper;
@@ -25,6 +26,15 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	/**
+	 * return admin data
+	 *
+	 * @return UserDTO
+	 */
+	private UserDTO getAdmin() {
+		return userMapper.getAdmin();
+	}
+
 	@Override
 	public UserDTO getUser(String id) {
 		return userMapper.getUser(id);
@@ -37,29 +47,23 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public String getUserPass(String id) {
-		return userMapper.getUserPass(id);
+		return userMapper.getPass(id);
 	}
 
-	/**
-	 * return admin data
-	 *
-	 * @return UserDTO
-	 */
-	private UserDTO getAdmin() {
-		return userMapper.getAdmin();
-	}
 
 	@Override
-	public String checkUser(String id, String pass) {
-		String result = "";
+	public UserDTO login(HashMap<String, Object> paramMap) {
+		UserDTO user = new UserDTO();
+		String id = paramMap.get("id").toString();
+		String pass = paramMap.get("pass").toString();
 
-		if(isUser(id, pass)) {
-			result = "ok";
+		if (isUser(id, pass)) {
+			user = userMapper.getUser(id);
 		} else {
-			result = "id와 비밀번호를 확인해주세요.";
+			throw new WrongLoginException();
 		}
 
-		return result;
+		return user;
 	}
 
 	@Override
@@ -114,7 +118,7 @@ public class UserServiceImpl implements UserService {
 			} else {
 				userType = 1;
 			}
-		} else if(userMapper.getUserPass(admin.getId()).equals("admin")) {
+		} else if(userMapper.getPass(admin.getId()).equals("admin")) {
 			userType = 3;
 		}
 
@@ -129,15 +133,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean isUser(String userId) {
-		if(getUser(userId) != null) return true;
+	public boolean isUser(String id) {
+		if(getUser(id) != null) return true;
 		return false;
 	}
 
 	@Override
-	public boolean isUser(String userId, String userPass) {
-		BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
-		if(pass.matches(userPass, userMapper.getUserPass(userId))) return true;
+	public boolean isUser(String id, String pass) {
+		BCryptPasswordEncoder encodePass = new BCryptPasswordEncoder(10);
+		if(encodePass.matches(pass, userMapper.getPass(id))) return true;
 		return false;
 	}
 
@@ -149,8 +153,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean isAdmin(String userId) {
-		if(isUser(userId) && getUser(userId).getAuth().equals("Y")) return true;
+	public boolean isAdmin(String id) {
+		if(isUser(id) && getUser(id).getAuth().equals("Y")) return true;
 		return false;
 	}
 }

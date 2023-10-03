@@ -2,10 +2,8 @@
 
 a {
 	text-decoration: none !important;
-	color: var(--bs-body-color) !important;
+	color: var(--bs-body-color);
 }
-
-a:hover { text-decoration: underline !important;}
 
 .pointer {
 	cursor: pointer;
