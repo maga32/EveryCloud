@@ -30,7 +30,7 @@
         비밀번호 확인
       </div>
       <div class="col-12 col-md-6 mb-4">
-        <Field type="password" size="20" class="form-control" name="confirmPass" label="비밀번호" rules="confirmed:@pass" />
+        <Field type="password" size="20" class="form-control" name="confirmPass" label="비밀번호 일치" :rules="'is:'+form.user.pass" v-model="form.confirmPass"/>
         <ErrorMessage name="confirmPass" as="p" class="text-danger" />
       </div>
 
@@ -87,6 +87,7 @@ const form = reactive({
   type: 'user',
   origId: '',
   origPass: '',
+  confirmPass: '',
 
   user: {
     id: '',

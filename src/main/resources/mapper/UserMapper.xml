@@ -21,7 +21,7 @@
 	</select>
 
 	<select id="getAdmin" resultType="UserDTO">
-		SELECT id, nickname, email FROM user
+		SELECT id, nickname, email, auth FROM user
 			WHERE auth = 'Y'
 	</select>
 

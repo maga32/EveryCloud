@@ -41,7 +41,7 @@
     <div class="clearfix"/>
 
     <div v-if="!$store.state.user.user">
-      <div class="d-grid gap-2 my-4">
+      <div class="d-grid gap-2 my-4" @click="closeWing">
         <router-link to="/loginForm" class="btn btn-secondary">Login</router-link>
       </div>
     </div>
@@ -52,7 +52,7 @@
         <div>( {{ $store.state.user.user.id }} )</div>
         <div v-if="$store.state.user.user.auth=='Y'" class="text-danger">관리자 계정</div>
       </div>
-      <div class="d-grid gap-2 my-4">
+      <div class="d-grid gap-2 my-4" @click="closeWing">
         <router-link :to="{path:'/updateUserForm', state:{params:{type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user' }}}"
             class="btn btn-outline-secondary">Edit Profile</router-link>
         <router-link class="btn btn-secondary" to="/" @click="logout">
