@@ -33,6 +33,7 @@ const HttpModule = {
         Swal.fire({ icon: 'error', text: response.data.code + ' : ' + response.data.message })
       }
       if (response.data.code === Const.RESPONSE_TYPE.NEED_LOGIN) {
+        $store.dispatch('link/addTempSiteHtml')
         router.replace('/loginForm')
       }
       /*

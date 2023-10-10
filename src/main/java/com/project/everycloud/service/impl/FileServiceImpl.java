@@ -1,7 +1,8 @@
 package com.project.everycloud.service.impl;
 
-import com.project.everycloud.model.AppList;
-import com.project.everycloud.model.file.FileDetailDTO;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.FileListLoadDTO;
+import com.project.everycloud.model.response.file.FileListDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.mapper.FileDao;
 import org.apache.commons.io.FilenameUtils;
@@ -10,18 +11,68 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.util.*;
 
 @Service
 public class FileServiceImpl implements FileService {
 
 	String sortParam;
-	
+
 	@Autowired
 	FileDao fileDao;
-	
+
 	@Override
-	public List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
+	public FileListDTO fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
+		FileListDTO result = new FileListDTO();
+
+		String sharePath = "";
+		String realPath = "";
+		String path = fileListLoad.getPath();
+		String shareLink = fileListLoad.getShareLink();
+
+//		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
+//		map.putAll(shareMap);
+
+		if(path.equals("") && shareLink.equals("")) path += "/";
+
+//		if(shareMap.get("invalidString") != null) {
+//			return map;
+//		} else if(!shareLink.equals("")) {
+//			sharePath = shareMap.get("sharePath");
+//			path = sharePath + (path.equals("/") ? "" : path);
+//		}
+
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
+		if(!isPathExist(path)) throw new InvalidPathException("","");
+
+		File nowPath = getFile(path);
+		// windows folder path processing
+		path = path.replaceAll("\\\\", "/");
+		try {
+			realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
+		} catch (IOException e) { throw new RuntimeException(e); }
+
+		if (!realPath.equals(path)) {
+			fileListLoad.setPath(realPath.replace(sharePath, ""));
+			return fileList(fileListLoad, sessionUser);
+		}
+
+		result.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+		result.setPath(path.replace(sharePath, ""));
+		result.setFileList(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
+		return result;
+	}
+
+	private boolean isPathExist(String path) {
+		return fileDao.isPathExist(path);
+	}
+
+
+	/* --------------------------- 수정필요 --------------------------- */
+
+	private List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
 		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
 		File[] files = null;
 		files = fileDao.getPathFiles(path, viewHidden, keyword);
@@ -29,7 +80,7 @@ public class FileServiceImpl implements FileService {
 
 		for(File i : files) {
 			Map<String, Object> param = new HashMap<String, Object>();
-			
+
 			param.put("isDirectory", i.isDirectory());
 			param.put("isFile", i.isFile());
 			param.put("isHidden", i.isHidden());
@@ -42,48 +93,46 @@ public class FileServiceImpl implements FileService {
 			param.put("length", i.length());
 			try { param.put("getCanonicalPath", i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
 			} catch (IOException e) { e.printStackTrace(); }
-			
+
 			fileList.add(param);
 		}
-		
-		if(sort.equals("name")) { sortParam = "getName";
+
+		if(sort.equals("")) sort = "name";
+
+		if (sort.equals("name")) { sortParam = "getName";
 		} else if (sort.equals("type")) { sortParam = "getExtension";
 		} else if (sort.equals("path")) { sortParam = "getPath";
 		} else if (sort.equals("date")) { sortParam = "lastModified";
 		} else if (sort.equals("size")) { sortParam = "length";
 		}
-		
-		if(sort.equals("name") || sort.equals("type") || sort.equals("path")) {
-			if(order.equals("asc")) {
-				fileList.sort(
-					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
-					.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam))
-				);
+		try {
+			if (sort.equals("name") || sort.equals("type") || sort.equals("path")) {
+				if (order.equals("desc")) {
+					fileList.sort(
+						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
+							.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam)).reversed()
+					);
+				} else {
+					fileList.sort(
+						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
+							.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam))
+					);
+				}
 			} else {
-				fileList.sort(
-					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
-					.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam)).reversed()
-				);
+				if (order.equals("desc")) {
+					fileList.sort(
+						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
+							.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam)).reversed()
+					);
+				} else {
+					fileList.sort(
+						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
+							.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam))
+					);
+				}
 			}
-		} else {
-			if(order.equals("asc")) {
-				fileList.sort(
-					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
-					.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam))
-				);
-			} else {
-				fileList.sort(
-					Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
-					.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam)).reversed()
-				);
-			}
-		}
+		} catch (Exception e) { e.printStackTrace(); }
 		return fileList;
-	}
-
-	@Override
-	public AppList<FileDetailDTO> getFileList(HashMap<String, Object> paramMap) {
-		return null;
 	}
 
 	@Override
@@ -105,14 +154,8 @@ public class FileServiceImpl implements FileService {
 		
 		return folderList;
 	}
-	@Override
-	public File getFile(String path) {
+	private File getFile(String path) {
 		return fileDao.getFile(path);
-	}
-
-	@Override
-	public boolean isPathExist(String path) {
-		return fileDao.isPathExist(path);
 	}
 
 	@Override

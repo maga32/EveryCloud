@@ -1,16 +1,23 @@
 const link = {
   namespaced: true,
   state: () => ({
-    siteHtml: '/',
+    siteHtml: '',
+    tempSiteHtml: '',
   }),
   getters: {
     siteHtml: (state) => {
-      return (state.siteHtml == '/') ? localStorage.getItem('siteHtml') : state.siteHtml
+      return state.siteHtml || localStorage.getItem('siteHtml') || '/'
+    },
+    tempSiteHtml: (state) => {
+      return state.tempSiteHtml || state.siteHtml || localStorage.getItem('siteHtml') || '/'
     }
   },
   mutations: {
     addSiteHtml: (state, payload) => {
       state.siteHtml = payload
+    },
+    addTempSiteHtml: (state, payload) => {
+      state.tempSiteHtml = payload
     }
   },
   actions: {
@@ -19,6 +26,10 @@ const link = {
       localStorage.setItem('siteHtml', siteHtml)
 
       commit('addSiteHtml', siteHtml)
+    },
+    addTempSiteHtml: ({commit}) => {
+      const tempSiteHtml = window.location.pathname + window.location.search
+      commit('addTempSiteHtml', tempSiteHtml)
     }
   }
 }

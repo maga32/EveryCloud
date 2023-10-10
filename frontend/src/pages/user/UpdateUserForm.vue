@@ -67,7 +67,6 @@ import Swal from 'sweetalert2'
 export default {
   beforeMount(to, from, next) {
     if(!history.state.params?.type) {
-      $store.dispatch('user/getSession')
       router.replace($store.getters['link/siteHtml'])
       Swal.fire({icon: 'error', text: '잘못된 접근방식입니다.'})
     }
@@ -101,7 +100,7 @@ onMounted(() => {
   form.type = params.type
   $http.post('/updateUserForm',{params:params}, null)
     .then((response) => {
-      if(!form.type || !response.data.id) {
+      if(!form.type || !response.data || !response.data.id) {
         $store.dispatch('user/getSession')
         router.replace($store.getters['link/siteHtml'])
         Swal.fire({ icon: 'error', text: '잘못된 접근방식입니다.' })

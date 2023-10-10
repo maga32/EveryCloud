@@ -40,7 +40,7 @@
 
     <div class="clearfix"/>
 
-    <div v-if="!$store.state.user.user">
+    <div v-if="!$store.state.user.user?.id">
       <div class="d-grid gap-2 my-4" @click="closeWing">
         <router-link to="/loginForm" class="btn btn-secondary">Login</router-link>
       </div>

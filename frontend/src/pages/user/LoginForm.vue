@@ -46,14 +46,14 @@ const form = reactive({
   },
 })
 
-onMounted( () => {
+onMounted(() => {
   $store.dispatch('user/getSession')
-  if($store.state.user.user) {
-    Swal.fire({ icon: 'error', text: '이미 로그인 되어있습니다.' })
-      .then(() => {
+    .then(()=>{
+      if($store.state.user.user?.id) {
         router.replace($store.getters['link/siteHtml'])
-      })
-  }
+        Swal.fire({ icon: 'error', text: '이미 로그인 되어있습니다.' })
+      }
+    })
 })
 
 function submit() {
@@ -61,7 +61,7 @@ function submit() {
     .then((response) => {
       if(response.data) {
         $store.dispatch('user/getSession')
-        router.replace($store.getters['link/siteHtml'])
+        router.replace($store.getters['link/tempSiteHtml'])
       }
     })
 }

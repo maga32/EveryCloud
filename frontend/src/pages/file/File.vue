@@ -93,7 +93,6 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import DropdownMenu from 'v-dropdown-menu'
 import { imageThumbnail, extensions } from '@/assets/extensions'
 
 import FileList from './FileList.vue'
@@ -137,6 +136,11 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
   form.keyword = resetKeyword ? '' : form.keyword
 
   setting.search = !!form.keyword
+
+  $http.post('/fileList', form, null)
+    .then((response) => {
+      console.log(response)
+    })
 
   setting.loadingList = false
 

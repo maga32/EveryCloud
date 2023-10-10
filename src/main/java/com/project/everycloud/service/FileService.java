@@ -1,25 +1,19 @@
 package com.project.everycloud.service;
 
-import com.project.everycloud.model.AppList;
-import com.project.everycloud.model.file.FileDetailDTO;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.FileListLoadDTO;
+import com.project.everycloud.model.response.file.FileListDTO;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public interface FileService {
-	List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden);
 
-	AppList<FileDetailDTO> getFileList(HashMap<String, Object> paramMap);
+	FileListDTO fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
 
 	List<Map<String, Object>> folderList(String sharePath, String path);
 	
-	File getFile(String path);
-	
-	boolean isPathExist(String path);
-
 	Map<String, Object> newFolder(String path, String newFolderName);
 
 	Map<String, Object> newFile(String path, String newFileName) throws IOException;

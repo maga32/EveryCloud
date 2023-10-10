@@ -1,8 +1,8 @@
 package com.project.everycloud.controller.user;
 
 import com.project.everycloud.common.type.ResponseType;
-import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -66,7 +66,7 @@ public class UserController {
 				.setData(true);
 	}
 
-	@RequestMapping("/login")
+	@PostMapping("/login")
 	public AppResponse<Boolean> login(@RequestBody HashMap<String, Object> paramMap) {
 
 		UserDTO user = userService.login(paramMap);

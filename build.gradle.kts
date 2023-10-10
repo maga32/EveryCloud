@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1")
 	implementation("org.springframework.security:spring-security-core")
 	implementation("org.xerial:sqlite-jdbc")

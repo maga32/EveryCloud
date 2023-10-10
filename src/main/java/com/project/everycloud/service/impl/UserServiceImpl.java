@@ -3,7 +3,7 @@ package com.project.everycloud.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.everycloud.common.exception.NeedAdminException;
 import com.project.everycloud.common.exception.NeedLoginException;
-import com.project.everycloud.common.exception.WrongLoginException;
+import com.project.everycloud.common.exception.InvalidLoginException;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.UserMapper;
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 		if (isUser(id, pass)) {
 			user = userMapper.getUser(id);
 		} else {
-			throw new WrongLoginException();
+			throw new InvalidLoginException();
 		}
 
 		return user;

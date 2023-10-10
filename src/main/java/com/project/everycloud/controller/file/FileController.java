@@ -1,25 +1,23 @@
 package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
-import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.AppResponse;
-import com.project.everycloud.model.file.FileDetailDTO;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.response.file.FileListDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -27,7 +25,7 @@ import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/api/v1")
-public class FileViewController {
+public class FileController {
 	
 	@Autowired
 	FileService fileService;
@@ -38,22 +36,20 @@ public class FileViewController {
 	@Autowired
 	HttpSession session;
 
-	@RequestMapping("/file")
-	public String file(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
-			@RequestParam(value="path", required=false, defaultValue="") String path,
-			@RequestParam(value="sort", required=false, defaultValue="name") String sort,
-			@RequestParam(value="order", required=false, defaultValue="asc") String order,
-			@RequestParam(value="keyword", required=false, defaultValue="") String keyword,
-			Model model) throws IOException {
-		model.addAttribute("shareLink", shareLink);
-		model.addAttribute("path", URLEncoder.encode(path,"utf-8"));
-		model.addAttribute("sort", sort);
-		model.addAttribute("order",order);
-		model.addAttribute("keyword",keyword);
-		
-		return "/file/file";
+	@PostMapping("/fileList")
+	public AppResponse<FileListDTO> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
+
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		FileListDTO fileList = fileService.fileList(fileListLoad, sessionUser);
+
+		return new AppResponse<FileListDTO>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(fileList);
 	}
 
+
+	/* --------------------------- 수정필요 --------------------------- */
 
 	@RequestMapping("/fileList2")
 	public AppResponse<HashMap<String,Object>> fileList(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
@@ -77,24 +73,24 @@ public class FileViewController {
 //		}
 		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 
-		boolean validPath = fileService.isPathExist(path);
+		// boolean validPath = fileService.isPathExist(path);
 
-		if(validPath) {
-			File nowPath = fileService.getFile(path);
-			// windows folder path processing
-			path = path.replaceAll("\\\\", "/");
-			String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
+		// if(validPath) {
+		// File nowPath = fileService.getFile(path);
+		// windows folder path processing
+		path = path.replaceAll("\\\\", "/");
+		// String realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
 
-			if(!realPath.equals(path)) {
-				return fileList(shareLink, realPath.replace(sharePath, ""), sort, order, keyword, viewHidden);
-			}
+		// if(!realPath.equals(path)) {
+		// return fileList(shareLink, realPath.replace(sharePath, ""), sort, order, keyword, viewHidden);
+		// }
 
-			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
-			map.put("fileList", fileService.fileList(sharePath, path, sort, order, keyword, viewHidden));
-		}
+		// map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+		// map.put("fileList", fileService.fileList(sharePath, path, sort, order, keyword, viewHidden));
+		// }
 
 		map.put("path", path.replace(sharePath, ""));
-		map.put("validPath", validPath);
+		// map.put("validPath", validPath);
 
 		return new AppResponse<HashMap<String, Object>>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -102,18 +98,6 @@ public class FileViewController {
 				.setData((HashMap<String, Object>) map);
 	}
 
-
-	@RequestMapping("/fileList")
-	public AppResponse<AppList<FileDetailDTO>> getFileList(@RequestParam HashMap<String, Object> paramMap) {
-
-		AppList<FileDetailDTO> fileList = fileService.getFileList(paramMap);
-
-		return new AppResponse<AppList<FileDetailDTO>>()
-				.setCode(ResponseType.SUCCESS.code())
-				.setMessage(ResponseType.SUCCESS.message())
-				.setData(fileList);
-	}
-	
 	@RequestMapping("/folderList")
 	public Map<String,Object> folderList(@RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
@@ -131,20 +115,20 @@ public class FileViewController {
 		}
 		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 
-		boolean validPath = fileService.isPathExist(path);
+		// boolean validPath = fileService.isPathExist(path);
 
-		if(validPath) {
-			File nowPath = fileService.getFile(path);
+		// if(validPath) {
+			// File nowPath = fileService.getFile(path);
 			// windows folder path processing
 			path = path.replaceAll("\\\\", "/");
-			String parentPath = nowPath.getPath().replaceAll("\\\\", "/").length() > sharePath.length() ? nowPath.getParent().replaceAll("\\\\", "/").replace(sharePath, "") : "/";
+			// String parentPath = nowPath.getPath().replaceAll("\\\\", "/").length() > sharePath.length() ? nowPath.getParent().replaceAll("\\\\", "/").replace(sharePath, "") : "/";
 			map.put("folderList", fileService.folderList(sharePath, path));
-			map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
-			map.put("parentPath", parentPath);
-		}
+			// map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+			// map.put("parentPath", parentPath);
+		// }
 		
 		map.put("path", path.replace(sharePath, ""));
-		map.put("validPath", validPath);
+		// map.put("validPath", validPath);
 		
 		return map;
 	}
