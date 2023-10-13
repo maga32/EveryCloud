@@ -1,8 +1,10 @@
 package com.project.everycloud.service.impl;
 
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
-import com.project.everycloud.model.response.file.FileListDTO;
+import com.project.everycloud.model.response.file.FileDetailDTO;
+import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.mapper.FileDao;
 import org.apache.commons.io.FilenameUtils;
@@ -17,14 +19,13 @@ import java.util.*;
 @Service
 public class FileServiceImpl implements FileService {
 
-	String sortParam;
-
 	@Autowired
 	FileDao fileDao;
 
 	@Override
-	public FileListDTO fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
-		FileListDTO result = new FileListDTO();
+	public AppList<FileDetailDTO, FileOptionDTO> fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
+		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
+		FileOptionDTO options = new FileOptionDTO();
 
 		String sharePath = "";
 		String realPath = "";
@@ -59,9 +60,12 @@ public class FileServiceImpl implements FileService {
 			return fileList(fileListLoad, sessionUser);
 		}
 
-		result.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
-		result.setPath(path.replace(sharePath, ""));
-		result.setFileList(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
+		options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+		options.setPath(path.replace(sharePath, ""));
+
+		result.setOption(options);
+		result.setLists(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
+
 		return result;
 	}
 
@@ -70,8 +74,83 @@ public class FileServiceImpl implements FileService {
 	}
 
 
-	/* --------------------------- 수정필요 --------------------------- */
+	private List<FileDetailDTO> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
+		List<FileDetailDTO> fileList = new ArrayList<FileDetailDTO>();
+		File[] files = null;
+		files = fileDao.getPathFiles(path, viewHidden, keyword);
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 
+		for(File i : files) {
+			FileDetailDTO file = new FileDetailDTO();
+
+			file.setIsDirectory(i.isDirectory());
+			file.setIsFile(i.isFile());
+			file.setIsHidden(i.isHidden());
+			file.setGetAbsolutePath(i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
+			file.setGetName(i.getName());
+			file.setGetExtension(FilenameUtils.getExtension(i.getName()).toLowerCase());
+			file.setGetParent(i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setGetPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setLastModified(i.lastModified());
+			file.setLength(i.length());
+			try {
+				file.setGetCanonicalPath(i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
+			} catch (IOException e) { }
+
+			fileList.add(file);
+		}
+
+		if(sort.equals("")) sort = "name";
+		if (sort.equals("name") || sort.equals("type") || sort.equals("path")) {
+			if (order.equals("desc")) {
+				String tempSort = sort;
+				fileList.sort(
+					Comparator.comparing(FileDetailDTO::getIsDirectory)
+						.thenComparing((FileDetailDTO file) -> {
+							if (tempSort.equals("name")) { return file.getGetName();
+							} else if (tempSort.equals("type")) { return file.getGetExtension();
+							} else if (tempSort.equals("path")) { return file.getGetPath();
+							} else { return file.getGetName(); }
+						}).reversed()
+				);
+			} else {
+				String tempSort = sort;
+				fileList.sort(
+					Comparator.comparing(FileDetailDTO::getIsFile)
+						.thenComparing((FileDetailDTO file) -> {
+							if (tempSort.equals("name")) { return file.getGetName();
+							} else if (tempSort.equals("type")) { return file.getGetExtension();
+							} else if (tempSort.equals("path")) { return file.getGetPath();
+							} else { return file.getGetName(); }
+						})
+				);
+			}
+		} else {
+			if (order.equals("desc")) {
+				String tempSort = sort;
+				fileList.sort(
+					Comparator.comparing(FileDetailDTO::getIsDirectory)
+						.thenComparing((FileDetailDTO file) -> {
+							if (tempSort.equals("lastModified")) { return file.getLastModified();
+							} else { return file.getLength(); }
+						}).reversed()
+				);
+			} else {
+				String tempSort = sort;
+				fileList.sort(
+					Comparator.comparing(FileDetailDTO::getIsFile)
+						.thenComparing((FileDetailDTO file) -> {
+							if (tempSort.equals("lastModified")) { return file.getLastModified();
+							} else { return file.getLength(); }
+						})
+				);
+			}
+		}
+
+		return fileList;
+	}
+
+	/*
 	private List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
 		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
 		File[] files = null;
@@ -134,6 +213,9 @@ public class FileServiceImpl implements FileService {
 		} catch (Exception e) { e.printStackTrace(); }
 		return fileList;
 	}
+	*/
+
+	/* --------------------------- 수정필요 --------------------------- */
 
 	@Override
 	public List<Map<String, Object>> folderList(String sharePath, String path) {

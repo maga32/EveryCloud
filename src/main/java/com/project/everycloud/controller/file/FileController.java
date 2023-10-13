@@ -1,10 +1,12 @@
 package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
-import com.project.everycloud.model.response.file.FileListDTO;
+import com.project.everycloud.model.response.file.FileDetailDTO;
+import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
 import org.apache.commons.io.FileUtils;
@@ -37,12 +39,12 @@ public class FileController {
 	HttpSession session;
 
 	@PostMapping("/fileList")
-	public AppResponse<FileListDTO> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
+	public AppResponse<AppList<FileDetailDTO, FileOptionDTO>> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
 
 		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		FileListDTO fileList = fileService.fileList(fileListLoad, sessionUser);
+		AppList<FileDetailDTO, FileOptionDTO> fileList = fileService.fileList(fileListLoad, sessionUser);
 
-		return new AppResponse<FileListDTO>()
+		return new AppResponse<AppList<FileDetailDTO, FileOptionDTO>>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message())
 				.setData(fileList);

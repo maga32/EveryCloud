@@ -1,8 +1,10 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
-import com.project.everycloud.model.response.file.FileListDTO;
+import com.project.everycloud.model.response.file.FileDetailDTO;
+import com.project.everycloud.model.response.file.FileOptionDTO;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Map;
 
 public interface FileService {
 
-	FileListDTO fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
+	AppList<FileDetailDTO, FileOptionDTO> fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
 
 	List<Map<String, Object>> folderList(String sharePath, String path);
 	

@@ -18,5 +18,6 @@ public class FileListLoadDTO {
 	String order;
 	@NotNull(message = "필수항목: keyword")
 	String keyword;
+
 	boolean viewHidden;
 }
