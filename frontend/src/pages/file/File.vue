@@ -132,7 +132,7 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
   form.shareLink = shareLink || form.shareLink
   form.path = path || form.path
   form.sort = sort || form.sort
-  form.order = order || form.order
+  form.order = order || (form.order == 'asc') ? 'desc' : 'asc'
   form.keyword = resetKeyword ? '' : form.keyword
 
   setting.search = !!form.keyword

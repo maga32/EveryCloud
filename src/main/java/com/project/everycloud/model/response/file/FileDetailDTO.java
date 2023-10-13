@@ -2,11 +2,9 @@ package com.project.everycloud.model.response.file;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @EqualsAndHashCode
-@RequiredArgsConstructor
 @NoArgsConstructor
 @ToString
 public class FileDetailDTO {

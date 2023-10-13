@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.InvalidPathException;
 import java.util.*;
 
@@ -100,120 +101,41 @@ public class FileServiceImpl implements FileService {
 			fileList.add(file);
 		}
 
-		if(sort.equals("")) sort = "name";
-		if (sort.equals("name") || sort.equals("type") || sort.equals("path")) {
-			if (order.equals("desc")) {
-				String tempSort = sort;
-				fileList.sort(
-					Comparator.comparing(FileDetailDTO::getIsDirectory)
-						.thenComparing((FileDetailDTO file) -> {
-							if (tempSort.equals("name")) { return file.getGetName();
-							} else if (tempSort.equals("type")) { return file.getGetExtension();
-							} else if (tempSort.equals("path")) { return file.getGetPath();
-							} else { return file.getGetName(); }
-						}).reversed()
-				);
-			} else {
-				String tempSort = sort;
-				fileList.sort(
-					Comparator.comparing(FileDetailDTO::getIsFile)
-						.thenComparing((FileDetailDTO file) -> {
-							if (tempSort.equals("name")) { return file.getGetName();
-							} else if (tempSort.equals("type")) { return file.getGetExtension();
-							} else if (tempSort.equals("path")) { return file.getGetPath();
-							} else { return file.getGetName(); }
-						})
-				);
-			}
-		} else {
-			if (order.equals("desc")) {
-				String tempSort = sort;
-				fileList.sort(
-					Comparator.comparing(FileDetailDTO::getIsDirectory)
-						.thenComparing((FileDetailDTO file) -> {
-							if (tempSort.equals("lastModified")) { return file.getLastModified();
-							} else { return file.getLength(); }
-						}).reversed()
-				);
-			} else {
-				String tempSort = sort;
-				fileList.sort(
-					Comparator.comparing(FileDetailDTO::getIsFile)
-						.thenComparing((FileDetailDTO file) -> {
-							if (tempSort.equals("lastModified")) { return file.getLastModified();
-							} else { return file.getLength(); }
-						})
-				);
-			}
-		}
-
-		return fileList;
-	}
-
-	/*
-	private List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
-		List<Map<String, Object>> fileList = new ArrayList<Map<String,Object>>();
-		File[] files = null;
-		files = fileDao.getPathFiles(path, viewHidden, keyword);
-		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
-
-		for(File i : files) {
-			Map<String, Object> param = new HashMap<String, Object>();
-
-			param.put("isDirectory", i.isDirectory());
-			param.put("isFile", i.isFile());
-			param.put("isHidden", i.isHidden());
-			param.put("getAbsolutePath", i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
-			param.put("getName", i.getName());
-			param.put("getExtension", FilenameUtils.getExtension(i.getName()).toLowerCase());
-			param.put("getParent", i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
-			param.put("getPath", i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
-			param.put("lastModified", i.lastModified());
-			param.put("length", i.length());
-			try { param.put("getCanonicalPath", i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
-			} catch (IOException e) { e.printStackTrace(); }
-
-			fileList.add(param);
-		}
-
-		if(sort.equals("")) sort = "name";
-
+		String sortParam;
 		if (sort.equals("name")) { sortParam = "getName";
 		} else if (sort.equals("type")) { sortParam = "getExtension";
 		} else if (sort.equals("path")) { sortParam = "getPath";
 		} else if (sort.equals("date")) { sortParam = "lastModified";
 		} else if (sort.equals("size")) { sortParam = "length";
+		} else { sortParam = "getName"; }
+
+        if (order.equals("desc")) {
+			fileList.sort(
+				Comparator.comparing(FileDetailDTO::getIsDirectory)
+					.thenComparing(list -> {
+						try {
+							Field field = list.getClass().getDeclaredField(sortParam);
+							field.setAccessible(true);
+							return (Comparable) field.get(list);
+						} catch (Exception e) { throw new RuntimeException("Error",e); }
+					}).reversed()
+			);
+		} else {
+			fileList.sort(
+				Comparator.comparing(FileDetailDTO::getIsDirectory)
+					.thenComparing(list -> {
+						try {
+							Field field = list.getClass().getDeclaredField(sortParam);
+							field.setAccessible(true);
+							return (Comparable) field.get(list);
+						} catch (Exception e) { throw new RuntimeException("Error",e); }
+					})
+			);
 		}
-		try {
-			if (sort.equals("name") || sort.equals("type") || sort.equals("path")) {
-				if (order.equals("desc")) {
-					fileList.sort(
-						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
-							.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam)).reversed()
-					);
-				} else {
-					fileList.sort(
-						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
-							.thenComparing((Map<String, Object> param) -> (String) param.get(sortParam))
-					);
-				}
-			} else {
-				if (order.equals("desc")) {
-					fileList.sort(
-						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isDirectory"))
-							.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam)).reversed()
-					);
-				} else {
-					fileList.sort(
-						Comparator.comparing((Map<String, Object> param) -> (Boolean) param.get("isFile"))
-							.thenComparing((Map<String, Object> param) -> (long) param.get(sortParam))
-					);
-				}
-			}
-		} catch (Exception e) { e.printStackTrace(); }
+
 		return fileList;
 	}
-	*/
+
 
 	/* --------------------------- 수정필요 --------------------------- */
 
