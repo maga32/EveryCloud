@@ -8,22 +8,17 @@
   },
   "extensions": {
     "app": "app",
-    "dll": "dll",
     "dmg": "dmg",
-    "exe": "exe",
-    "folder": "folder",
-    "htm": "html",
-    "html": "html",
-    "pdf": "pdf",
     "pkg": "pkg",
-    "psd": "psd",
     "reg": "reg",
-    "stl": "stl",
+    "dll": "dll",
+    "exe": "exe",
     "torrent": "torrent",
+
     "ttc": "font",
     "ttf": "font",
     "otf": "font",
-    "txt": "txt",
+
     "rar": "rar",
     "7z": "zip",
     "alz": "zip",
@@ -33,6 +28,7 @@
     "tz": "zip",
     "z": "zip",
     "zip": "zip",
+
     "aac": "music",
     "aiff": "music",
     "alac": "music",
@@ -42,6 +38,7 @@
     "mp3": "music",
     "wav": "music",
     "wma": "music",
+
     "ai": "photo",
     "bmp": "photo",
     "gif": "photo",
@@ -56,6 +53,7 @@
     "tif": "photo",
     "tiff": "photo",
     "webp": "photo",
+
     "3gp": "video",
     "avi": "video",
     "flv": "video",
@@ -67,6 +65,8 @@
     "ogg": "video",
     "swf": "video",
     "wmv": "video",
+
+    "pdf": "pdf",
     "doc": "doc",
     "docx": "doc",
     "pages": "doc",
@@ -78,13 +78,20 @@
     "xlsx": "xls",
     "numbers": "xls",
     "hwp": "hwp",
+    "txt": "txt",
+
+    "htm": "html",
+    "html": "html",
     "css": "code",
     "ini": "code",
     "js": "code",
     "java": "code",
     "log": "code",
     "php": "code",
+    "py": "code",
     "xml": "code",
+
+    "psd": "psd",
     "ses": "ses",
     "sesx": "ses",
     "flm": "fl",
@@ -94,6 +101,9 @@
     "vsqx": "vsq",
     "moti": "motion",
     "motn": "motion",
+    "stl": "stl",
+
+    "folder": "folder",
     "default": "default"
   }
 }

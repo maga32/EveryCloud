@@ -66,6 +66,7 @@ public class FileServiceImpl implements FileService {
 
 		result.setOption(options);
 		result.setLists(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
+		result.setTotal(result.getLists().size());
 
 		return result;
 	}
@@ -87,31 +88,32 @@ public class FileServiceImpl implements FileService {
 			file.setIsDirectory(i.isDirectory());
 			file.setIsFile(i.isFile());
 			file.setIsHidden(i.isHidden());
-			file.setGetAbsolutePath(i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
-			file.setGetName(i.getName());
-			file.setGetExtension(FilenameUtils.getExtension(i.getName()).toLowerCase());
-			file.setGetParent(i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
-			file.setGetPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
-			file.setLastModified(i.lastModified());
-			file.setLength(i.length());
+			file.setAbsolutePath(i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
+			file.setName(i.getName());
+			file.setLowerName(i.getName().toLowerCase());
+			file.setExtension(FilenameUtils.getExtension(i.getName()).toLowerCase());
+			file.setParent(i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setDate(i.lastModified());
+			file.setSize(i.length());
 			try {
-				file.setGetCanonicalPath(i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
+				file.setCanonicalPath(i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
 			} catch (IOException e) { }
 
 			fileList.add(file);
 		}
 
 		String sortParam;
-		if (sort.equals("name")) { sortParam = "getName";
-		} else if (sort.equals("type")) { sortParam = "getExtension";
-		} else if (sort.equals("path")) { sortParam = "getPath";
+		if (sort.equals("name")) { sortParam = "lowerName";
+		} else if (sort.equals("type")) { sortParam = "extension";
+		} else if (sort.equals("path")) { sortParam = "path";
 		} else if (sort.equals("date")) { sortParam = "lastModified";
 		} else if (sort.equals("size")) { sortParam = "length";
-		} else { sortParam = "getName"; }
+		} else { sortParam = "lowerName"; }
 
         if (order.equals("desc")) {
 			fileList.sort(
-				Comparator.comparing(FileDetailDTO::getIsDirectory)
+				Comparator.comparing(FileDetailDTO::isIsDirectory)
 					.thenComparing(list -> {
 						try {
 							Field field = list.getClass().getDeclaredField(sortParam);
@@ -122,7 +124,7 @@ public class FileServiceImpl implements FileService {
 			);
 		} else {
 			fileList.sort(
-				Comparator.comparing(FileDetailDTO::getIsDirectory)
+				Comparator.comparing(FileDetailDTO::isIsFile)
 					.thenComparing(list -> {
 						try {
 							Field field = list.getClass().getDeclaredField(sortParam);

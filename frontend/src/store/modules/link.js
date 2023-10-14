@@ -24,7 +24,6 @@ const link = {
     addSiteHtml: ({commit}) => {
       const siteHtml = window.location.pathname + window.location.search
       localStorage.setItem('siteHtml', siteHtml)
-
       commit('addSiteHtml', siteHtml)
     },
     addTempSiteHtml: ({commit}) => {
