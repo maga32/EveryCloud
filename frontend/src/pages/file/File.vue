@@ -6,54 +6,68 @@
 
         <div class="col-12 col-md-8">
           <div id="nowPath">
-            <div class='d-flex'>
-              <dropdown-menu withDropdownCloser direction="right">
-                <template #trigger>
-                  <i class="pointer fa-solid fa-wrench"></i>
-                </template>
 
-                <template #body>
-                  <ul class="dropdown-menu show" dropdown-closer>
-                    <li><div class="dropdown-item pointer" @click="toggleHiddenCheck">
-                      <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check"></i></span>
-                      <i class="fa-solid fa-file-shield pe-2"></i>숨김파일보기
-                    </div></li>
-                    <li><div class="dropdown-item pointer" onClick="newFolder()" data-bs-toggle="modal" data-bs-target="#functionModal">
-                      <i class="fa-solid fa-folder-plus pe-2"></i>새폴더
-                    </div></li>
-                    <li><div class="dropdown-item pointer" onClick="newFile()" data-bs-toggle="modal" data-bs-target="#functionModal">
-                      <i class="fa-solid fa-file-circle-plus pe-2"></i>새파일
-                    </div></li>
-                  </ul>
-                </template>
-              </dropdown-menu>
+            <div class='d-flex'>
+                <div v-if="homePath.index > 2" >
+                  <dropdown-menu withDropdownCloser>
+                    <template #trigger>
+                      <i class="pointer fa-solid fa-house" />
+                    </template>
+                    <template #body>
+                      <ul class="dropdown-menu show" dropdown-closer>
+                        <li v-for="(li,i) in homePath.parents">
+                          <div v-if="i < homePath.index-1" class="dropdown-item pointer" @click="loadFileList(form.shareLink, li.link, '','','',true)">
+                            {{ li.name }}
+                          </div>
+                        </li>
+                      </ul>
+                    </template>
+                  </dropdown-menu>
+                </div>
+                <div v-else class='pointer' @click="loadFileList(form.shareLink, homePath.parents[0].link, '','','',true)">
+                  <i class="pointer fa-solid fa-house" />
+                </div>
+
+                <div v-if="homePath.index > 0" class="px-2 text-truncate">
+                  <span class='pointer' @click="loadFileList(form.shareLink, (homePath.index === 1 ? homePath.parents[1].link : homePath.parents[homePath.index-1].link), '','','',true)">
+                    {{ homePath.index === 1 ? homePath.parents[1].name : homePath.parents[homePath.index-1].name }}
+                  </span>
+                </div>
+                <div v-if="homePath.index > 1">
+                  <i class='fa-solid fa-angle-right' />
+                </div>
+                <div v-if="homePath.index > 1" class="px-2 text-truncate">
+                  <span class='pointer' @click="loadFileList(form.shareLink, homePath.parents[homePath.index].link, '','','',true)">
+                    {{ homePath.parents[homePath.index].name }}
+                  </span>
+                </div>
             </div>
+
           </div>
         </div>
 
         <div class="col-12 col-md-4 row text-end">
           <div class="col-4 d-md-none"></div>
           <div class="col-6 col-md-8 px-2">
-            <input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" v-model="form.keyword">
+            <input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" v-model="form.keyword" @keyup.enter="loadFileList('','','','')">
           </div>
-          <div class="col-1 col-md-2 pointer" onClick="searchFileClick()"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="col-1 col-md-2 pointer" @click="loadFileList('','','','')"><i class="fa-solid fa-magnifying-glass" /></div>
           <div class="col-1 col-md-2 ps-2">
             <dropdown-menu withDropdownCloser direction="right">
               <template #trigger>
-                <i class="pointer fa-solid fa-wrench"></i>
+                <i class="pointer fa-solid fa-wrench" />
               </template>
-
               <template #body>
-                <ul class="dropdown-menu show" dropdown-closer>
+                <ul class="dropdown-menu show" dropdown-closer style="right:50px">
                   <li><div class="dropdown-item pointer" @click="toggleHiddenCheck">
-                    <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check"></i></span>
-                    <i class="fa-solid fa-file-shield pe-2"></i>숨김파일보기
+                    <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" /></span>
+                    <i class="fa-solid fa-file-shield pe-2" />숨김파일보기
                   </div></li>
-                  <li><div class="dropdown-item pointer" onClick="newFolder()" data-bs-toggle="modal" data-bs-target="#functionModal">
-                    <i class="fa-solid fa-folder-plus pe-2"></i>새폴더
+                  <li><div class="dropdown-item pointer" onClick="newFolder()">
+                    <i class="fa-solid fa-folder-plus pe-2" />새폴더
                   </div></li>
-                  <li><div class="dropdown-item pointer" onClick="newFile()" data-bs-toggle="modal" data-bs-target="#functionModal">
-                    <i class="fa-solid fa-file-circle-plus pe-2"></i>새파일
+                  <li><div class="dropdown-item pointer" onClick="newFile()">
+                    <i class="fa-solid fa-file-circle-plus pe-2" />새파일
                   </div></li>
                 </ul>
               </template>
@@ -64,7 +78,7 @@
         <table class="w-100">
           <tr>
             <td class="text-center" style="width:35px;"><input type="checkbox" class="form-check-input" v-model="setting.checkAllFile"></td>
-            <td style="width:80px;"></td>
+            <td style="width:20px;"></td>
             <td class="w-auto d-flex">
               <span class="pointer" @click="loadFileList('', '', 'name', (form.order == 'asc' ? 'desc' : 'asc'))">이름{{sortArrow('name')}}</span>
               <span class="pointer px-3" @click="loadFileList('', '', 'size', (form.order == 'asc' ? 'desc' : 'asc'))">크기{{sortArrow('size')}}</span>
@@ -81,10 +95,6 @@
 
       </div>
     </div>
-  </div>
-
-  <div class="position-fixed shadow border border-secondary rounded bg-body-tertiary p-3 inactive" id="fileControlMenu">
-    테스트
   </div>
 
   <FileList
@@ -143,6 +153,7 @@ const setting = reactive({
 })
 
 const homePath = reactive({
+  index: 0,
   parents: []
 })
 
@@ -189,11 +200,11 @@ async function makeFileList() {
 
   const urlParams = new URLSearchParams(window.location.search)
 
-  form.shareLink  = urlParams.get('shareLink')  || form.shareLink
-  form.path       = urlParams.get('path')       || form.path
-  form.sort       = urlParams.get('sort')       || form.sort
-  form.order      = urlParams.get('order')      || form.order
-  form.keyword    = urlParams.get('keyword')    || form.keyword
+  form.shareLink  = urlParams.get('shareLink')  || ''
+  form.path       = urlParams.get('path')       || ''
+  form.sort       = urlParams.get('sort')       || 'name'
+  form.order      = urlParams.get('order')      || 'asc'
+  form.keyword    = urlParams.get('keyword')    || ''
 
   setting.search = !!form.keyword
 
@@ -212,13 +223,17 @@ function viewFileControlMenu() {
 }
 
 function pathLink(shareLink, nowPath) {
+  homePath.parents = []
   const parents = nowPath.replace(/\\/g, '/').split('/')
   let link = ''
 
   for(let i=0; i < parents.length; i++) {
     link += parents[i] + '/'
-    homePath.parents.push({link: link, name: parents[i]})
+    if(!parents[0]) parents[0] = 'HOME'
+    if(parents[i]) homePath.parents.push({link: link, name: parents[i]})
   }
+
+  homePath.index = homePath.parents.length -1
 }
 
 function toggleHiddenCheck() {
