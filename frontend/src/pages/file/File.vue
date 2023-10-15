@@ -169,22 +169,13 @@
 <!--  <button @click="parentTest">parent test</button>-->
 
   <!-- Modal -->
-  <div class="modal fade" id="functionModal" tabindex="-1" aria-labelledby="functionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5 text-break w-100 pe-3" id="functionModalLabel"></h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="functionModalBody">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="functionModalAffect()">확인</button>
-        </div>
+  <ModalView @close="closeModal" v-if="modalOn">
+    <template #functionModalBody>
+      <div>
+        test!!
       </div>
-    </div>
-  </div>
+    </template>
+  </ModalView>
 
 </template>
 
@@ -193,8 +184,9 @@ import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
-import FileList from './FileList.vue'
 import Swal from 'sweetalert2'
+import FileList from './FileList.vue'
+import ModalView from '@/components/ModalView.vue'
 
 const route = useRoute()
 
@@ -341,7 +333,7 @@ function downloadFiles() {
  * type - moveFiles / copyFiles
  */
 const moveFiles = (path='', type='moveFiles') => {
-
+  openModal()
 }
 
 // pass to child component
