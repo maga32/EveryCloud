@@ -72,9 +72,10 @@ public class GlobalExceptionHandler {
             apiResponseMessage = ResponseType.BAD_REQUEST.message();
         // ETC
         } else {
+            e.printStackTrace();
             apiResponseType = ResponseType.ERROR;
-            // apiResponseMessage = ResponseType.ERROR.message();
-            apiResponseMessage = e.toString();
+            apiResponseMessage = ResponseType.ERROR.message();
+            // apiResponseMessage = e.toString();
         }
 
         AppResponse<String> apiResponse = new AppResponse<String>()

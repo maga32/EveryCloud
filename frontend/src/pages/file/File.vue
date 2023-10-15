@@ -81,7 +81,7 @@
         <!-- Filter -->
         <table class="w-100">
           <tr>
-            <td class="text-center" style="width:35px;"><input type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
+            <td class="text-center" style="width:35px;"><input v-if="!setting.search" type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
             <td style="width:20px;"></td>
             <td class="w-auto d-flex">
               <span class="pointer" @click="loadFileList('', '', 'name', (form.order == 'asc' ? 'desc' : 'asc'))">이름{{sortArrow('name')}}</span>
@@ -109,15 +109,15 @@
       <table>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
-          <td class="p-1" onclick="downloadFiles()">다운로드</td>
+          <td class="p-1" @click="downloadFiles()">다운로드</td>
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-share" /></td>
-          <td class="p-1" onclick="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">이동</td>
+          <td class="p-1" @click="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">이동</td>
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
-          <td class="p-1" onclick="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">복사</td>
+          <td class="p-1" @click="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">복사</td>
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-trash" /></td>
@@ -145,9 +145,9 @@
         <tr>
           <td colspan="2" class="p-2">
             <div class="btn-group">
-              <button type="button" class="btn btn-outline-secondary" onclick="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
-              <button type="button" class="btn btn-outline-secondary" onclick="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-share" /></button>
-              <button type="button" class="btn btn-outline-secondary" onclick="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-clipboard" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-share" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-clipboard" /></button>
               <button type="button" class="btn btn-outline-secondary" onclick="deleteFiles()" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-trash" /></button>
             </div>
           </td>
@@ -185,6 +185,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
@@ -193,6 +194,7 @@ import router from '@/router'
 import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
 import FileList from './FileList.vue'
+import Swal from 'sweetalert2'
 
 const route = useRoute()
 
@@ -219,6 +221,10 @@ const homePath = reactive({
 
 const fileList = ref([])
 
+const modalOn = ref(false)
+
+/*------------------------ compute ------------------------*/
+
 const checkAllFile = computed({
   get() {
     return setting.checkedFiles.length === fileList.value.length
@@ -232,7 +238,7 @@ const checkAllFile = computed({
 const tempImg = computed({
   get() {
     const tempMap = fileList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
-    return imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path)
+    return tempMap ? imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path) : ''
   }
 })
 
@@ -246,11 +252,14 @@ watch(() => route.fullPath, (to, from)=>{
   }
 })
 
-function sortArrow(sort) {
-  return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : ''
-}
+/*------------------------ functions ------------------------*/
 
-function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = false) {
+const openModal = () => { modalOn.value = true }
+const closeModal = () => { modalOn.value = false }
+
+const sortArrow = (sort) => { return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : '' }
+
+const loadFileList = (shareLink, path, sort, order, keyword, resetKeyword = false) => {
   form.shareLink  = shareLink || form.shareLink
   form.path       = path      || form.path
   form.sort       = sort      || form.sort
@@ -269,7 +278,7 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
   })
 }
 
-async function getFileList() {
+const getFileList = async () =>{
   setting.loadingList = true
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -294,7 +303,7 @@ async function getFileList() {
   setting.loadingList = false
 }
 
-function homeLink(shareLink, nowPath) {
+const homeLink = (shareLink, nowPath) => {
   homePath.parents = []
   const parents = nowPath.replace(/\\/g, '/').split('/')
   let link = ''
@@ -308,17 +317,31 @@ function homeLink(shareLink, nowPath) {
   homePath.index = homePath.parents.length -1
 }
 
-function toggleHiddenCheck() {
+const toggleHiddenCheck = () => {
   form.viewHidden = !form.viewHidden
   getFileList()
 }
 
-function imgSelector(extension, isHidden, path) {
+const imgSelector = (extension, isHidden, path) => {
   if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
     return '/api/v1/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + path.replace(/\\/g, '/')
   } else {
     return '/img/fileicons/' + extensions[extension] + '.png'
   }
+}
+
+/*------------------------ File Control Menu Functions ------------------------*/
+
+function downloadFiles() {
+  window.open("/api/v1/fileDownload?path=" + form.path + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
+}
+
+/**
+ * move(or copy) files
+ * type - moveFiles / copyFiles
+ */
+const moveFiles = (path='', type='moveFiles') => {
+
 }
 
 // pass to child component

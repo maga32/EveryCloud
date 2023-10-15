@@ -50,6 +50,78 @@ public class FileController {
 				.setData(fileList);
 	}
 
+	@GetMapping("/fileDownload")
+	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
+					  @RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
+					  @RequestParam("fileNames") String fileNames) throws Exception {
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
+		// String sharePath = "";
+
+		// String invalidString = "" + (shareMap.get("invalidString") != null ? shareMap.get("invalidString") : "");
+		/*
+		if(!invalidString.equals("")) {
+			response.setContentType("text/html; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.println("<script>");
+			out.println("	alert('" + invalidString + "');");
+			out.println("	window.close();");
+			out.println("</script>");
+			out.close();
+			return;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		*/
+		String[] fileList = fileNames.split(":/:");
+		File firstFile = new File(path + File.separator + fileList[0]);
+
+		if(fileList.length!=1 || firstFile.isDirectory()) { // when multiple files selected or selected one is folder.
+			String downName ="downloads";
+			response.setContentType("application/octet-stream");
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + new String(downName.getBytes("utf-8"),"8859_1")+".zip" + "\";");
+			ZipOutputStream out = new ZipOutputStream(response.getOutputStream());
+
+			for (String fileName : fileList) {
+				File file = new File(path + File.separator + fileName);
+				addDownloadFile(out, file, "");
+			}
+
+			out.close();
+
+		} else {	// when selected only one file
+			if(firstFile.isFile()) {
+				byte[] fileByte = FileUtils.readFileToByteArray(firstFile);
+
+				response.setContentType("application/octet-stream");
+				response.setHeader("Content-Disposition", "attachment; fileName=\"" +new String(fileList[0].getBytes("utf-8"),"8859_1") +"\";");
+				response.setHeader("Content-Transfer-Encoding", "binary");
+				response.setContentLength(fileByte.length);
+				response.getOutputStream().write(fileByte);
+				response.getOutputStream().flush();
+				response.getOutputStream().close();
+			}
+		}
+	}
+
+	private static void addDownloadFile(ZipOutputStream out, File file, String path) throws IOException {
+		if (file.isDirectory()) {
+			for (File f : file.listFiles()) {
+				addDownloadFile(out, f, path + file.getName() + File.separator);
+			}
+			return;
+		}
+
+		FileInputStream in = new FileInputStream(file);
+		out.putNextEntry(new ZipEntry(path + file.getName()));
+
+		int len;
+		byte[] buf = new byte[4096];
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		out.closeEntry();
+	}
 
 	/* --------------------------- 수정필요 --------------------------- */
 
@@ -200,8 +272,8 @@ public class FileController {
 		return map;
 	}
 	
-	@RequestMapping("/fileDownload")
-	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
+	@RequestMapping("/fileDownload2")
+	void fileDownload2(HttpServletResponse response, @RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 			@RequestParam("fileNames") String fileNames) throws Exception {
 		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
@@ -234,7 +306,7 @@ public class FileController {
 			
         	for (String fileName : fileList) {
         		File file = new File(path + File.separator + fileName);
-        		addDownloadFile(out, file, "");
+        		addDownloadFile2(out, file, "");
             }
         	
         	out.close();
@@ -254,7 +326,7 @@ public class FileController {
 		}
 	}
 	
-	private static void addDownloadFile(ZipOutputStream out, File file, String path) throws IOException {
+	private static void addDownloadFile2(ZipOutputStream out, File file, String path) throws IOException {
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
 				addDownloadFile(out, f, path + file.getName() + File.separator);

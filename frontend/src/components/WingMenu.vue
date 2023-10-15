@@ -97,10 +97,9 @@ onMounted(()=> {
   $store.dispatch('user/getSession')
 })
 
-function logout() {
-  $http.post('/logout').then(()=>
-    $store.dispatch('user/getSession')
-  )
+const logout = () => {
+  $http.post('/logout')
+    .then(() => $store.dispatch('user/getSession'))
 }
 
 /*------- theme & wing -------*/
@@ -116,19 +115,11 @@ const userDark = useDark({
 const minWing = ref(false)
 const themeSelect = ref(false)
 
-function openWing() {
-  minWing.value = true
-}
+const openWing = () => { minWing.value = true }
+const closeWing = () => { minWing.value = false }
+const closeThemeSelect = () => { themeSelect.value = false }
 
-function closeWing() {
-  minWing.value = false
-}
-
-function closeThemeSelect() {
-  themeSelect.value = false
-}
-
-function languageSelect(language='') {
+const languageSelect = (language='') => {
   language = language || (state.value.language || (form.languages.includes(usePreferredLanguages()) || 'en'))
   state.value.language = language
   setLocale(language)

@@ -115,11 +115,9 @@ onMounted(() => {
     })
 })
 
-function unDupCheck() {
-  duplicateChecked.value = false
-}
+const unDupCheck = () => { duplicateChecked.value = false }
 
-function checkOverlapId() {
+const checkOverlapId = () => {
   duplicateChecked.value = false
   if(!form.user.id) {
     Swal.fire({ icon: 'error', text: '아이디를 입력해주세요.', showConfirmButton: false, timer: 1500})
@@ -141,7 +139,7 @@ function checkOverlapId() {
     })
 }
 
-function submit() {
+const submit = () => {
   $http.post('/updateUser', form, null)
     .then((response) => {
       if(response.data) {

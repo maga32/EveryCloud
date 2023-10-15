@@ -56,7 +56,7 @@ onMounted(() => {
     })
 })
 
-function submit() {
+const submit = () => {
   $http.post('/login', form.user, null)
     .then((response) => {
       if(response.data) {

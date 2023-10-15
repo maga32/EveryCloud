@@ -19,7 +19,8 @@
         <table class="w-100 rounded fileTable" :class="setting.checkedFiles.includes(li.name) ? 'checked' : ''">
           <tr>
             <td class="text-center" style="width:35px;">
-              <input type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
+              <input v-if="setting.search" type="hidden" class="li_parent" :value="li.parent">
+              <input v-else type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
             </td>
             <td class="text-center py-2" style="width:80px;">
               <img class="fileImg" :src="imgSelector(li.extension, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
@@ -29,7 +30,7 @@
                 <span v-if="li.extension !== 'folder'" class="fileName" style="word-break:break-all">
                   {{ li.name }}
                 </span>
-                <span v-else class="fileName pointer" @click="loadFileList(form.shareLink, li.path.replace(/\\/g, '/'),'','','',true)" style="word-break:break-all">
+                <span v-else class="fileName pointer" @click="loadFileList('', li.path.replace(/\\/g, '/'),'','','',true)" style="word-break:break-all">
                   {{ li.name }}
                 </span>
               </div>
@@ -67,17 +68,23 @@ import dayjs from 'dayjs'
 
 const props = defineProps(['form', 'setting', 'fileList', 'imageThumbnail', 'extensions'])
 
-function labelClick(e) {
+const labelClick = (e) => {
   // block to show File Control Menu
-  if(e.target.classList.contains('pointer')) e.preventDefault()
+  if(e.target.classList.contains('pointer') || props.setting.search) e.preventDefault()
+
+  // if search file mode, go to path
+  if(props.setting.search) loadFileList('', e.target.closest('table').querySelector('.li_parent').value, '', '', '', true)
 }
 
 
-function childTest() {
+const childTest = () => {
   console.log(props)
 }
 
 // get from parent component
+/**
+ * @params shareLink<br> path<br> sort<br> order<br> keyword<br> resetKeyword = false
+ */
 const loadFileList = inject('loadFileList')
 const imgSelector = inject('imgSelector')
 
