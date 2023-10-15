@@ -1,13 +1,15 @@
 <template>
+  <!-- Top Menu -->
   <div class="row fixed-top" id="fileMenuContainer">
     <div class="col-0 col-md-3"></div>
     <div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
       <div class="row rounded border p-2 m-0 bg-light-subtle">
 
+        <!-- Navigation -->
         <div class="col-12 col-md-8">
           <div id="nowPath">
-
             <div class='d-flex'>
+
                 <div v-if="homePath.index > 2" >
                   <dropdown-menu withDropdownCloser>
                     <template #trigger>
@@ -41,15 +43,16 @@
                     {{ homePath.parents[homePath.index].name }}
                   </span>
                 </div>
-            </div>
 
+            </div>
           </div>
         </div>
 
+        <!-- Tools -->
         <div class="col-12 col-md-4 row text-end">
           <div class="col-4 d-md-none"></div>
           <div class="col-6 col-md-8 px-2">
-            <input type="text" class="w-100 border border-secondary rounded-5 px-2" id="keyword" v-model="form.keyword" @keyup.enter="loadFileList('','','','')">
+            <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadFileList('','','','')">
           </div>
           <div class="col-1 col-md-2 pointer" @click="loadFileList('','','','')"><i class="fa-solid fa-magnifying-glass" /></div>
           <div class="col-1 col-md-2 ps-2">
@@ -75,9 +78,10 @@
           </div>
         </div>
 
+        <!-- Filter -->
         <table class="w-100">
           <tr>
-            <td class="text-center" style="width:35px;"><input type="checkbox" class="form-check-input" v-model="setting.checkAllFile"></td>
+            <td class="text-center" style="width:35px;"><input type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
             <td style="width:20px;"></td>
             <td class="w-auto d-flex">
               <span class="pointer" @click="loadFileList('', '', 'name', (form.order == 'asc' ? 'desc' : 'asc'))">이름{{sortArrow('name')}}</span>
@@ -97,6 +101,63 @@
     </div>
   </div>
 
+  <!-- File Control Menu -->
+  <div class="position-fixed shadow border border-secondary rounded bg-body-tertiary p-3" :class="setting.checkedFiles.length > 0 ? 'active': 'inactive'" id="fileControlMenu">
+    <div v-if="setting.checkedFiles.length > 1">
+      <div class="px-1"> {{ setting.checkedFiles.length }} 개의 파일 선택</div>
+      <div class="text-center px-2 py-3"><img src="/img/fileicons/files.png"></div>
+      <table>
+        <tr class="pointer">
+          <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
+          <td class="p-1" onclick="downloadFiles()">다운로드</td>
+        </tr>
+        <tr class="pointer">
+          <td class="p-1"><i class="fa-solid fa-share" /></td>
+          <td class="p-1" onclick="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">이동</td>
+        </tr>
+        <tr class="pointer">
+          <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
+          <td class="p-1" onclick="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">복사</td>
+        </tr>
+        <tr class="pointer">
+          <td class="p-1"><i class="fa-solid fa-trash" /></td>
+          <td class="p-1 pointer" onclick="deleteFiles()" data-bs-toggle="modal" data-bs-target="#functionModal">삭제</td>
+        </tr>
+      </table>
+    </div>
+
+    <div v-else-if="setting.checkedFiles.length === 1">
+      <div class="px-1" style="word-break:break-all;">{{ setting.checkedFiles[0] }}</div>
+      <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px;"></div>
+      <table>
+        <tr>
+          <td class="p-1"><i class="fa-solid fa-star" /></td>
+          <td class="p-1">즐겨찾기</td>
+        </tr>
+        <tr>
+          <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
+          <td class="p-1 pointer" onclick="changeFileName()" data-bs-toggle="modal" data-bs-target="#functionModal">이름바꾸기</td>
+        </tr>
+        <tr>
+          <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
+          <td class="p-1 pointer" onclick="shareFile()" data-bs-toggle="modal" data-bs-target="#functionModal">공유</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="p-2">
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-secondary" onclick="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
+              <button type="button" class="btn btn-outline-secondary" onclick="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-share" /></button>
+              <button type="button" class="btn btn-outline-secondary" onclick="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-clipboard" /></button>
+              <button type="button" class="btn btn-outline-secondary" onclick="deleteFiles()" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-trash" /></button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- File List -->
   <FileList
       :form="form"
       :setting="setting"
@@ -127,7 +188,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, provide, watch } from 'vue'
+import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
@@ -148,8 +209,7 @@ const setting = reactive({
   loadingList: false,
   nowPath: '',
   search: false,
-  checkAllFile: false,
-  dropdownSetting: false,
+  checkedFiles: [],
 })
 
 const homePath = reactive({
@@ -159,13 +219,30 @@ const homePath = reactive({
 
 const fileList = ref([])
 
+const checkAllFile = computed({
+  get() {
+    return setting.checkedFiles.length === fileList.value.length
+  },
+  set(value) {
+    setting.checkedFiles = []
+    value ? fileList.value.forEach((li)=>setting.checkedFiles.push(li.name)) : []
+  }
+})
+
+const tempImg = computed({
+  get() {
+    const tempMap = fileList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
+    return imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path)
+  }
+})
+
 onMounted(() => {
-  makeFileList()
+  getFileList()
 })
 
 watch(() => route.fullPath, (to, from)=>{
   if(from !== to) {
-    makeFileList()
+    getFileList()
   }
 })
 
@@ -174,9 +251,6 @@ function sortArrow(sort) {
 }
 
 function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = false) {
-  setting.checkAllFile = false
-  viewFileControlMenu()
-
   form.shareLink  = shareLink || form.shareLink
   form.path       = path      || form.path
   form.sort       = sort      || form.sort
@@ -195,7 +269,7 @@ function loadFileList(shareLink, path, sort, order, keyword, resetKeyword = fals
   })
 }
 
-async function makeFileList() {
+async function getFileList() {
   setting.loadingList = true
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -210,19 +284,17 @@ async function makeFileList() {
 
   await $http.post('/fileList', form, null)
         .then((response) => {
-          pathLink(form.shareLink, response.data.option.nowPath)
+          homeLink(form.shareLink, response.data.option.nowPath)
           fileList.value = response.data.lists
         })
   $store.dispatch('link/addSiteHtml')
 
+  setting.checkedFiles = []
+
   setting.loadingList = false
 }
 
-function viewFileControlMenu() {
-
-}
-
-function pathLink(shareLink, nowPath) {
+function homeLink(shareLink, nowPath) {
   homePath.parents = []
   const parents = nowPath.replace(/\\/g, '/').split('/')
   let link = ''
@@ -238,11 +310,20 @@ function pathLink(shareLink, nowPath) {
 
 function toggleHiddenCheck() {
   form.viewHidden = !form.viewHidden
-  makeFileList()
+  getFileList()
+}
+
+function imgSelector(extension, isHidden, path) {
+  if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
+    return '/api/v1/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + path.replace(/\\/g, '/')
+  } else {
+    return '/img/fileicons/' + extensions[extension] + '.png'
+  }
 }
 
 // pass to child component
 provide('loadFileList', loadFileList)
+provide('imgSelector', imgSelector)
 
 </script>
 

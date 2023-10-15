@@ -1,6 +1,7 @@
 <template>
   <div class="col-12" id="fileListContainer">
 
+    <!-- Loading Motion -->
     <div id="loadingList" class="fixed-top row" :class="!setting.loadingList || 'act'">
       <div class="d-none d-md-block col-3"></div>
       <div class="col-12 col-md-9 px-4 text-center bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center">
@@ -8,20 +9,20 @@
       </div>
     </div>
 
+    <!-- File List -->
     <div id="fileList" class="px-2">
 
-      <label v-for="li in fileList" class="w-100 pe-2 pe-md-5">
+      <label v-for="li in fileList" class="w-100 pe-2 pe-md-5" @click="labelClick">
         <span class="d-none">
           {{ li.extension = li.isDirectory ? 'folder' : !extensions.hasOwnProperty(li.extension) ? 'default' : li.extension }}
         </span>
-        <table class="w-100 rounded fileTable">
+        <table class="w-100 rounded fileTable" :class="setting.checkedFiles.includes(li.name) ? 'checked' : ''">
           <tr>
             <td class="text-center" style="width:35px;">
-              <input type="checkbox" class="form-check-input checkFile" name="checkedFile" :value="li.name">
+              <input type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
             </td>
             <td class="text-center py-2" style="width:80px;">
-              <img class="fileImg" v-if="imageThumbnail.hasOwnProperty(li.extension) && !li.isHidden" :src="'/api/v1/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + li.path.replace(/\\/g, '/')" width="64px" loading="lazy">
-              <img class="fileImg" v-else :src="'/img/fileicons/' + extensions[li.extension] + '.png'" :style="li.isHidden ? 'opacity:0.3;' : ''" loading="lazy">
+              <img class="fileImg" :src="imgSelector(li.extension, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
             </td>
             <td class="w-auto">
               <div>
@@ -66,12 +67,19 @@ import dayjs from 'dayjs'
 
 const props = defineProps(['form', 'setting', 'fileList', 'imageThumbnail', 'extensions'])
 
+function labelClick(e) {
+  // block to show File Control Menu
+  if(e.target.classList.contains('pointer')) e.preventDefault()
+}
+
+
 function childTest() {
   console.log(props)
 }
 
 // get from parent component
 const loadFileList = inject('loadFileList')
+const imgSelector = inject('imgSelector')
 
 </script>
 
