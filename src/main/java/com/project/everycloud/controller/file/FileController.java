@@ -2,31 +2,32 @@ package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppList;
-import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/file")
 public class FileController {
 	
 	@Autowired
@@ -121,6 +122,52 @@ public class FileController {
 			out.write(buf, 0, len);
 		}
 		out.closeEntry();
+	}
+
+	public static final String DEFAULT_SIZE = "128";
+
+	@GetMapping("/thumbnailMaker")
+	public void thumbnailMaker(HttpServletResponse response,
+			String name,
+			@RequestParam(value="size", required = false, defaultValue=DEFAULT_SIZE) Integer size,
+			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) throws IOException {
+		/*
+		if(!userUtil.isAdmin()) {
+			if (shareLink.equals("")) return;
+			if (fileUtil.hasValidAuth(shareLink,0) != 1) return;
+		}
+
+		Share share = shareService.getShareByLink(shareLink);
+		if(share != null) name = share.getPath() + name;
+		*/
+
+		File file = new File(name);
+		String extension = FilenameUtils.getExtension(name).toLowerCase();
+		boolean transparent = extension.equals("png") || extension.equals("gif");
+		BufferedImage sourceImage= ImageIO.read(file);
+
+		int width = sourceImage.getWidth();
+		int height = sourceImage.getHeight();
+
+		// size 0 is original size
+		if(size != 0) {
+			if (width >= height && width > size) {
+				height = (int) (height * (size / (float) width));
+				width = size;
+			} else if (height > size) {
+				width = (int) (width * (size / (float) height));
+				height = size;
+			}
+		}
+
+		BufferedImage img = new BufferedImage(width, height, (transparent ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB));
+		Image scaledImage = sourceImage.getScaledInstance(width,height, Image.SCALE_SMOOTH);
+
+		img.createGraphics().drawImage(scaledImage, 0, 0, null);
+
+		OutputStream os = response.getOutputStream();
+		ImageIO.write(img, FilenameUtils.getExtension(name), os);
+		os.close();
 	}
 
 	/* --------------------------- 수정필요 --------------------------- */

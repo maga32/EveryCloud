@@ -187,6 +187,7 @@ import { imageThumbnail, extensions } from '@/assets/extensions'
 import Swal from 'sweetalert2'
 import FileList from './FileList.vue'
 import ModalView from '@/components/ModalView.vue'
+import Const from "@/const";
 
 const route = useRoute()
 
@@ -283,12 +284,17 @@ const getFileList = async () =>{
 
   setting.search = !!form.keyword
 
-  await $http.post('/fileList', form, null)
+  await $http.post('/file/fileList', form, null)
         .then((response) => {
-          homeLink(form.shareLink, response.data.option.nowPath)
-          fileList.value = response.data.lists
+          if(response.data) {
+            homeLink(form.shareLink, response.data.option.nowPath)
+            fileList.value = response.data.lists
+            $store.dispatch('link/addSiteHtml')
+          } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
+            setTimeout(() => router.go(-1), 2000)
+          }
         })
-  $store.dispatch('link/addSiteHtml')
+
 
   setting.checkedFiles = []
 
@@ -316,7 +322,7 @@ const toggleHiddenCheck = () => {
 
 const imgSelector = (extension, isHidden, path) => {
   if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-    return '/api/v1/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + path.replace(/\\/g, '/')
+    return '/api/v1/file/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))
   } else {
     return '/img/fileicons/' + extensions[extension] + '.png'
   }
@@ -325,7 +331,7 @@ const imgSelector = (extension, isHidden, path) => {
 /*------------------------ File Control Menu Functions ------------------------*/
 
 function downloadFiles() {
-  window.open("/api/v1/fileDownload?path=" + form.path + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
+  window.open("/api/v1/file/fileDownload?path=" + form.path + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
 }
 
 /**

@@ -12,23 +12,16 @@ const HttpModule = {
 
     /*------------- request ------------- */
     http.interceptors.request.use((config) => {
-      // window.$loading.show()
-      config.headers = config.headers ?? {}
-      config.headers['Content-Type'] = config.data instanceof FormData ? 'multipart/form-data' : 'application/json'
-      /*
-      header 에 menuId및 토큰 저장.
-      config.headers ["MENU_ID"] = window.$store.getters['Menu/getCurMenuId']
-      config.headers.Authorization = `Bearer ${sessionStorage.getItem("userToken")}`
-      */
+      // config.headers = config.headers ?? {}
+      // config.headers['Content-Type'] = config.data instanceof FormData ? 'multipart/form-data' : 'application/json'
+
       return config;
     }, (error) => {
-      // window.$loading.hide()
       Swal.fire({ icon: 'error', text: error })
     })
 
     /*------------ response ------------ */
     http.interceptors.response.use((response) => {
-      // window.$loading.hide ()
       if (response.data.code !== Const.RESPONSE_TYPE.SUCCESS) {
         Swal.fire({ icon: 'error', text: response.data.code + ' : ' + response.data.message })
       }
@@ -36,15 +29,10 @@ const HttpModule = {
         $store.dispatch('link/addTempSiteHtml')
         router.replace('/loginForm')
       }
-      /*
-      if(response.headers.get("Authorization")) {
-        window.$store.dispatch('User/setToken', response.headers.get("Authorization"))
-      }
-      */
+
       return response.data
 
     }, (error) => {
-      // window.$loading.hide()
       if (error.response) {
         Swal.fire({ icon: 'error', text: error.response.status + ' : ' + error.response.statusText })
       } else {
