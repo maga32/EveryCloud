@@ -113,15 +113,15 @@
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-share" /></td>
-          <td class="p-1" @click="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">이동</td>
+          <td class="p-1" @click="fileModal('moveFiles')">이동</td>
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
-          <td class="p-1" @click="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal">복사</td>
+          <td class="p-1" @click="fileModal('copyFiles')">복사</td>
         </tr>
         <tr class="pointer">
           <td class="p-1"><i class="fa-solid fa-trash" /></td>
-          <td class="p-1 pointer" onclick="deleteFiles()" data-bs-toggle="modal" data-bs-target="#functionModal">삭제</td>
+          <td class="p-1 pointer" @click="fileModal('deleteFiles')">삭제</td>
         </tr>
       </table>
     </div>
@@ -146,9 +146,9 @@
           <td colspan="2" class="p-2">
             <div class="btn-group">
               <button type="button" class="btn btn-outline-secondary" @click="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
-              <button type="button" class="btn btn-outline-secondary" @click="moveFiles('','moveFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-share" /></button>
-              <button type="button" class="btn btn-outline-secondary" @click="moveFiles('','copyFiles')" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-clipboard" /></button>
-              <button type="button" class="btn btn-outline-secondary" onclick="deleteFiles()" data-bs-toggle="modal" data-bs-target="#functionModal"><i class="fa-solid fa-trash" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="fileModal('moveFiles')"><i class="fa-solid fa-share" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="fileModal('copyFiles')"><i class="fa-solid fa-clipboard" /></button>
+              <button type="button" class="btn btn-outline-secondary" @click="fileModal('deleteFiles')"><i class="fa-solid fa-trash" /></button>
             </div>
           </td>
         </tr>
@@ -169,13 +169,14 @@
 <!--  <button @click="parentTest">parent test</button>-->
 
   <!-- Modal -->
-  <ModalView @close="closeModal" v-if="modalOn">
-    <template #functionModalBody>
-      <div>
-        test!!
-      </div>
-    </template>
-  </ModalView>
+  <FileModal
+    v-if="modalOn"
+    @close="closeModal"
+    :form="form"
+    :modalFunc="modalFunc"
+    :extensions="extensions"
+  >
+  </FileModal>
 
 </template>
 
@@ -186,7 +187,7 @@ import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
 import Swal from 'sweetalert2'
 import FileList from './FileList.vue'
-import ModalView from '@/components/ModalView.vue'
+import FileModal from './FileModal.vue'
 import Const from "@/const";
 
 const route = useRoute()
@@ -215,6 +216,8 @@ const homePath = reactive({
 const fileList = ref([])
 
 const modalOn = ref(false)
+const modalFunc = ref('')
+const modalReq = ref({})
 
 /*------------------------ compute ------------------------*/
 
@@ -330,15 +333,12 @@ const imgSelector = (extension, isHidden, path) => {
 
 /*------------------------ File Control Menu Functions ------------------------*/
 
-function downloadFiles() {
+const downloadFiles = () => {
   window.open("/api/v1/file/fileDownload?path=" + form.path + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
 }
 
-/**
- * move(or copy) files
- * type - moveFiles / copyFiles
- */
-const moveFiles = (path='', type='moveFiles') => {
+const fileModal = (type) => {
+  modalFunc.value = type
   openModal()
 }
 

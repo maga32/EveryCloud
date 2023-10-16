@@ -51,6 +51,41 @@ public class FileController {
 				.setData(fileList);
 	}
 
+	@RequestMapping("/folderList1")
+	public Map<String,Object> folderList1(@RequestParam("path") String path,
+										  @RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
+		map.putAll(shareMap);
+
+		String sharePath = "";
+
+		if(shareMap.get("invalidString") != null) {
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
+		// boolean validPath = fileService.isPathExist(path);
+
+		// if(validPath) {
+		// File nowPath = fileService.getFile(path);
+		// windows folder path processing
+		path = path.replaceAll("\\\\", "/");
+		// String parentPath = nowPath.getPath().replaceAll("\\\\", "/").length() > sharePath.length() ? nowPath.getParent().replaceAll("\\\\", "/").replace(sharePath, "") : "/";
+		map.put("folderList", fileService.folderList(sharePath, path));
+		// map.put("nowPath", nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+		// map.put("parentPath", parentPath);
+		// }
+
+		map.put("path", path.replace(sharePath, ""));
+		// map.put("validPath", validPath);
+
+		return map;
+	}
+
 	@GetMapping("/fileDownload")
 	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
 					  @RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
@@ -219,8 +254,8 @@ public class FileController {
 				.setData((HashMap<String, Object>) map);
 	}
 
-	@RequestMapping("/folderList")
-	public Map<String,Object> folderList(@RequestParam("path") String path,
+	@RequestMapping("/folderList2")
+	public Map<String,Object> folderList2(@RequestParam("path") String path,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);

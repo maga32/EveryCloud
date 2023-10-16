@@ -9,15 +9,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class FileListLoadDTO {
 	@NotNull(message = "필수항목: shareLink")
-	String shareLink;
+	private String shareLink;
 	@NotNull(message = "필수항목: path")
-	String path;
-	@NotNull(message = "필수항목: sort")
-	String sort;
-	@NotNull(message = "필수항목: order")
-	String order;
-	@NotNull(message = "필수항목: keyword")
-	String keyword;
+	private String path;
+	private String sort = "name";
+	private String order = "asc";
+	private String keyword = "";
 
-	boolean viewHidden;
+	private boolean viewHidden;
 }
