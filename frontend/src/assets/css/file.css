@@ -29,9 +29,9 @@
 #fileControlMenu {
 	width: 200px;
 	position: fixed;
-	top: 20%;
+	top: 21%;
 	right: 50px;
-	z-index: 20;
+	z-index: 5;
 }
 
 #keyword {

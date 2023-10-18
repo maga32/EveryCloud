@@ -1,8 +1,10 @@
 package com.project.everycloud.service.impl;
 
+import com.project.everycloud.common.exception.ExistNameException;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
@@ -24,7 +26,7 @@ public class FileServiceImpl implements FileService {
 	FileDao fileDao;
 
 	@Override
-	public AppList<FileDetailDTO, FileOptionDTO> fileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
+	public AppList<FileDetailDTO, FileOptionDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
 		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
@@ -50,15 +52,14 @@ public class FileServiceImpl implements FileService {
 		if(!isPathExist(path)) throw new InvalidPathException("","");
 
 		File nowPath = getFile(path);
-		// windows folder path processing
-		path = path.replaceAll("\\\\", "/");
+		path = winPath(path);
 		try {
-			realPath = nowPath.getCanonicalPath().replaceAll("\\\\", "/");
+			realPath = winPath(nowPath.getCanonicalPath());
 		} catch (IOException e) { throw new RuntimeException(e); }
 
 		if (!realPath.equals(path)) {
 			fileListLoad.setPath(realPath.replace(sharePath, ""));
-			return fileList(fileListLoad, sessionUser);
+			return getFileList(fileListLoad, sessionUser);
 		}
 
 		options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
@@ -70,11 +71,6 @@ public class FileServiceImpl implements FileService {
 
 		return result;
 	}
-
-	private boolean isPathExist(String path) {
-		return fileDao.isPathExist(path);
-	}
-
 
 	private List<FileDetailDTO> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden) {
 		List<FileDetailDTO> fileList = new ArrayList<FileDetailDTO>();
@@ -99,7 +95,6 @@ public class FileServiceImpl implements FileService {
 			try {
 				file.setCanonicalPath(i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
 			} catch (IOException e) { }
-
 			fileList.add(file);
 		}
 
@@ -111,27 +106,27 @@ public class FileServiceImpl implements FileService {
 		} else if (sort.equals("size")) { sortParam = "length";
 		} else { sortParam = "lowerName"; }
 
-        if (order.equals("desc")) {
+		if (order.equals("desc")) {
 			fileList.sort(
-				Comparator.comparing(FileDetailDTO::isIsDirectory)
-					.thenComparing(list -> {
-						try {
-							Field field = list.getClass().getDeclaredField(sortParam);
-							field.setAccessible(true);
-							return (Comparable) field.get(list);
-						} catch (Exception e) { throw new RuntimeException("Error",e); }
-					}).reversed()
+					Comparator.comparing(FileDetailDTO::isIsDirectory)
+							.thenComparing(list -> {
+								try {
+									Field field = list.getClass().getDeclaredField(sortParam);
+									field.setAccessible(true);
+									return (Comparable) field.get(list);
+								} catch (Exception e) { throw new RuntimeException("Error",e); }
+							}).reversed()
 			);
 		} else {
 			fileList.sort(
-				Comparator.comparing(FileDetailDTO::isIsFile)
-					.thenComparing(list -> {
-						try {
-							Field field = list.getClass().getDeclaredField(sortParam);
-							field.setAccessible(true);
-							return (Comparable) field.get(list);
-						} catch (Exception e) { throw new RuntimeException("Error",e); }
-					})
+					Comparator.comparing(FileDetailDTO::isIsFile)
+							.thenComparing(list -> {
+								try {
+									Field field = list.getClass().getDeclaredField(sortParam);
+									field.setAccessible(true);
+									return (Comparable) field.get(list);
+								} catch (Exception e) { throw new RuntimeException("Error",e); }
+							})
 			);
 		}
 
@@ -139,56 +134,120 @@ public class FileServiceImpl implements FileService {
 	}
 
 
-	/* --------------------------- 수정필요 --------------------------- */
-
 	@Override
-	public List<Map<String, Object>> folderList(String sharePath, String path) {
-		List<Map<String, Object>> folderList = new ArrayList<Map<String,Object>>();
+	public AppList<FileDetailDTO, FileOptionDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser) {
+		// Map<String, Object> map = new HashMap<String, Object>();
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
+		// map.putAll(shareMap);
+		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
+		FileOptionDTO options = new FileOptionDTO();
+
+		String sharePath = "";
+		String path = folderListLoad.getPath();
+		String shareLink = folderListLoad.getShareLink();
+
+		/*
+		if(shareMap.get("invalidString") != null) {
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		*/
+		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+		boolean validPath = isPathExist(path);
+
+		if(validPath) {
+			File nowPath = getFile(path);
+			path = winPath(path);
+			String parentPath = winPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
+								? winPath(nowPath.getParent()).replace(sharePath, "")
+								: "/";
+
+			result.setLists(folderList(sharePath, path));
+			options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+			options.setParentPath(parentPath);
+		}
+
+		options.setPath(path.replace(sharePath, ""));
+		result.setOption(options);
+
+		return result;
+	}
+
+	private List<FileDetailDTO> folderList(String sharePath, String path) {
+		List<FileDetailDTO> folderList = new ArrayList<FileDetailDTO>();
 		File[] files = fileDao.getFolderList(path);
 		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
 
 		for(File i : files) {
-			Map<String, Object> param = new HashMap<String, Object>();
-			
-			param.put("getName", i.getName());
-			param.put("getPath", i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
-			param.put("lastModified", i.lastModified());
-			param.put("length", i.length());
-			
-			folderList.add(param);
+			FileDetailDTO file = new FileDetailDTO();
+
+			file.setName(i.getName());
+			file.setLowerName(i.getName().toLowerCase());
+			file.setPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setDate(i.lastModified());
+			file.setIsHidden(i.isHidden());
+
+			folderList.add(file);
 		}
-		
+
+		folderList.sort(Comparator.comparing(FileDetailDTO::getLowerName));
+
 		return folderList;
 	}
+
+	@Override
+	public void newFile(NewFileDTO newFile, UserDTO sessionUser, String type) {
+		String path = newFile.getPath();
+		String newName = newFile.getNewName();
+		String shareLink = newFile.getShareLink();
+
+		// Map<String, Object> map = new HashMap<String, Object>();
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+
+		String sharePath = "";
+		/*
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		*/
+
+		if(isPathExist(path + File.separator + newName)) {
+			throw new ExistNameException(newName);
+		} else {
+			if(type.equals("file")) {
+				try { fileDao.newFile(path, newName); } catch (IOException e) {}
+			} else if(type.equals("folder")) {
+				fileDao.newFolder(path, newName);
+			}
+		}
+	}
+
+
+	/**
+	 * Replace WINDOWS folder path processing
+	 *
+	 * @param path
+	 * @return path.replaceAll("\\\\", "/")
+	 */
+	private String winPath(String path) {
+		return path.replaceAll("\\\\", "/");
+	}
+
+	private boolean isPathExist(String path) {
+		return fileDao.isPathExist(path);
+	}
+
 	private File getFile(String path) {
 		return fileDao.getFile(path);
 	}
 
-	@Override
-	public Map<String, Object> newFolder(String path, String newFolderName) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		if(fileDao.isPathExist(path + File.separator + newFolderName)) {
-			map.put("result", "이미 폴더명이 존재합니다.");
-			return map;
-		}
-		
-		fileDao.newFolder(path, newFolderName);
-		map.put("result", "ok");
-		return map;
-	}
-
-	@Override
-	public Map<String, Object> newFile(String path, String newFileName) throws IOException {
-		Map<String, Object> map = new HashMap<String, Object>();
-		if(fileDao.isPathExist(path + File.separator + newFileName)) {
-			map.put("result", "이미 파일명이 존재합니다.");
-			return map;
-		}
-		
-		fileDao.newFile(path, newFileName);
-		map.put("result", "ok");
-		return map;
-	}
+	/* --------------------------- 수정필요 --------------------------- */
 
 	@Override
 	public void changeName(String path, String origFileName, String newFileName) {

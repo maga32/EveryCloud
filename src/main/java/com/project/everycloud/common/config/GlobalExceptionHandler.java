@@ -36,6 +36,10 @@ public class GlobalExceptionHandler {
         } else if(e instanceof DuplicateKeyException) {
             apiResponseType = ResponseType.DUP_PK;
             apiResponseMessage = ResponseType.DUP_PK.message();
+        // ExistName
+        } else if(e instanceof ExistNameException) {
+            apiResponseType = ResponseType.EXIST_NAME;
+            apiResponseMessage = e.getMessage() + " : " + ResponseType.EXIST_NAME.message();
         // NotVaildArgument
         } else if(e instanceof MethodArgumentNotValidException) {
             apiResponseType = ResponseType.NOT_VALID_AGUMENT;

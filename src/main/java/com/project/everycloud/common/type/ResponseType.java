@@ -14,6 +14,7 @@ public enum ResponseType {
 
     NOT_VALID_AGUMENT("701", ""), // 유효성예외
     DUP_PK("702", "이미 등록된 데이터입니다."),
+    EXIST_NAME("702", "이미 존재하는 이름입니다."),
     NOT_EXIST_FILE("703", "업로드 파일이 없습니다."),
     NOT_ALLOW_FILE("704", "잘못된 파일 형식입니다."),
 

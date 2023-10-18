@@ -10,4 +10,5 @@ public class FileOptionDTO {
 	String sharePath;
 	String nowPath;
 	String path;
+	String parentPath;
 }

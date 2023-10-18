@@ -63,7 +63,7 @@
               <template #body>
                 <ul class="dropdown-menu show" dropdown-closer style="right:50px">
                   <li><div class="dropdown-item pointer" @click="toggleHiddenCheck">
-                    <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" /></span>
+                    <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" />&nbsp;</span>
                     <i class="fa-solid fa-file-shield pe-2" />숨김파일보기
                   </div></li>
                   <li><div class="dropdown-item pointer" onClick="newFolder()">
