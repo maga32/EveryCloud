@@ -10,9 +10,9 @@
     </div>
 
     <!-- File List -->
-    <div id="fileList" class="px-2">
+    <div id="fileList">
 
-      <label v-for="li in fileList" class="w-100 pe-2 pe-md-5" @click="labelClick">
+      <label v-for="li in fileList" class="w-100 pe-1 pe-md-5" @click="labelClick">
         <span class="d-none">
           {{ li.extension = li.isDirectory ? 'folder' : !extensions.hasOwnProperty(li.extension) ? 'default' : li.extension }}
         </span>

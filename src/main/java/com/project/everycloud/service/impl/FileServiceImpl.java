@@ -102,8 +102,8 @@ public class FileServiceImpl implements FileService {
 		if (sort.equals("name")) { sortParam = "lowerName";
 		} else if (sort.equals("type")) { sortParam = "extension";
 		} else if (sort.equals("path")) { sortParam = "path";
-		} else if (sort.equals("date")) { sortParam = "lastModified";
-		} else if (sort.equals("size")) { sortParam = "length";
+		} else if (sort.equals("date")) { sortParam = "date";
+		} else if (sort.equals("size")) { sortParam = "size";
 		} else { sortParam = "lowerName"; }
 
 		if (order.equals("desc")) {
@@ -221,7 +221,8 @@ public class FileServiceImpl implements FileService {
 			throw new ExistNameException(newName);
 		} else {
 			if(type.equals("file")) {
-				try { fileDao.newFile(path, newName); } catch (IOException e) {}
+				try { fileDao.newFile(path, newName);
+				} catch (IOException e) { throw new RuntimeException(); }
 			} else if(type.equals("folder")) {
 				fileDao.newFolder(path, newName);
 			}

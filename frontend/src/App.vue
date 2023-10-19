@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row mx-0">
     <div class="col-12" id="header">
       <header-menu/>
     </div>
