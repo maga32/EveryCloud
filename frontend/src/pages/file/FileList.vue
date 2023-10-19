@@ -16,9 +16,9 @@
         <span class="d-none">
           {{ li.extension = li.isDirectory ? 'folder' : !extensions.hasOwnProperty(li.extension) ? 'default' : li.extension }}
         </span>
-        <table class="w-100 rounded fileTable" :class="setting.checkedFiles.includes(li.name) ? 'checked' : ''">
+        <table class="w-100 rounded fileTable" :class="!setting.checkedFiles.includes(li.name) || 'checked'">
           <tr>
-            <td class="text-center" style="width:35px;">
+            <td v-show="!setting.search" class="text-center" style="width:35px;">
               <input v-if="setting.search" type="hidden" class="li_parent" :value="li.parent">
               <input v-else type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
             </td>

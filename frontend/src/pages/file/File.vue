@@ -49,13 +49,13 @@
         </div>
 
         <!-- Tools -->
-        <div class="col-12 col-md-4 row text-end">
-          <div class="col-4 d-md-none"></div>
-          <div class="col-6 col-md-8 px-2">
+        <div class="col-12 col-md-4 px-0 row text-end">
+          <div class="col-4 col-sm-6 d-md-none"></div>
+          <div class="col-6 col-sm-4 col-md-8 px-2">
             <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadFileList('','','','')">
           </div>
           <div class="col-1 col-md-2 pointer" @click="loadFileList('','','','')"><i class="fa-solid fa-magnifying-glass" /></div>
-          <div class="col-1 col-md-2 ps-2">
+          <div class="col-1 col-md-2">
             <dropdown-menu withDropdownCloser direction="right">
               <template #trigger>
                 <i class="pointer fa-solid fa-wrench" />
