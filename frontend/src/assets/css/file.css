@@ -48,10 +48,12 @@
 	table-layout : fixed ;
 }
 
-.fileTable:hover {
+.fileTable.checked {
 	background-color: var(--file-select-color);
 }
 
-.fileTable.checked {
-	background-color: var(--file-select-color);
+@media (pointer:none) {
+	.fileTable:hover {
+		background-color: var(--file-select-color);
+	}
 }
