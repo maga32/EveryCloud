@@ -2,7 +2,7 @@
   <div>
     <div class="modal-backdrop fade show"></div>
     <transition name="modal" appear>
-      <div @click.self="$emit('close')" class="modal fade show" style="display: block" id="functionModal">
+      <div @click.self="$emit('close', reload)" class="modal fade show" style="display: block" id="functionModal">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
@@ -12,7 +12,7 @@
                   {{ moveTo.nowPath }}
                   <div class="d-flex pt-4 align-items-center">
                     <div v-if="isNewFolder" class="w-100 pe-4">
-                      <input type="text" class="form-control" v-model="newFolderName" placeholder="새 폴더명을 입력해주세요.">
+                      <input type="text" class="form-control" v-model="newName" placeholder="새 폴더명을 입력해주세요.">
                     </div>
                     <div class="flex-shrink-1 pointer" @click="moveFilesNewFolder">
                       <i class="fa-solid fa-folder-plus" :class="!isNewFolder || 'text-success'" />
@@ -20,23 +20,25 @@
                   </div>
                 </template>
               </h1>
-              <button type="button" class="btn-close" @click="$emit('close')"></button>
+              <button type="button" class="btn-close" @click="$emit('close', reload)"></button>
             </div>
-            <div class="modal-body" id="functionModalBody">
+            <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
               <div v-if="modalFunc === 'newFolder'">
-                newFolder
+                <input type="text" class="form-control" v-model="newName" placeholder="폴더명을 입력해주세요">
               </div>
               <div v-else-if="modalFunc === 'newFile'">
-                newFile
+                <input type="text" class="form-control" v-model="newName" placeholder="파일명을 입력해주세요">
               </div>
               <div v-else-if="modalFunc === 'changeName'">
-                changeName
+                <input type="text" class="form-control" v-model="newName" placeholder="바꿀 이름을 입력해주세요">
               </div>
               <div v-else-if="modalFunc === 'deleteFiles'">
-                deleteFiles
+                <div class="text-danger">아래 {{ setting.checkedFiles.length }} 개의 파일을 삭제하시겠습니까?</div>
+                <div v-for="li in setting.checkedFiles"> {{ li }} </div>
               </div>
               <div v-else-if="modalFunc === 'copyFiles' || modalFunc === 'moveFiles'">
                 <table>
+                  <!-- upper directory -->
                   <tr v-if="moveTo.parentPath !== moveTo.nowPath" class="pointer" @click="loadFolders(moveTo.parentPath)">
                     <td class='text-center py-2' style='width:50px;'>
                       <img class="fileImg" :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
@@ -44,6 +46,7 @@
                     <td class='w-auto'>..</td>
                   </tr>
 
+                  <!-- directory list -->
                   <tr v-for="li in moveTo.folderList" class="pointer" @click="loadFolders(li.path.replace(/\\/g, '/'))">
                     <td class='text-center py-2' style='width:50px;'>
                       <img class='fileImg' :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
@@ -53,9 +56,9 @@
                     </td>
                   </tr>
 
+                  <!-- Error text -->
                   <tr v-if="moveTo.invalidText"><td>{{ moveTo.invalidText }}</td></tr>
                 </table>
-
               </div>
               <div v-else-if="modalFunc === 'shareFile'">
                 shareFile
@@ -65,8 +68,8 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="$emit('close')">취소</button>
-              <button type="button" class="btn btn-primary" @click="">확인</button>
+              <button type="button" class="btn btn-secondary" @click="$emit('close', reload)">취소</button>
+              <button type="button" class="btn btn-primary" @click="submit">확인</button>
             </div>
           </div>
         </div>
@@ -76,11 +79,12 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
-import Const from "@/const";
-import Swal from "sweetalert2";
+import { onMounted, reactive, ref, inject } from 'vue'
+import Const from '@/const'
+import Swal from 'sweetalert2'
 
-const props = defineProps(['modalFunc', 'form', 'extensions'])
+const props = defineProps(['modalFunc', 'form', 'setting', 'extensions'])
+const emit = defineEmits(['close'])
 
 const functionModalLabel = {
   newFolder     : '폴더 만들기',
@@ -93,8 +97,10 @@ const functionModalLabel = {
   needPassword  : '비밀번호 입력',
 }
 
+const reload = ref(false)
 const isNewFolder = ref(false)
-const newFolderName = ref('New Folder')
+const newName = ref('')
+const origName = ref('')
 
 const moveTo = reactive({
   parentPath: props.form.path,
@@ -103,7 +109,12 @@ const moveTo = reactive({
 })
 
 onMounted(()=> {
-  if(props.modalFunc === 'moveFiles' || props.modalFunc === 'copyFiles') loadFolders(props.form.path)
+  if(props.modalFunc === 'moveFiles' || props.modalFunc === 'copyFiles') {
+    loadFolders(props.form.path)
+  } else if(props.modalFunc === 'changeName') {
+    origName.value = props.setting.checkedFiles[0]
+    newName.value = origName.value
+  }
 })
 
 /*------------------------ functions ------------------------*/
@@ -125,20 +136,112 @@ const moveFilesNewFolder = () => {
   if(!isNewFolder.value) {
     isNewFolder.value = true
   } else {
-    if (!newFolderName.value.trim()) {
+    if (!newName.value.trim()) {
       Swal.fire({ icon: 'error', text: '폴더명은 필수입니다.' })
     } else {
       const params = {
         path: moveTo.nowPath,
         shareLink: props.form.shareLink,
-        newName: newFolderName.value.trim()
+        newName: newName.value.trim()
       }
       $http.post('/file/newFolder', params, null)
         .then((response) => {
           loadFolders(params.path)
+          if(params.path === props.form.path || params.path === props.form.path.slice(0, -1)) {
+            reload.value = true
+          }
         })
     }
   }
+}
+
+const submit = async () => {
+  let result = false
+  if(!newName.value.trim() &&
+      (props.modalFunc === 'newFile' || props.modalFunc === 'newFolder' || props.modalFunc === 'changeName')) {
+    Swal.fire({ icon: 'error', text: '이름은 필수입니다.' })
+    return result
+  }
+
+  // new file
+  if(props.modalFunc === 'newFile') {
+    const params = {
+      path: props.form.path,
+      shareLink: props.form.shareLink,
+      newName: newName.value.trim()
+    }
+    await $http.post('/file/newFile', params, null)
+      .then((response) => {
+        result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+      })
+
+  // new folder
+  } else if(props.modalFunc === 'newFolder') {
+    const params = {
+      path: props.form.path,
+      shareLink: props.form.shareLink,
+      newName: newName.value.trim()
+    }
+    await $http.post('/file/newFolder', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
+
+  // change name
+  } else if(props.modalFunc === 'changeName') {
+    const params = {
+      path: props.form.path,
+      shareLink: props.form.shareLink,
+      newName: newName.value.trim(),
+      origName: origName.value
+    }
+    await $http.post('/file/changeName', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
+
+  // copy files
+  } else if(props.modalFunc === 'copyFiles') {
+    const params = {
+      path: props.form.path,
+      newPath: moveTo.nowPath,
+      shareLink: props.form.shareLink,
+      fileList: props.setting.checkedFiles
+    }
+    await $http.post('/file/copyFiles', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
+
+  // move files
+  } else if(props.modalFunc === 'moveFiles') {
+    const params = {
+      path: props.form.path,
+      newPath: moveTo.nowPath,
+      shareLink: props.form.shareLink,
+      fileList: props.setting.checkedFiles
+    }
+    await $http.post('/file/moveFiles', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
+
+  // delete files
+  } else if(props.modalFunc === 'deleteFiles') {
+    const params = {
+      path: props.form.path,
+      shareLink: props.form.shareLink,
+      fileList: props.setting.checkedFiles
+    }
+    await $http.post('/file/deleteFiles', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
+  }
+
+  if(!result) return false
+
+  emit('close', true)
 }
 
 </script>

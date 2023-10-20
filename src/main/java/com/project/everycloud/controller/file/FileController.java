@@ -6,6 +6,7 @@ import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.request.file.UpdateFileListDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
@@ -21,9 +22,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -188,94 +190,69 @@ public class FileController {
 
 
 	@PostMapping("/newFolder")
-	public AppResponse<Integer> newFolder(@Valid @RequestBody NewFileDTO newFolder) {
+	public AppResponse<Void> newFolder(@Valid @RequestBody NewFileDTO newFolder) {
 
 		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
 		fileService.newFile(newFolder, sessionUser, "folder");
 
-		return new AppResponse<Integer>()
+		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message());
 	}
 
 	@PostMapping("/newFile")
-	public AppResponse<Integer> newFile(@Valid @RequestBody NewFileDTO newFile) {
+	public AppResponse<Void> newFile(@Valid @RequestBody NewFileDTO newFile) {
 
 		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
 		fileService.newFile(newFile, sessionUser, "file");
 
-		return new AppResponse<Integer>()
+		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message());
 	}
 
-	/* --------------------------- 수정필요 --------------------------- */
-	
-	@RequestMapping("/chageName")
-	public Map<String,Object> chageName(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
-			@RequestParam("path") String path, @RequestParam("origFileName") String origFileName,
-			@RequestParam("newFileName") String newFileName) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+	@PostMapping("/changeName")
+	public AppResponse<Void> changeName(@Valid @RequestBody NewFileDTO newFile) {
 
-		String sharePath = "";
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		fileService.changeName(newFile, sessionUser);
 
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
-		}
-
-		fileService.changeName(path, origFileName, newFileName);
-		
-		map.put("result", "ok");
-		return map;
+		return new AppResponse<Void>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message());
 	}
 
-	@RequestMapping("/moveFiles")
-	public Map<String,Object> moveFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
-			@RequestParam("fileNames") String fileNames, @RequestParam("type") String type,
-			@RequestParam("path") String path,  @RequestParam("moveToPath") String moveToPath) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+	@PostMapping("/copyFiles")
+	public AppResponse<Void> copyFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
 
-		String sharePath = "";
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		fileService.moveFiles(updateFileList, sessionUser, "copy");
 
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
-			moveToPath = sharePath + (moveToPath.equals("/") ? "" : moveToPath);
-		}
-
-		map.putAll(fileService.moveFiles(path, moveToPath, fileNames, type));
-		
-		return map;
+		return new AppResponse<Void>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message());
 	}
-	
-	@RequestMapping("/deleteFiles")
-	public Map<String,Object> deleteFiles(@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
-			@RequestParam("path") String path, @RequestParam("fileNames") String fileNames) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
 
-		String sharePath = "";
+	@PostMapping("/moveFiles")
+	public AppResponse<Void> moveFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
 
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
-		}
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		fileService.moveFiles(updateFileList, sessionUser, "move");
 
-		map.putAll(fileService.deleteFiles(path,fileNames));
-		
-		return map;
+		return new AppResponse<Void>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message());
+	}
+
+	@PostMapping("/deleteFiles")
+	public AppResponse<Void> deleteFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
+
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		fileService.deleteFiles(updateFileList, sessionUser);
+
+		return new AppResponse<Void>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message());
 	}
 
 }

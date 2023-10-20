@@ -1,10 +1,12 @@
 package com.project.everycloud.service.impl;
 
 import com.project.everycloud.common.exception.ExistNameException;
+import com.project.everycloud.common.exception.NotExistFileException;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.request.file.UpdateFileListDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
@@ -108,25 +110,25 @@ public class FileServiceImpl implements FileService {
 
 		if (order.equals("desc")) {
 			fileList.sort(
-					Comparator.comparing(FileDetailDTO::isIsDirectory)
-							.thenComparing(list -> {
-								try {
-									Field field = list.getClass().getDeclaredField(sortParam);
-									field.setAccessible(true);
-									return (Comparable) field.get(list);
-								} catch (Exception e) { throw new RuntimeException("Error",e); }
-							}).reversed()
+				Comparator.comparing(FileDetailDTO::isIsDirectory)
+					.thenComparing(list -> {
+						try {
+							Field field = list.getClass().getDeclaredField(sortParam);
+							field.setAccessible(true);
+							return (Comparable) field.get(list);
+						} catch (Exception e) { throw new RuntimeException("Error",e); }
+					}).reversed()
 			);
 		} else {
 			fileList.sort(
-					Comparator.comparing(FileDetailDTO::isIsFile)
-							.thenComparing(list -> {
-								try {
-									Field field = list.getClass().getDeclaredField(sortParam);
-									field.setAccessible(true);
-									return (Comparable) field.get(list);
-								} catch (Exception e) { throw new RuntimeException("Error",e); }
-							})
+				Comparator.comparing(FileDetailDTO::isIsFile)
+					.thenComparing(list -> {
+						try {
+							Field field = list.getClass().getDeclaredField(sortParam);
+							field.setAccessible(true);
+							return (Comparable) field.get(list);
+						} catch (Exception e) { throw new RuntimeException("Error",e); }
+					})
 			);
 		}
 
@@ -197,6 +199,7 @@ public class FileServiceImpl implements FileService {
 		return folderList;
 	}
 
+
 	@Override
 	public void newFile(NewFileDTO newFile, UserDTO sessionUser, String type) {
 		String path = newFile.getPath();
@@ -230,6 +233,97 @@ public class FileServiceImpl implements FileService {
 	}
 
 
+	@Override
+	public void changeName(NewFileDTO newFile, UserDTO sessionUser) {
+		String path = newFile.getPath();
+		String newName = newFile.getNewName();
+		String shareLink = newFile.getShareLink();
+		String origName = newFile.getOrigName();
+
+		// Map<String, Object> map = new HashMap<String, Object>();
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+
+		String sharePath = "";
+
+		/*
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		*/
+
+		if(!isPathExist(path + File.separator + origName)) {
+			throw new NotExistFileException(origName);
+		} else if(isPathExist(path + File.separator + newName)){
+			throw new ExistNameException(newName);
+		}
+		fileDao.changeName(path, origName, newName);
+	}
+
+
+	@Override
+	public void moveFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser, String type) {
+		String path = updateFileList.getPath();
+		String newPath = updateFileList.getNewPath();
+		String shareLink = updateFileList.getShareLink();
+		List<String> fileList = updateFileList.getFileList();
+
+		// Map<String, Object> map = new HashMap<String, Object>();
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+
+		String sharePath = "";
+
+		/*
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+			moveToPath = sharePath + (moveToPath.equals("/") ? "" : moveToPath);
+		}
+		*/
+
+		for (String fileName : fileList) {
+			File file = new File(path + File.separator + fileName);
+			if(file.exists()) {
+				fileDao.moveFiles(file, newPath, type);
+			}
+		}
+	}
+
+
+	@Override
+	public void deleteFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser) {
+		String path = updateFileList.getPath();
+		String shareLink = updateFileList.getShareLink();
+		List<String> fileList = updateFileList.getFileList();
+
+		// Map<String, Object> map = new HashMap<String, Object>();
+		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+
+		String sharePath = "";
+
+		/*
+		if(shareMap.get("invalidString") != null) {
+			map.put("result",shareMap.get("invalidString"));
+			return map;
+		} else if(!shareLink.equals("")) {
+			sharePath = shareMap.get("sharePath");
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
+		*/
+
+		for(String fileName : fileList) {
+			File file = new File(path + File.separator + fileName);
+			if(file.exists()) fileDao.deleteFile(file);
+		}
+	}
+
+
 	/**
 	 * Replace WINDOWS folder path processing
 	 *
@@ -249,42 +343,5 @@ public class FileServiceImpl implements FileService {
 	}
 
 	/* --------------------------- 수정필요 --------------------------- */
-
-	@Override
-	public void changeName(String path, String origFileName, String newFileName) {
-		fileDao.changeName(path, origFileName, newFileName);
-	}
-
-	@Override
-	public Map<String, Object> moveFiles(String path, String moveToPath, String fileNames, String type) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		String[] fileList = fileNames.split(",");
-		for (String fileName : fileList) {
-    		File file = new File(path + File.separator + fileName);
-    		if(file.exists()) {
-    			fileDao.moveFiles(file, moveToPath, type);
-    		}
-        }
-		
-		map.put("result", "ok");
-		return map;
-	}
-
-	@Override
-	public Map<String, Object> deleteFiles(String path, String fileNames) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		
-		String[] fileList = fileNames.split(",");
-		for (String fileName : fileList) {
-    		File file = new File(path + File.separator + fileName);
-    		if(file.exists()) {
-    			fileDao.deleteFile(file);
-    		}
-        }
-		
-		map.put("result", "ok");
-		return map;
-	}
 
 }

@@ -90,24 +90,22 @@ public class FileDaoImpl implements FileDao {
 	}
 
 	@Override
-	public void changeName(String path, String origFileName, String newFileName) {
-		File origFile = new File(path + File.separator + origFileName);
-		File newFile = new File(path + File.separator + newFileName);
+	public void changeName(String path, String origName, String newName) {
+		File origFile = new File(path + File.separator + origName);
+		File newFile = new File(path + File.separator + newName);
 		if(origFile.exists()) {
 			origFile.renameTo(newFile);
 		}
 	}
 
 	@Override
-	public void moveFiles(File file, String moveToPath, String type) {
-		File newFile = new File(moveToPath + File.separator + file.getName());
-		if(type.equals("moveFiles")) {
+	public void moveFiles(File file, String newPath, String type) {
+		File newFile = new File(newPath + File.separator + file.getName());
+		if(type.equals("move")) {
 			try {
 				Files.move(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else if(type.equals("copyFiles")) {
+			} catch (IOException e) { e.printStackTrace(); }
+		} else if(type.equals("copy")) {
 			try { 
 				copyFileRegardlessExistion(file, newFile);
 			} catch (IOException e) { e.printStackTrace(); }

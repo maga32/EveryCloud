@@ -16,9 +16,9 @@ public interface FileDao {
 
 	void newFile(String path, String newFileName) throws IOException;
 
-	void changeName(String path, String origFileName, String newFileName);
+	void changeName(String path, String origName, String newName);
 
-	void moveFiles(File file, String moveToPath, String type);
+	void moveFiles(File file, String newPath, String type);
 
 	void deleteFile(File file);
 }

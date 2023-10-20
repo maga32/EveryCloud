@@ -66,10 +66,10 @@
                     <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" />&nbsp;</span>
                     <i class="fa-solid fa-file-shield pe-2" />숨김파일보기
                   </div></li>
-                  <li><div class="dropdown-item pointer" onClick="newFolder()">
+                  <li v-if="!setting.search"><div class="dropdown-item pointer" @click="fileModal('newFolder')">
                     <i class="fa-solid fa-folder-plus pe-2" />새폴더
                   </div></li>
-                  <li><div class="dropdown-item pointer" onClick="newFile()">
+                  <li v-if="!setting.search"><div class="dropdown-item pointer" @click="fileModal('newFile')">
                     <i class="fa-solid fa-file-circle-plus pe-2" />새파일
                   </div></li>
                 </ul>
@@ -136,11 +136,11 @@
         </tr>
         <tr>
           <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
-          <td class="p-1 pointer" onclick="changeFileName()" data-bs-toggle="modal" data-bs-target="#functionModal">이름바꾸기</td>
+          <td class="p-1 pointer" @click="fileModal('changeName')">이름바꾸기</td>
         </tr>
         <tr>
           <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
-          <td class="p-1 pointer" onclick="shareFile()" data-bs-toggle="modal" data-bs-target="#functionModal">공유</td>
+          <td class="p-1 pointer" onclick="shareFile()">공유</td>
         </tr>
         <tr>
           <td colspan="2" class="p-2">
@@ -173,6 +173,7 @@
     v-if="modalOn"
     @close="closeModal"
     :form="form"
+    :setting="setting"
     :modalFunc="modalFunc"
     :extensions="extensions"
   >
@@ -251,7 +252,10 @@ watch(() => route.fullPath, (to, from)=>{
 /*------------------------ functions ------------------------*/
 
 const openModal = () => { modalOn.value = true }
-const closeModal = () => { modalOn.value = false }
+const closeModal = (reload = false) => {
+  modalOn.value = false
+  if(reload) getFileList()
+}
 
 const sortArrow = (sort) => { return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : '' }
 
@@ -345,6 +349,7 @@ const fileModal = (type) => {
 // pass to child component
 provide('loadFileList', loadFileList)
 provide('imgSelector', imgSelector)
+provide('getFileList', getFileList)
 
 </script>
 

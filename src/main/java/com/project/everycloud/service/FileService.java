@@ -4,10 +4,9 @@ import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.request.file.UpdateFileListDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
-
-import java.util.Map;
 
 public interface FileService {
 
@@ -17,9 +16,9 @@ public interface FileService {
 
 	void newFile(NewFileDTO newFile, UserDTO sessionUser, String type);
 
-	void changeName(String path, String origFileName, String newFileName);
+	void changeName(NewFileDTO newFile, UserDTO sessionUser);
 
-	Map<String, Object> moveFiles(String path, String moveToPath, String fileNames, String type);
+	void moveFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser, String type);
 
-	Map<String, Object> deleteFiles(String path, String fileNames);
+	void deleteFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser);
 }

@@ -39,7 +39,11 @@ public class GlobalExceptionHandler {
         // ExistName
         } else if(e instanceof ExistNameException) {
             apiResponseType = ResponseType.EXIST_NAME;
-            apiResponseMessage = e.getMessage() + " : " + ResponseType.EXIST_NAME.message();
+            apiResponseMessage = e.getMessage() + " - " + ResponseType.EXIST_NAME.message();
+        // NotExistFile
+        } else if(e instanceof NotExistFileException) {
+            apiResponseType = ResponseType.NOT_EXIST_FILE;
+            apiResponseMessage = e.getMessage() + " - " + ResponseType.NOT_EXIST_FILE.message();
         // NotVaildArgument
         } else if(e instanceof MethodArgumentNotValidException) {
             apiResponseType = ResponseType.NOT_VALID_AGUMENT;
