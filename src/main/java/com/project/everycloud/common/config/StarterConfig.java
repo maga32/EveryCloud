@@ -20,10 +20,12 @@ public class StarterConfig {
     private static String 	DB 						= "EveryCloud.db";
     private static String 	CONFIG 					= "config.yml";
     private static String 	CONFIG_DEFAULT 			= "config-default.yml";
+    private static String 	PID_FILE 	        	= "EveryCloud.pid";
     private static Path     LOCAL_FOLDER 			= Paths.get(System.getProperty("user.home") + File.separator + ".everyCloud");
     private static Path 	LOCAL_DB 				= Paths.get(LOCAL_FOLDER + File.separator + DB);
     private static Path 	LOCAL_CONFIG 			= Paths.get(LOCAL_FOLDER + File.separator + CONFIG);
     private static Path 	LOCAL_CONFIG_DEFAULT 	= Paths.get(LOCAL_FOLDER + File.separator + CONFIG_DEFAULT);
+    private static Path 	LOCAL_PID_FILE          = Paths.get(LOCAL_FOLDER + File.separator + PID_FILE);
     private static String 	OS 						= System.getProperty("os.name").toLowerCase();
 
     public static void init() {
@@ -76,32 +78,41 @@ public class StarterConfig {
             writer.close();
 
             /*---------- if already use the port, kill process before start ----------*/
+            // 1. kill by pid file
+            if(new File(String.valueOf(LOCAL_PID_FILE)).exists()) {
+                Runtime rt = Runtime.getRuntime();
+                if (OS.contains("win")) {
+                    rt.exec("taskkill /F /PID " + LOCAL_PID_FILE);
+                } else {
+                    rt.exec("kill -9 " + new BufferedReader(new InputStreamReader(rt.exec("cat " + LOCAL_PID_FILE).getInputStream())).readLine());
+                }
+                Thread.sleep(1000);
+            }
+
+            // 2. kill by port
             int port = (int) yamlData.get(ConfigType.PORT.ecKey());
             if(!isPortAvailable(port)) {
-                // get pid
+                Runtime rt = Runtime.getRuntime();
                 int pid = 0;
 
                 String command = OS.contains("win") ? "netstat -ano" : "lsof -i :" + port;
 
                 ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
                 Process process = processBuilder.start();
-                InputStream is = process.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
+                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
                 String line;
                 while ((line = br.readLine()) != null) {
+                    String[] parts = line.trim().split("\\s+");
                     if (OS.contains("win") && line.contains(":" + port)) {
-                        String[] parts = line.trim().split("\\s+");
                         pid = Integer.parseInt(parts[parts.length - 1]);
                     } else if (!OS.contains("win") && line.contains("LISTEN")) {
-                        String[] parts = line.trim().split("\\s+");
                         pid = Integer.parseInt(parts[1]);
                     }
                 }
                 process = OS.contains("win")
-                        ? Runtime.getRuntime().exec("taskkill /F /PID " + pid)
-                        : Runtime.getRuntime().exec("kill -9 " + pid);
+                        ? rt.exec("taskkill /F /PID " + pid)
+                        : rt.exec("kill -9 " + pid);
                 process.waitFor();
             }
         } catch (Exception e) {
@@ -125,18 +136,7 @@ public class StarterConfig {
                 } else if(OS.contains("mac")) {
                     rt.exec("open " + url);
                 } else if(OS.contains("nix") || OS.contains("nux")) {
-                    String[] browsers = { "google-chrome", "firefox", "mozilla", "epiphany", "konqueror", "netscape", "opera", "links", "lynx" };
-
-                    StringBuffer cmd = new StringBuffer();
-                    for (int i = 0; i < browsers.length; i++) {
-                        if (i == 0) {
-                            cmd.append(String.format("%s \"%s\"", browsers[i], url));
-                        } else {
-                            cmd.append(String.format(" || %s \"%s\"", browsers[i], url));
-                        }
-                    }
-
-                    rt.exec(new String[] { "sh", "-c", cmd.toString() });
+                    rt.exec("xdg-open " + url);
                 }
             }
 

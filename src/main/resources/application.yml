@@ -8,6 +8,8 @@ spring:
   datasource:
     url: jdbc:sqlite:${user.home}/.everyCloud/EveryCloud.db
     driver-class-name: org.sqlite.JDBC
+  pid:
+    file: ${user.home}/.everyCloud/EveryCloud.pid
 
 logging:
   level:
