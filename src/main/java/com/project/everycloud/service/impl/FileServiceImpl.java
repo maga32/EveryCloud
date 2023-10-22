@@ -82,6 +82,7 @@ public class FileServiceImpl implements FileService {
 
 		for(File i : files) {
 			FileDetailDTO file = new FileDetailDTO();
+			if(i.getAbsolutePath().contains(".everyCloud")) continue;
 
 			file.setIsDirectory(i.isDirectory());
 			file.setIsFile(i.isFile());
@@ -184,6 +185,7 @@ public class FileServiceImpl implements FileService {
 
 		for(File i : files) {
 			FileDetailDTO file = new FileDetailDTO();
+			if(i.getAbsolutePath().contains(".everyCloud")) continue;
 
 			file.setName(i.getName());
 			file.setLowerName(i.getName().toLowerCase());

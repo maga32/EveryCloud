@@ -1,2 +1,2 @@
-server:
-  port: 11024
+port: 11024
+openBrowser: true

@@ -52,7 +52,7 @@
 	background-color: var(--file-select-color);
 }
 
-@media (pointer:none) {
+@media (pointer:fine) {
 	.fileTable:hover {
 		background-color: var(--file-select-color);
 	}

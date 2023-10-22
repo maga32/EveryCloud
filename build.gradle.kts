@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.project"
-version = "0.0.1-SNAPSHOT"
+version = "v0.0.1"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_1_8
@@ -33,9 +33,6 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	implementation("commons-io:commons-io:2.8.0")
 	implementation("org.yaml:snakeyaml")
-
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.3.1")
 }
 
 tasks.withType<Test> {

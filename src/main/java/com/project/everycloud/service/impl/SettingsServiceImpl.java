@@ -1,5 +1,6 @@
 package com.project.everycloud.service.impl;
 
+import com.project.everycloud.common.type.ConfigType;
 import com.project.everycloud.model.settings.SettingsDTO;
 import com.project.everycloud.service.SettingsService;
 import com.project.everycloud.service.mapper.SettingsMapper;
@@ -10,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +32,17 @@ public class SettingsServiceImpl implements SettingsService {
 
     @Override
     public void setPort(int port) {
+        setConfig(ConfigType.PORT.ecKey(), port);
+    }
+
+    private void setConfig(String key, Object value) {
         String filePath = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "config.yml";
 
         try {
             Yaml yaml = new Yaml();
-            Reader yamlFile = new FileReader(filePath);
-            Map<String, Object> yamlData = yaml.load(yamlFile);
-            Map<String, Object> portData = new HashMap<String, Object>();
-            portData.put("port", port);
-            yamlData.put("server", portData);
+            Reader configFile = new FileReader(filePath);
+            Map<String, Object> yamlData = yaml.load(configFile);
+            yamlData.put(key, value);
 
             FileWriter writer = new FileWriter(filePath);
             Representer representer = new Representer();
