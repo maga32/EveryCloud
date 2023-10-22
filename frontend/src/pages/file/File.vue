@@ -338,7 +338,7 @@ const imgSelector = (extension, isHidden, path) => {
 /*------------------------ File Control Menu Functions ------------------------*/
 
 const downloadFiles = () => {
-  window.open("/api/v1/file/fileDownload?path=" + form.path + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
+  window.open("/api/v1/file/fileDownload?path=" + encodeURIComponent(form.path) + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
 }
 
 const fileModal = (type) => {
