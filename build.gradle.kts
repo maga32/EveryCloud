@@ -31,7 +31,8 @@ dependencies {
 	implementation("org.xerial:sqlite-jdbc")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
-	compileOnly("commons-io:commons-io:2.8.0")
+	implementation("commons-io:commons-io:2.8.0")
+	implementation("org.yaml:snakeyaml")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.3.1")

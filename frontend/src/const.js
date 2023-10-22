@@ -7,6 +7,7 @@ export default {
     NEED_PASSWORD: '403',
     INVALID_LOGIN: '403',
     INVALID_PATH: '404',
-    INVALID_LINK: '404'
+    INVALID_LINK: '404',
+    INTERNAL_SERVER_ERROR: 500
   }
 }

@@ -34,7 +34,11 @@ const HttpModule = {
 
     }, (error) => {
       if (error.response) {
-        Swal.fire({ icon: 'error', text: error.response.status + ' : ' + error.response.statusText })
+        if(error.response.status === Const.RESPONSE_TYPE.INTERNAL_SERVER_ERROR) {
+          Swal.fire({icon: 'error', text: '서버의 재실행이 필요합니다.'})
+        } else {
+          Swal.fire({icon: 'error', text: error.response.status + ' : ' + error.response.statusText})
+        }
       } else {
         Swal.fire({ icon: 'error', text: error })
       }

@@ -8,4 +8,6 @@ public interface SettingsService {
     List<SettingsDTO> getSettings();
 
     SettingsDTO getSettings(String type);
+
+    void setPort(int port);
 }

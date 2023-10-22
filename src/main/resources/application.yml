@@ -1,10 +1,12 @@
 server:
-  port: 11024
+  port: ${server.port}
 
 spring:
+  config:
+    import: file:${user.home}/.everyCloud/config.yml
   ##db settings
   datasource:
-    url: jdbc:sqlite::resource:datasource/db/EveryCloud.db
+    url: jdbc:sqlite:${user.home}/.everyCloud/EveryCloud.db
     driver-class-name: org.sqlite.JDBC
 
 logging:

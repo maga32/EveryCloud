@@ -1,4 +1,5 @@
 import router from '@/router'
+import Const from "@/const";
 
 const user = {
   namespaced: true,
@@ -24,7 +25,7 @@ const user = {
       return new Promise((resolve, reject) => {
         $http.post('/getSessionUser')
           .then((response) => {
-            if (response.code === '402') {
+            if (response.code === Const.RESPONSE_TYPE.NEED_ADMIN) {
               router.push({
                 path: '/updateUserForm',
                 state: {params: {type: 'admin'}}
