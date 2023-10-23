@@ -28,11 +28,12 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1")
 	implementation("org.springframework.security:spring-security-core")
-	implementation("org.xerial:sqlite-jdbc")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	implementation("commons-io:commons-io:2.8.0")
 	implementation("org.yaml:snakeyaml")
+
+	implementation("io.github.willena:sqlite-jdbc:3.41.2.1")
 }
 
 tasks.withType<Test> {
