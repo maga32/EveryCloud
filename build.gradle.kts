@@ -31,7 +31,7 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	implementation("commons-io:commons-io:2.8.0")
-	implementation("org.yaml:snakeyaml")
+	implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
 
 	implementation("io.github.willena:sqlite-jdbc:3.41.2.1")
 }

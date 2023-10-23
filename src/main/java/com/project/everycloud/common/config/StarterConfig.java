@@ -2,6 +2,7 @@ package com.project.everycloud.common.config;
 
 import com.project.everycloud.EveryCloudApplication;
 import com.project.everycloud.common.type.ConfigType;
+import com.project.everycloud.service.InstallService;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
@@ -54,19 +55,35 @@ public class StarterConfig {
                 configError = true;
             }
 
+            // get port
             try { intTest = (int) yamlData.get(ConfigType.PORT.ecKey());
             } catch (Exception e) {
                 yamlData.put(ConfigType.PORT.ecKey(), defaultYamlData.get(ConfigType.PORT.key()));
                 configError = true;
             }
+            // get open browser property
             try { booleanTest = (Boolean) yamlData.get(ConfigType.OPEN_BROWSER.ecKey());
             } catch (Exception e) {
                 yamlData.put(ConfigType.OPEN_BROWSER.ecKey(), defaultYamlData.get(ConfigType.OPEN_BROWSER.key()));
                 configError = true;
             }
 
+            // get db cert
+            if(yamlData.get(ConfigType.DB.ecKey()) == null) {
+                yamlData.put(ConfigType.DB.ecKey(), "ENC("+InstallService.getDbValue()+")");
+                configError = true;
+            }
+
             yamlData.remove(ConfigType.PORT.key());
             yamlData.remove(ConfigType.OPEN_BROWSER.key());
+            yamlData.remove(ConfigType.DB.key());
+
+            // decoding bean
+            Map<String,Object> encryptor = new HashMap<>();
+            Map<String,Object> bean = new HashMap<>();
+            bean.put("bean", "jasyptStringEncryptor");
+            encryptor.put("encryptor", bean);
+            yamlData.put("jasypt", encryptor);
 
             FileWriter writer = new FileWriter(String.valueOf(LOCAL_CONFIG));
             Representer representer = new Representer();

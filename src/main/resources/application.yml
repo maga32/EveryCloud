@@ -6,7 +6,7 @@ spring:
     import: file:${user.home}/.everyCloud/config.yml
   ##db settings
   datasource:
-    url: jdbc:sqlite:${user.home}/.everyCloud/EveryCloud.db
+    url: jdbc:sqlite:${user.home}/.everyCloud/EveryCloud.db?${ec-db}
     driver-class-name: org.sqlite.JDBC
   pid:
     file: ${user.home}/.everyCloud/EveryCloud.pid
