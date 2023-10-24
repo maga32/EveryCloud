@@ -6,6 +6,8 @@ public enum ResponseType {
     BAD_REQUEST("400", "잘못된 요청입니다."),
     NEED_LOGIN("401", "로그인이 필요한 서비스입니다."),
     NEED_ADMIN("402", "관리자계정 설정이 필요합니다."),
+    CERT_SITE_ERROR("403", "인증서버 접속실패."),
+    CERT_ERROR("403", "사용인증 실패."),
     NOT_ALLOWED("403", "접근권한이 없습니다."),
     NEED_PASSWORD("403", "패스워드가 필요한 서비스입니다."),
     INVALID_LOGIN("403", "id와 password를 확인해주세요."),

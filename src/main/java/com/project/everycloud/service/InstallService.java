@@ -1,8 +1,12 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.common.util.HttpUtil;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -15,18 +19,22 @@ import java.util.Enumeration;
 
 public class InstallService {
 
+    private static final String KEY = "EveryCloudClient";
+
     public static String getDbKey() {
-        getMac();
-        return "";
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("mac", encryptor(KEY, getMac()));
+        return HttpUtil.post(new HttpHeaders(), body, "", "/getDbKey").asText();
     }
 
     public static String getDbValue() {
-        getMac();
-        return "";
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("mac", encryptor(KEY, getMac()));
+        return HttpUtil.post(new HttpHeaders(), body, "", "/getDbValue").asText();
     }
 
     public void dbInstall() {
-        String path = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "EveryCloud2.db";
+        String path = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "EveryCloud.db";
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:"+path+"?"+decryptor(getDbValue()));
 
@@ -97,10 +105,14 @@ public class InstallService {
         return result.toString();
     }
 
-    public static StringEncryptor encrytConfig() {
+    public static StringEncryptor encryptConfig() {
+        return encryptConfig(getDbKey());
+    }
+
+    public static StringEncryptor encryptConfig(String key) {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword(getDbKey());
+        config.setPassword(key);
         config.setAlgorithm("PBEWithMD5AndDES");
         config.setKeyObtentionIterations("1000");
         config.setPoolSize("1");
@@ -111,7 +123,17 @@ public class InstallService {
         return encryptor;
     }
 
-    public String decryptor(String encryptText) {
-        return encrytConfig().decrypt(encryptText);
+    public static String encryptor(String encryptText) {
+        return encryptConfig().encrypt(encryptText);
+    }
+    public static String encryptor(String key, String encryptText) {
+        return encryptConfig(key).encrypt(encryptText);
+    }
+
+    public static String decryptor(String encryptText) {
+        return encryptConfig().decrypt(encryptText);
+    }
+    public static String decryptor(String key, String encryptText) {
+        return encryptConfig(key).decrypt(encryptText);
     }
 }

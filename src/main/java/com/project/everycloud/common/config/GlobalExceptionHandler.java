@@ -74,6 +74,14 @@ public class GlobalExceptionHandler {
         } else if(e instanceof InvalidPathException) {
             apiResponseType = ResponseType.INVALID_PATH;
             apiResponseMessage = ResponseType.INVALID_PATH.message();
+        // CertSiteError
+        } else if(e instanceof CertSiteErrorException) {
+            apiResponseType = ResponseType.CERT_SITE_ERROR;
+            apiResponseMessage = ResponseType.CERT_SITE_ERROR.message();
+        // CertError
+        } else if(e instanceof CertErrorException) {
+            apiResponseType = ResponseType.CERT_ERROR;
+            apiResponseMessage = ResponseType.CERT_ERROR.message();
         // BadRequest
         } else if(e instanceof BadRequestException) {
             apiResponseType = ResponseType.BAD_REQUEST;

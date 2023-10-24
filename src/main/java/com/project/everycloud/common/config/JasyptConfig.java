@@ -10,7 +10,7 @@ public class JasyptConfig {
 
     @Bean("jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
-        return InstallService.encrytConfig();
+        return InstallService.encryptConfig();
     }
 
 }
