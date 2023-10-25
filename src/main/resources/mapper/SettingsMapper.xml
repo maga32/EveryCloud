@@ -4,8 +4,8 @@
 
 <mapper namespace="com.project.everycloud.service.mapper.SettingsMapper">
 	<select id="getSettings" resultType="SettingsDTO">
-		SELECT * FROM settings where
-				type = #{type}
+		SELECT * FROM SETTINGS where
+				TYPE = #{type}
 	</select>
 
 </mapper>
