@@ -2,7 +2,7 @@
   <div>
     <div class="modal-backdrop fade show"></div>
     <transition name="modal" appear>
-      <div @click.self="$emit('close', reload)" class="modal fade show" style="display: block" id="functionModal">
+      <div @click.self="$emit('close', reload, reloadCheckedFiles)" class="modal fade show" style="display: block" id="functionModal">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
@@ -20,7 +20,7 @@
                   </div>
                 </template>
               </h1>
-              <button type="button" class="btn-close" @click="$emit('close', reload)"></button>
+              <button type="button" class="btn-close" @click="$emit('close', reload, reloadCheckedFiles)"></button>
             </div>
             <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
               <div v-if="modalFunc === 'newFolder'">
@@ -68,7 +68,7 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="$emit('close', reload)">취소</button>
+              <button type="button" class="btn btn-secondary" @click="$emit('close', reload, reloadCheckedFiles)">취소</button>
               <button type="button" class="btn btn-primary" @click="submit">확인</button>
             </div>
           </div>
@@ -82,6 +82,7 @@
 import { onMounted, reactive, ref, inject } from 'vue'
 import Const from '@/const'
 import Swal from 'sweetalert2'
+import Utils from '@/modules/utils'
 
 const props = defineProps(['modalFunc', 'form', 'setting', 'extensions'])
 const emit = defineEmits(['close'])
@@ -98,6 +99,7 @@ const functionModalLabel = {
 }
 
 const reload = ref(false)
+const reloadCheckedFiles = ref([])
 const isNewFolder = ref(false)
 const newName = ref('')
 const origName = ref('')
@@ -147,8 +149,9 @@ const moveFilesNewFolder = () => {
       $http.post('/file/newFolder', params, null)
         .then((response) => {
           loadFolders(params.path)
-          if(params.path === props.form.path || params.path === props.form.path.slice(0, -1)) {
+          if(Utils.addSlash(params.path) === Utils.addSlash(props.form.path)) {
             reload.value = true
+            reloadCheckedFiles.value = props.setting.checkedFiles
           }
         })
     }
@@ -157,6 +160,7 @@ const moveFilesNewFolder = () => {
 
 const submit = async () => {
   let result = false
+
   if(!newName.value.trim() &&
       (props.modalFunc === 'newFile' || props.modalFunc === 'newFolder' || props.modalFunc === 'changeName')) {
     Swal.fire({ icon: 'error', text: '이름은 필수입니다.' })
@@ -174,6 +178,7 @@ const submit = async () => {
       .then((response) => {
         result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
       })
+    reloadCheckedFiles.value = props.setting.checkedFiles
 
   // new folder
   } else if(props.modalFunc === 'newFolder') {
@@ -186,6 +191,7 @@ const submit = async () => {
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
         })
+    reloadCheckedFiles.value = props.setting.checkedFiles
 
   // change name
   } else if(props.modalFunc === 'changeName') {
@@ -241,7 +247,7 @@ const submit = async () => {
 
   if(!result) return false
 
-  emit('close', true)
+  emit('close', true, reloadCheckedFiles.value)
 }
 
 </script>

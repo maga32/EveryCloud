@@ -53,6 +53,24 @@ const isInteger = (number) => {
   return number % 1 === 0
 }
 
+/** If String doesn't end with '/', add '/' end of the String
+ *
+ * @param str
+ * @returns String
+ */
+const addSlash = (str) => {
+  return str.endsWith('/') ? str : str+'/'
+}
+
+/** If String end with '/', remove last '/' in the String
+ *
+ * @param str
+ * @returns String
+ */
+const removeSlash = (str) => {
+  return str.endsWith('/') ? str.slice(0, -1) : str
+}
+
 /** translate filesize
  *
  * @param {number}size filesize(byte)
@@ -77,4 +95,6 @@ export default {
   addComma,
   isInteger,
   fileSize,
+  addSlash,
+  removeSlash,
 }

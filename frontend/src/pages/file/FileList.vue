@@ -13,9 +13,6 @@
     <div id="fileList">
 
       <label v-for="li in fileList" class="w-100 pe-1 pe-md-5" @click="labelClick">
-        <span class="d-none">
-          {{ li.extension = li.isDirectory ? 'folder' : !extensions.hasOwnProperty(li.extension) ? 'default' : li.extension }}
-        </span>
         <table class="w-100 rounded fileTable" :class="!setting.checkedFiles.includes(li.name) || 'checked'">
           <tr>
             <td v-show="!setting.search" class="text-center" style="width:35px;">
@@ -62,7 +59,7 @@
 </template>
 
 <script setup>
-import {inject, onUpdated} from 'vue'
+import {computed, inject, onUpdated} from 'vue'
 import Utils from '@/modules/utils'
 import dayjs from 'dayjs'
 

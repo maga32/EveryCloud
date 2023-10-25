@@ -252,9 +252,9 @@ watch(() => route.fullPath, (to, from)=>{
 /*------------------------ functions ------------------------*/
 
 const openModal = () => { modalOn.value = true }
-const closeModal = (reload = false) => {
+const closeModal = (reload, checkedFiles) => {
   modalOn.value = false
-  if(reload) getFileList()
+  if(reload) getFileList(checkedFiles)
 }
 
 const sortArrow = (sort) => { return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : '' }
@@ -278,7 +278,7 @@ const loadFileList = (shareLink, path, sort, order, keyword, resetKeyword = fals
   })
 }
 
-const getFileList = async () =>{
+const getFileList = async (checkedFiles = []) =>{
   setting.loadingList = true
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -295,15 +295,19 @@ const getFileList = async () =>{
         .then((response) => {
           if(response.data) {
             homeLink(form.shareLink, response.data.option.nowPath)
-            fileList.value = response.data.lists
+            fileList.value = response.data.lists.map(li => {
+                                return {
+                                  ...li,
+                                  extension: li.isDirectory ? 'folder' : extensions.hasOwnProperty(li.extension) ? li.extension : 'default'
+                                }
+                              })
             $store.dispatch('link/addSiteHtml')
           } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
             setTimeout(() => router.go(-1), 2000)
           }
         })
 
-
-  setting.checkedFiles = []
+  setting.checkedFiles = checkedFiles
 
   setting.loadingList = false
 }
