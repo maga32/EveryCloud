@@ -78,6 +78,7 @@ public class GlobalExceptionHandler {
         } else if(e instanceof CertSiteErrorException) {
             apiResponseType = ResponseType.CERT_SITE_ERROR;
             apiResponseMessage = ResponseType.CERT_SITE_ERROR.message();
+            // 화면에 경고창 띄워주기(인증서버오류)
         // CertError
         } else if(e instanceof CertErrorException) {
             apiResponseType = ResponseType.CERT_ERROR;

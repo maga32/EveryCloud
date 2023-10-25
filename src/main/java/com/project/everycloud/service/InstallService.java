@@ -23,13 +23,13 @@ public class InstallService {
 
     public static String getDbKey() {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("mac", encryptor(KEY, getMac()));
+        body.add("client", encryptor(KEY, getMac()));
         return HttpUtil.post(new HttpHeaders(), body, "", "/getDbKey").asText();
     }
 
     public static String getDbValue() {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("mac", encryptor(KEY, getMac()));
+        body.add("client", encryptor(KEY, getMac()));
         return HttpUtil.post(new HttpHeaders(), body, "", "/getDbValue").asText();
     }
 
