@@ -71,6 +71,15 @@ const removeSlash = (str) => {
   return str.endsWith('/') ? str.slice(0, -1) : str
 }
 
+/** Change String with '\', replace all to '/'
+ *
+ * @param str
+ * @returns String
+ */
+const backSlashToSlash = (str) => {
+  return str.replaceAll("\\", "/")
+}
+
 /** translate filesize
  *
  * @param {number}size filesize(byte)
@@ -96,5 +105,6 @@ export default {
   isInteger,
   fileSize,
   addSlash,
+  backSlashToSlash,
   removeSlash,
 }

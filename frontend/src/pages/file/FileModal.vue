@@ -149,7 +149,7 @@ const moveFilesNewFolder = () => {
       $http.post('/file/newFolder', params, null)
         .then((response) => {
           loadFolders(params.path)
-          if(Utils.addSlash(params.path) === Utils.addSlash(props.form.path)) {
+          if(Utils.addSlash(Utils.backSlashToSlash(params.path)) === Utils.addSlash(props.form.path)) {
             reload.value = true
             reloadCheckedFiles.value = props.setting.checkedFiles
           }
