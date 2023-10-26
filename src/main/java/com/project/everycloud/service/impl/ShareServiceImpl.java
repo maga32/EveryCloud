@@ -1,6 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
 import com.project.everycloud.model.share.ShareDTO;
 import com.project.everycloud.model.share.ShareGroupDTO;
 import com.project.everycloud.service.ShareService;
@@ -31,6 +32,12 @@ public class ShareServiceImpl implements ShareService {
 
     @Lazy
     FileUtil fileUtil;
+
+    @Override
+    public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
+
+        return "share test";
+    }
 
     @Override
     public ShareDTO getShareByLink(String link) {

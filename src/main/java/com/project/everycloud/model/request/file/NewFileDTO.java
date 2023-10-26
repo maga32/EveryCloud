@@ -12,7 +12,7 @@ public class NewFileDTO {
 	private String shareLink;
 	@NotNull(message = "필수항목: path")
 	private String path;
-	@NotNull(message = "필수항목: newName")
-	private String newName;
+	@NotNull(message = "필수항목: name")
+	private String name;
 	private String origName;
 }

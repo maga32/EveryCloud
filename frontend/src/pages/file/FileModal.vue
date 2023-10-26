@@ -144,7 +144,7 @@ const moveFilesNewFolder = () => {
       const params = {
         path: moveTo.nowPath,
         shareLink: props.form.shareLink,
-        newName: newName.value.trim()
+        name: newName.value.trim()
       }
       $http.post('/file/newFolder', params, null)
         .then((response) => {
@@ -172,7 +172,7 @@ const submit = async () => {
     const params = {
       path: props.form.path,
       shareLink: props.form.shareLink,
-      newName: newName.value.trim()
+      name: newName.value.trim()
     }
     await $http.post('/file/newFile', params, null)
       .then((response) => {
@@ -185,7 +185,7 @@ const submit = async () => {
     const params = {
       path: props.form.path,
       shareLink: props.form.shareLink,
-      newName: newName.value.trim()
+      name: newName.value.trim()
     }
     await $http.post('/file/newFolder', params, null)
         .then((response) => {
@@ -198,7 +198,7 @@ const submit = async () => {
     const params = {
       path: props.form.path,
       shareLink: props.form.shareLink,
-      newName: newName.value.trim(),
+      name: newName.value.trim(),
       origName: origName.value
     }
     await $http.post('/file/changeName', params, null)

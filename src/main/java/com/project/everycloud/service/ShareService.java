@@ -1,5 +1,7 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
 import com.project.everycloud.model.share.ShareDTO;
 import com.project.everycloud.model.share.ShareGroupDTO;
 
@@ -7,6 +9,8 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 public interface ShareService {
+
+    String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
 
     ShareDTO getShareByLink(String link);
 

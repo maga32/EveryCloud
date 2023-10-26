@@ -140,7 +140,7 @@
         </tr>
         <tr>
           <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
-          <td class="p-1 pointer" onclick="shareFile()">공유</td>
+          <td class="p-1 pointer" @click="shareFile">공유</td>
         </tr>
         <tr>
           <td colspan="2" class="p-2">
@@ -333,7 +333,7 @@ const toggleHiddenCheck = () => {
 
 const imgSelector = (extension, isHidden, path) => {
   if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-    return '/api/v1/file/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))
+    return (import.meta.env.VITE_SERVER_BASE_URL) + '/file/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))
   } else {
     return '/img/fileicons/' + extensions[extension] + '.png'
   }
@@ -342,7 +342,20 @@ const imgSelector = (extension, isHidden, path) => {
 /*------------------------ File Control Menu Functions ------------------------*/
 
 const downloadFiles = () => {
-  window.open("/api/v1/file/fileDownload?path=" + encodeURIComponent(form.path) + "&fileNames=" + encodeURIComponent(setting.checkedFiles.join(':/:')) + "&shareLink=" + form.shareLink);
+  window.open((import.meta.env.VITE_SERVER_BASE_URL) + '/file/fileDownload?path=' + encodeURIComponent(form.path) + '&fileNames=' + encodeURIComponent(setting.checkedFiles.join(':/:')) + '&shareLink=' + form.shareLink);
+}
+
+const shareFile = () => {
+  const params = {
+    path: form.path,
+    shareLink: form.shareLink,
+    name: setting.checkedFiles[0]
+  }
+  console.log(params)
+  $http.post('/share/shareNewFile', params, null)
+    .then((response) => {
+      console.log(response)
+    })
 }
 
 const fileModal = (type) => {

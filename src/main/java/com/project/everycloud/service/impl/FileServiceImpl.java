@@ -205,7 +205,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public void newFile(NewFileDTO newFile, UserDTO sessionUser, String type) {
 		String path = newFile.getPath();
-		String newName = newFile.getNewName();
+		String newName = newFile.getName();
 		String shareLink = newFile.getShareLink();
 
 		// Map<String, Object> map = new HashMap<String, Object>();
@@ -238,7 +238,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public void changeName(NewFileDTO newFile, UserDTO sessionUser) {
 		String path = newFile.getPath();
-		String newName = newFile.getNewName();
+		String newName = newFile.getName();
 		String shareLink = newFile.getShareLink();
 		String origName = newFile.getOrigName();
 
