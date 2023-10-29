@@ -128,7 +128,7 @@
 
     <div v-else-if="setting.checkedFiles.length === 1">
       <div class="px-1" style="word-break:break-all;">{{ setting.checkedFiles[0] }}</div>
-      <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px;"></div>
+      <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px;" @click="showImg"></div>
       <table>
         <tr>
           <td class="p-1"><i class="fa-solid fa-star" /></td>
@@ -361,6 +361,13 @@ const shareFile = () => {
         fileModal('shareFile')
       }
     })
+}
+
+const showImg = (e) => {
+  if(e.target.src.includes('thumbnailMaker')) {
+    modalBody.value = { image: e.target.src }
+    fileModal('showImg')
+  }
 }
 
 const fileModal = (type) => {

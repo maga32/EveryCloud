@@ -3,12 +3,13 @@
     <div class="modal-backdrop fade show"></div>
     <transition name="modal" appear>
       <div @click.self="$emit('close', reload, reloadCheckedFiles)" class="modal fade show" style="display: block" id="functionModal">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" :class="!fullSize || 'modal-fullscreen'">
           <div class="modal-content">
 
             <div class="modal-header">
               <h1 class="modal-title fs-5 text-break w-100 pe-3" id="functionModalLabel">
                 {{ functionModalLabel[modalFunc] }}
+
                 <template v-if="modalFunc === 'copyFiles' || modalFunc === 'moveFiles'" >
                   {{ moveTo.nowPath }}
                   <div class="d-flex pt-4 align-items-center">
@@ -20,6 +21,13 @@
                     </div>
                   </div>
                 </template>
+                <template v-else-if="modalFunc === 'showImg'">
+                  <span>
+                    <i class="btn btn-outline-secondary fa-solid fa-rotate-right ms-2" @click="degree += 90"/>
+                    <i class="btn btn-outline-secondary fa-solid fa-rotate-left ms-2" @click="degree -= 90"/>
+                  </span>
+                </template>
+
               </h1>
               <button type="button" class="btn-close" @click="$emit('close', reload, reloadCheckedFiles)"></button>
             </div>
@@ -69,6 +77,10 @@
               <div v-else-if="modalFunc === 'needPassword'">
                 needPassword
               </div>
+              <div v-else-if="modalFunc === 'showImg'">
+                <!--<div class="text-center" style="position: relative"><i class="fa-solid fa-circle-notch fa-spin fs-5" style="position: absolute; z-index:0;"/></div>-->
+                <img class="img-fluid" style="transition: all 1s;" :style="'transform:rotate('+degree+'deg);'" :src="modalBody.image+'&size=0'" @click="fullSize=!fullSize">
+              </div>
 
             </div>
             <div class="modal-footer">
@@ -100,6 +112,7 @@ const functionModalLabel = {
   moveFiles     : '이동:',
   shareFile     : '공유',
   needPassword  : '비밀번호 입력',
+  showImg       : '사진보기',
 }
 
 const reload = ref(false)
@@ -107,6 +120,9 @@ const reloadCheckedFiles = ref([])
 const isNewFolder = ref(false)
 const newName = ref('')
 const origName = ref('')
+
+const fullSize = ref(false)
+const degree = ref(0)
 
 const moveTo = reactive({
   parentPath: props.form.path,
@@ -260,6 +276,9 @@ const submit = async () => {
   } else if(props.modalFunc === 'shareFile') {
     copyShareLink()
     return false
+  // show image
+  } else if(props.modalFunc === 'showImg') {
+    result = true
   }
 
   if(!result) return false
