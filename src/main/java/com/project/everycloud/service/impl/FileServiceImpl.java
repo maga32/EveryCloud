@@ -2,6 +2,7 @@ package com.project.everycloud.service.impl;
 
 import com.project.everycloud.common.exception.ExistNameException;
 import com.project.everycloud.common.exception.NotExistFileException;
+import com.project.everycloud.common.util.FileUtil;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.FileListLoadDTO;
@@ -10,19 +11,30 @@ import com.project.everycloud.model.request.file.UpdateFileListDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
+import com.project.everycloud.service.ShareService;
+import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.FileDao;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.InvalidPathException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+	@Autowired
+	ShareService shareService;
+
+	@Autowired
+	UserService userService;
 
 	@Autowired
 	FileDao fileDao;
@@ -32,31 +44,33 @@ public class FileServiceImpl implements FileService {
 		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
+		if(userService.isAdmin(sessionUser) && StringUtils.hasText(fileListLoad.getShareLink())) {
+			fileListLoad.setPath(shareService.getShareByLink(fileListLoad.getShareLink()).getPath());
+			fileListLoad.setShareLink("");
+		}
+
 		String sharePath = "";
 		String realPath = "";
 		String path = fileListLoad.getPath();
 		String shareLink = fileListLoad.getShareLink();
 
-//		Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0);
-//		map.putAll(shareMap);
+		shareService.verifyAuth(shareLink, 0, sessionUser);
 
 		if(path.equals("") && shareLink.equals("")) path += "/";
 
-//		if(shareMap.get("invalidString") != null) {
-//			return map;
-//		} else if(!shareLink.equals("")) {
-//			sharePath = shareMap.get("sharePath");
-//			path = sharePath + (path.equals("/") ? "" : path);
-//		}
+		if(StringUtils.hasText(shareLink)) {
+			sharePath = shareService.getShareByLink(shareLink).getPath();
+			path = sharePath + (path.equals("/") ? "" : path);
+		}
 
-		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+		String windowsSharePath = FileUtil.winPath(sharePath);
 
 		if(!isPathExist(path)) throw new InvalidPathException("","");
 
 		File nowPath = getFile(path);
-		path = winPath(path);
+		path = FileUtil.macPath(path);
 		try {
-			realPath = winPath(nowPath.getCanonicalPath());
+			realPath = FileUtil.macPath(nowPath.getCanonicalPath());
 		} catch (IOException e) { throw new RuntimeException(e); }
 
 		if (!realPath.equals(path)) {
@@ -66,6 +80,7 @@ public class FileServiceImpl implements FileService {
 
 		options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
 		options.setPath(path.replace(sharePath, ""));
+		options.setShareLink(shareLink);
 
 		result.setOption(options);
 		result.setLists(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
@@ -78,7 +93,7 @@ public class FileServiceImpl implements FileService {
 		List<FileDetailDTO> fileList = new ArrayList<FileDetailDTO>();
 		File[] files = null;
 		files = fileDao.getPathFiles(path, viewHidden, keyword);
-		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+		String windowsSharePath = FileUtil.winPath(sharePath);
 
 		for(File i : files) {
 			FileDetailDTO file = new FileDetailDTO();
@@ -139,32 +154,33 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public AppList<FileDetailDTO, FileOptionDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser) {
-		// Map<String, Object> map = new HashMap<String, Object>();
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
-		// map.putAll(shareMap);
 		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
 		FileOptionDTO options = new FileOptionDTO();
+
+		if(userService.isAdmin(sessionUser) && StringUtils.hasText(folderListLoad.getShareLink())) {
+			folderListLoad.setPath(shareService.getShareByLink(folderListLoad.getShareLink()).getPath());
+			folderListLoad.setShareLink("");
+		}
 
 		String sharePath = "";
 		String path = folderListLoad.getPath();
 		String shareLink = folderListLoad.getShareLink();
 
-		/*
-		if(shareMap.get("invalidString") != null) {
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
+		shareService.verifyAuth(shareLink, 0, sessionUser);
+
+		if(StringUtils.hasText(shareLink)) {
+			sharePath = shareService.getShareByLink(shareLink).getPath();
 			path = sharePath + (path.equals("/") ? "" : path);
 		}
-		*/
-		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+
+		String windowsSharePath = FileUtil.winPath(sharePath);
 		boolean validPath = isPathExist(path);
 
 		if(validPath) {
 			File nowPath = getFile(path);
-			path = winPath(path);
-			String parentPath = winPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
-								? winPath(nowPath.getParent()).replace(sharePath, "")
+			path = FileUtil.macPath(path);
+			String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
+								? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
 								: "/";
 
 			result.setLists(folderList(sharePath, path));
@@ -173,6 +189,7 @@ public class FileServiceImpl implements FileService {
 		}
 
 		options.setPath(path.replace(sharePath, ""));
+		options.setShareLink(shareLink);
 		result.setOption(options);
 
 		return result;
@@ -181,7 +198,7 @@ public class FileServiceImpl implements FileService {
 	private List<FileDetailDTO> folderList(String sharePath, String path) {
 		List<FileDetailDTO> folderList = new ArrayList<FileDetailDTO>();
 		File[] files = fileDao.getFolderList(path);
-		String windowsSharePath = sharePath.replaceAll("/", "\\\\");
+		String windowsSharePath = FileUtil.winPath(sharePath);
 
 		for(File i : files) {
 			FileDetailDTO file = new FileDetailDTO();
@@ -208,19 +225,11 @@ public class FileServiceImpl implements FileService {
 		String newName = newFile.getName();
 		String shareLink = newFile.getShareLink();
 
-		// Map<String, Object> map = new HashMap<String, Object>();
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+		shareService.verifyAuth(shareLink, 1, sessionUser);
 
-		String sharePath = "";
-		/*
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
+		if(StringUtils.hasText(shareLink)) {
+			path = shareService.getShareByLink(shareLink).getPath() + (path.equals("/") ? "" : path);
 		}
-		*/
 
 		if(isPathExist(path + File.separator + newName)) {
 			throw new ExistNameException(newName);
@@ -242,20 +251,11 @@ public class FileServiceImpl implements FileService {
 		String shareLink = newFile.getShareLink();
 		String origName = newFile.getOrigName();
 
-		// Map<String, Object> map = new HashMap<String, Object>();
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+		shareService.verifyAuth(shareLink, 1, sessionUser);
 
-		String sharePath = "";
-
-		/*
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
+		if(StringUtils.hasText(shareLink)) {
+			path = shareService.getShareByLink(shareLink).getPath() + (path.equals("/") ? "" : path);
 		}
-		*/
 
 		if(!isPathExist(path + File.separator + origName)) {
 			throw new NotExistFileException(origName);
@@ -273,21 +273,13 @@ public class FileServiceImpl implements FileService {
 		String shareLink = updateFileList.getShareLink();
 		List<String> fileList = updateFileList.getFileList();
 
-		// Map<String, Object> map = new HashMap<String, Object>();
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+		shareService.verifyAuth(shareLink, 1, sessionUser);
 
-		String sharePath = "";
-
-		/*
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
+		if(StringUtils.hasText(shareLink)) {
+			String sharePath = shareService.getShareByLink(shareLink).getPath();
 			path = sharePath + (path.equals("/") ? "" : path);
-			moveToPath = sharePath + (moveToPath.equals("/") ? "" : moveToPath);
+			newPath = sharePath + (newPath.equals("/") ? "" : newPath);
 		}
-		*/
 
 		for (String fileName : fileList) {
 			File file = new File(path + File.separator + fileName);
@@ -304,36 +296,16 @@ public class FileServiceImpl implements FileService {
 		String shareLink = updateFileList.getShareLink();
 		List<String> fileList = updateFileList.getFileList();
 
-		// Map<String, Object> map = new HashMap<String, Object>();
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 1, session);
+		shareService.verifyAuth(shareLink, 1, sessionUser);
 
-		String sharePath = "";
-
-		/*
-		if(shareMap.get("invalidString") != null) {
-			map.put("result",shareMap.get("invalidString"));
-			return map;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
+		if(StringUtils.hasText(shareLink)) {
+			path = shareService.getShareByLink(shareLink).getPath() + (path.equals("/") ? "" : path);
 		}
-		*/
 
 		for(String fileName : fileList) {
 			File file = new File(path + File.separator + fileName);
 			if(file.exists()) fileDao.deleteFile(file);
 		}
-	}
-
-
-	/**
-	 * Replace WINDOWS folder path processing
-	 *
-	 * @param path
-	 * @return path.replaceAll("\\\\", "/")
-	 */
-	private String winPath(String path) {
-		return path.replaceAll("\\\\", "/");
 	}
 
 	private boolean isPathExist(String path) {
@@ -343,7 +315,5 @@ public class FileServiceImpl implements FileService {
 	private File getFile(String path) {
 		return fileDao.getFile(path);
 	}
-
-	/* --------------------------- 수정필요 --------------------------- */
 
 }

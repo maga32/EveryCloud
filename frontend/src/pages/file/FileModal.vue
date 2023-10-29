@@ -5,6 +5,7 @@
       <div @click.self="$emit('close', reload, reloadCheckedFiles)" class="modal fade show" style="display: block" id="functionModal">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
+
             <div class="modal-header">
               <h1 class="modal-title fs-5 text-break w-100 pe-3" id="functionModalLabel">
                 {{ functionModalLabel[modalFunc] }}
@@ -22,7 +23,9 @@
               </h1>
               <button type="button" class="btn-close" @click="$emit('close', reload, reloadCheckedFiles)"></button>
             </div>
+
             <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
+
               <div v-if="modalFunc === 'newFolder'">
                 <input type="text" class="form-control" v-model="newName" placeholder="폴더명을 입력해주세요">
               </div>
@@ -61,11 +64,12 @@
                 </table>
               </div>
               <div v-else-if="modalFunc === 'shareFile'">
-                shareFile
+                <input class="form-control text-break" id="newShareLink" v-model="modalBody.shareLink" @click="copyShareLink">
               </div>
               <div v-else-if="modalFunc === 'needPassword'">
                 needPassword
               </div>
+
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" @click="$emit('close', reload, reloadCheckedFiles)">취소</button>
@@ -84,7 +88,7 @@ import Const from '@/const'
 import Swal from 'sweetalert2'
 import Utils from '@/modules/utils'
 
-const props = defineProps(['modalFunc', 'form', 'setting', 'extensions'])
+const props = defineProps(['modalFunc', 'form', 'setting', 'extensions', 'modalBody'])
 const emit = defineEmits(['close'])
 
 const functionModalLabel = {
@@ -158,6 +162,15 @@ const moveFilesNewFolder = () => {
   }
 }
 
+const copyShareLink = () => {
+  document.querySelector("#newShareLink").select()
+  document.execCommand("copy");
+  Swal.fire({ icon: 'success', text: '링크가 복사되었습니다.', timer: 1200, showConfirmButton: false })
+  emit('close', false, props.setting.checkedFiles)
+}
+
+
+/*-------------------- modal submit --------------------*/
 const submit = async () => {
   let result = false
 
@@ -243,6 +256,10 @@ const submit = async () => {
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
         })
+  // share file
+  } else if(props.modalFunc === 'shareFile') {
+    copyShareLink()
+    return false
   }
 
   if(!result) return false

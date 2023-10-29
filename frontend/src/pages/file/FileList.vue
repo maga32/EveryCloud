@@ -54,7 +54,6 @@
 
     </div>
 
-<!--    <button @click="childTest">child test</button>-->
   </div>
 </template>
 
@@ -71,11 +70,6 @@ const labelClick = (e) => {
 
   // if search file mode, go to path
   if(props.setting.search) loadFileList('', e.target.closest('table').querySelector('.li_parent').value, '', '', '', true)
-}
-
-
-const childTest = () => {
-  console.log(props)
 }
 
 // get from parent component

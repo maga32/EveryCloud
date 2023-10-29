@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         String apiResponseMessage = "";
 
         // NoAuth
-        if(e instanceof HttpClientErrorException.Unauthorized) {
+        if(e instanceof HttpClientErrorException.Unauthorized || e instanceof NotAllowedException) {
             apiResponseType = ResponseType.NOT_ALLOWED;
             apiResponseMessage = ResponseType.NOT_ALLOWED.message();
         // DupPk
@@ -62,6 +62,10 @@ public class GlobalExceptionHandler {
         } else if(e instanceof NeedLoginException) {
             apiResponseType = ResponseType.NEED_LOGIN;
             apiResponseMessage = ResponseType.NEED_LOGIN.message();
+        // NeedPassword
+        } else if(e instanceof NeedPasswordException) {
+            apiResponseType = ResponseType.NEED_PASSWORD;
+            apiResponseMessage = ResponseType.NEED_PASSWORD.message();
         // InvalidLogin
         } else if(e instanceof InvalidLoginException) {
             apiResponseType = ResponseType.INVALID_LOGIN;

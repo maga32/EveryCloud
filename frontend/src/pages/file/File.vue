@@ -166,8 +166,6 @@
       :extensions="extensions"
   />
 
-<!--  <button @click="parentTest">parent test</button>-->
-
   <!-- Modal -->
   <FileModal
     v-if="modalOn"
@@ -175,6 +173,7 @@
     :form="form"
     :setting="setting"
     :modalFunc="modalFunc"
+    :modalBody="modalBody"
     :extensions="extensions"
   >
   </FileModal>
@@ -186,7 +185,6 @@ import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
-import Swal from 'sweetalert2'
 import FileList from './FileList.vue'
 import FileModal from './FileModal.vue'
 import Const from "@/const";
@@ -218,7 +216,7 @@ const fileList = ref([])
 
 const modalOn = ref(false)
 const modalFunc = ref('')
-const modalReq = ref({})
+const modalBody = ref({})
 
 /*------------------------ compute ------------------------*/
 
@@ -293,6 +291,11 @@ const getFileList = async (checkedFiles = []) =>{
 
   await $http.post('/file/fileList', form, null)
         .then((response) => {
+          // if you are admin, remove shareLink
+          if(!response.data?.option?.shareLink) {
+            form.shareLink = ''
+            form.path = response.data?.option.path
+          }
           if(response.data) {
             homeLink(form.shareLink, response.data.option.nowPath)
             fileList.value = response.data.lists.map(li => {
@@ -305,11 +308,10 @@ const getFileList = async (checkedFiles = []) =>{
           } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
             setTimeout(() => router.go(-1), 2000)
           }
+          setting.loadingList = false
         })
 
   setting.checkedFiles = checkedFiles
-
-  setting.loadingList = false
 }
 
 const homeLink = (shareLink, nowPath) => {
@@ -351,10 +353,13 @@ const shareFile = () => {
     shareLink: form.shareLink,
     name: setting.checkedFiles[0]
   }
-  console.log(params)
+
   $http.post('/share/shareNewFile', params, null)
     .then((response) => {
-      console.log(response)
+      if(response.data) {
+        modalBody.value = { shareLink: response.data }
+        fileModal('shareFile')
+      }
     })
 }
 

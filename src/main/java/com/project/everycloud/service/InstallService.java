@@ -35,21 +35,20 @@ public class InstallService {
 
     public void dbInstall() {
         String path = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "EveryCloud.db";
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:"+path+"?"+decryptor(getDbValue()));
+        try(Connection conn = DriverManager.getConnection("jdbc:sqlite:"+path+"?"+decryptor(getDbValue()))) {
 
-            Statement stmt = connection.createStatement();
+            Statement stmt = conn.createStatement();
             stmt.execute("CREATE TABLE SETTINGS (TYPE TEXT, EXTERNAL_URL TEXT" +
                             ", PRIMARY KEY(TYPE))");
             stmt.execute("CREATE TABLE GROUP_SETTING (NO INTEGER, NAME TEXT NOT NULL" +
-                            ", PRIMARY KEY(NO))");
+                            ", PRIMARY KEY(NO AUTOINCREMENT))");
             stmt.execute("CREATE TABLE SHARE (LINK TEXT, PATH TEXT NOT NULL UNIQUE, DATE TEXT, METHOD INTEGER NOT NULL, PASS TEXT, AUTH INTEGER NOT NULL DEFAULT 0" +
                             ", PRIMARY KEY(LINK))");
             stmt.execute("CREATE TABLE SHARE_GROUP (SHARE_LINK TEXT NOT NULL, GROUP_NO INTEGER NOT NULL, AUTH INTEGER NOT NULL DEFAULT 0" +
                             ", PRIMARY KEY(SHARE_LINK, GROUP_NO)" +
                             ", FOREIGN KEY(GROUP_NO) REFERENCES GROUP_SETTING(NO)" +
                             ", FOREIGN KEY(SHARE_LINK) REFERENCES SHARE(LINK))");
-            stmt.execute("CREATE TABLE USER (ID TEXT, PASS TEXT NOT NULL, NICKNAME TEXT NOT NULL, EMAIL TEXT, AUTH TEXT NOT NULL DEFAULT N, GROUP_NO INTEGER NOT NULL DEFAULT 1" +
+            stmt.execute("CREATE TABLE USER (ID TEXT, PASS TEXT NOT NULL, NICKNAME TEXT NOT NULL, EMAIL TEXT, AUTH TEXT NOT NULL DEFAULT N, NEED_VERIFY TEXT, GROUP_NO INTEGER NOT NULL DEFAULT 1" +
                             ", PRIMARY KEY(ID)" +
                             ", FOREIGN KEY(GROUP_NO) REFERENCES GROUP_SETTING(NO))");
 
@@ -59,10 +58,9 @@ public class InstallService {
                             "VALUES('admin', 'http://127.0.0.1:11024')");
             stmt.execute("INSERT INTO GROUP_SETTING  (NO, NAME) " +
                             "VALUES(1, 'default')");
-            stmt.execute("INSERT INTO USER (ID, PASS, NICKNAME, EMAIL, AUTH, GROUP_NO) " +
-                            "VALUES('admin', 'admin', 'admin', null, 'Y', 1)");
+            stmt.execute("INSERT INTO USER (ID, PASS, NICKNAME, EMAIL, AUTH, NEED_VERIFY, GROUP_NO) " +
+                            "VALUES('admin', 'admin', 'admin', null, 'Y', '', 1)");
 
-            connection.close();
         } catch (final SQLException e) {
             e.printStackTrace();
         }

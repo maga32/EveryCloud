@@ -1,4 +1,4 @@
-package com.project.everycloud.model.share;
+package com.project.everycloud.model.response.share;
 
 import java.sql.Timestamp;
 

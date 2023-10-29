@@ -14,6 +14,7 @@ import com.project.everycloud.service.ShareService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
@@ -22,10 +23,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -75,15 +73,13 @@ public class FileController {
 			String name,
 			@RequestParam(value="size", required = false, defaultValue=DEFAULT_SIZE) Integer size,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) throws IOException {
-		/*
-		if(!userUtil.isAdmin()) {
-			if (shareLink.equals("")) return;
-			if (fileUtil.hasValidAuth(shareLink,0) != 1) return;
-		}
 
-		Share share = shareService.getShareByLink(shareLink);
-		if(share != null) name = share.getPath() + name;
-		*/
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		shareService.verifyAuth(shareLink, 0, sessionUser);
+
+		if(StringUtils.hasText(shareLink)) {
+			name = shareService.getShareByLink(shareLink).getPath() + name;
+		}
 
 		File file = new File(name);
 		String extension = FilenameUtils.getExtension(name).toLowerCase();
@@ -119,25 +115,25 @@ public class FileController {
 	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,
 					  @RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 					  @RequestParam("fileNames") String fileNames) throws Exception {
-		// Map<String, String> shareMap = shareService.getShareAuth(shareLink, 0, session);
-		// String sharePath = "";
 
-		// String invalidString = "" + (shareMap.get("invalidString") != null ? shareMap.get("invalidString") : "");
-		/*
-		if(!invalidString.equals("")) {
+		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+		try {
+			shareService.verifyAuth(shareLink, 0, sessionUser);
+		} catch(Exception e) {
 			response.setContentType("text/html; charset=utf-8");
 			PrintWriter out = response.getWriter();
 			out.println("<script>");
-			out.println("	alert('" + invalidString + "');");
+			out.println("	alert('" + "권한이 없습니다." + "');");
 			out.println("	window.close();");
 			out.println("</script>");
 			out.close();
 			return;
-		} else if(!shareLink.equals("")) {
-			sharePath = shareMap.get("sharePath");
-			path = sharePath + (path.equals("/") ? "" : path);
 		}
-		*/
+
+		if(StringUtils.hasText(shareLink)) {
+			path = shareService.getShareByLink(shareLink).getPath() + (path.equals("/") ? "" : path);
+		}
+
 		String[] fileList = fileNames.split(":/:");
 		File firstFile = new File(path + File.separator + fileList[0]);
 

@@ -1,7 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.project.everycloud.common.type.ConfigType;
-import com.project.everycloud.model.settings.SettingsDTO;
+import com.project.everycloud.model.response.settings.SettingsDTO;
 import com.project.everycloud.service.SettingsService;
 import com.project.everycloud.service.mapper.SettingsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
