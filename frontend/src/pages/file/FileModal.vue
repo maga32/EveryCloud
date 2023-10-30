@@ -77,9 +77,25 @@
               <div v-else-if="modalFunc === 'needPassword'">
                 needPassword
               </div>
-              <div v-else-if="modalFunc === 'showImg'">
+              <div v-else-if="modalFunc === 'showImg'" ref="imageBox">
                 <!--<div class="text-center" style="position: relative"><i class="fa-solid fa-circle-notch fa-spin fs-5" style="position: absolute; z-index:0;"/></div>-->
-                <img class="img-fluid" style="transition: all 1s;" :style="'transform:rotate('+degree+'deg);'" :src="modalBody.image+'&size=0'" @click="fullSize=!fullSize">
+                <img
+                  ref="image"
+                  :srcset="
+                              modalBody.image+'&size=360  360w,'
+                            + modalBody.image+'&size=540  540w,'
+                            + modalBody.image+'&size=720  720w,'
+                            + modalBody.image+'&size=1080 1080w,'
+                            + modalBody.image+'&size=2440 2440w,'
+                            + modalBody.image+'&size=3200 3200w,'
+                            + modalBody.image+'&size=3840 3840w,'
+                            + modalBody.image+'&size=7680 7680w'
+                          "
+                  :src="modalBody.image+'&size=0'"
+                  @click="fullSize=!fullSize"
+                  style="transition: all 1s;"
+                  :style="imgStyle + 'transform:rotate('+degree+'deg);'"
+                >
               </div>
 
             </div>
@@ -95,7 +111,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, inject } from 'vue'
+import { onMounted, reactive, ref, inject, computed } from 'vue'
 import Const from '@/const'
 import Swal from 'sweetalert2'
 import Utils from '@/modules/utils'
@@ -121,6 +137,8 @@ const isNewFolder = ref(false)
 const newName = ref('')
 const origName = ref('')
 
+const imageBox = ref(null)
+const image = ref(null)
 const fullSize = ref(false)
 const degree = ref(0)
 
@@ -139,6 +157,25 @@ onMounted(()=> {
   }
 })
 
+const imgStyle = computed({
+  get() {
+    let result = 'width: 100%;'
+    if(imageBox.value?.offsetWidth) {
+      if(degree.value % 180 === 0) {
+        result += 'height: auto;'
+      } else {
+        const imgW = image.value.width
+        const imgH = image.value.width**2 / image.value.height
+        const marginX = (imgH - imgW) / 2
+        const marginY = (imgW - imgH) / 2
+        result = 'width:' + imgH + 'px;'
+               + 'height:' + imgW + 'px;'
+               + 'margin:' + marginX + 'px ' + marginY + 'px;'
+      }
+    }
+    return result
+  }
+})
 /*------------------------ functions ------------------------*/
 const loadFolders = (path) => {
   moveTo.invalidText = ''
