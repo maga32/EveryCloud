@@ -4,7 +4,6 @@ import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
-import com.project.everycloud.service.FileService;
 import com.project.everycloud.service.ShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +16,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/share")
 public class ShareController {
-
-    @Autowired
-    FileService fileService;
 
     @Autowired
     ShareService shareService;
