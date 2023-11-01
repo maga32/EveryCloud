@@ -23,7 +23,7 @@ public class UserController {
 
 	@PostMapping("/getSessionUser")
 	public AppResponse<UserDTO> getSessionUser() {
-		UserDTO user = userService.getSessionUser((UserDTO) session.getAttribute("user"));
+		UserDTO user = userService.getSessionUser(sessionUser());
 
 		return new AppResponse<UserDTO>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -34,7 +34,7 @@ public class UserController {
 	@PostMapping(value = "/updateUserForm")
 	public AppResponse<UserDTO> updateUserForm(@RequestParam HashMap<String, Object> paramMap) {
 
-		paramMap.put("user", (UserDTO) session.getAttribute("user"));
+		paramMap.put("user", sessionUser());
 		UserDTO user = userService.updateUserForm(paramMap);
 
 		return new AppResponse<UserDTO>()
@@ -57,8 +57,8 @@ public class UserController {
 	@PostMapping("/updateUser")
 	public AppResponse<Boolean> updateUser(@RequestBody HashMap<String, Object> paramMap) {
 
-		paramMap.put("sessionUser", (UserDTO) session.getAttribute("user"));
-		session.setAttribute("user", userService.updateUser(paramMap));
+		paramMap.put("sessionUser", sessionUser());
+		setSessionUser(userService.updateUser(paramMap));
 
 		return new AppResponse<Boolean>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -70,7 +70,7 @@ public class UserController {
 	public AppResponse<Boolean> login(@RequestBody HashMap<String, Object> paramMap) {
 
 		UserDTO user = userService.login(paramMap);
-		session.setAttribute("user", user);
+		setSessionUser(user);
 
 		return new AppResponse<Boolean>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -89,4 +89,11 @@ public class UserController {
 				.setData(true);
 	}
 
+	private UserDTO sessionUser() {
+		return (UserDTO) session.getAttribute("user");
+	}
+
+	private void setSessionUser(UserDTO user) {
+		session.setAttribute("user", user);
+	}
 }

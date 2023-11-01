@@ -43,8 +43,7 @@ public class FileController {
 	@PostMapping("/fileList")
 	public AppResponse<AppList<FileDetailDTO, FileOptionDTO>> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		AppList<FileDetailDTO, FileOptionDTO> fileList = fileService.getFileList(fileListLoad, sessionUser);
+		AppList<FileDetailDTO, FileOptionDTO> fileList = fileService.getFileList(fileListLoad, sessionUser());
 
 		return new AppResponse<AppList<FileDetailDTO, FileOptionDTO>>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -56,8 +55,7 @@ public class FileController {
 	@PostMapping("/folderList")
 	public AppResponse<AppList<FileDetailDTO, FileOptionDTO>> getFolderList(@Valid @RequestBody FileListLoadDTO folderListLoad) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		AppList<FileDetailDTO, FileOptionDTO> folderList = fileService.getFolderList(folderListLoad, sessionUser);
+		AppList<FileDetailDTO, FileOptionDTO> folderList = fileService.getFolderList(folderListLoad, sessionUser());
 
 		return new AppResponse<AppList<FileDetailDTO, FileOptionDTO>>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -74,8 +72,7 @@ public class FileController {
 			@RequestParam(value="size", required = false, defaultValue=DEFAULT_SIZE) Integer size,
 			@RequestParam(value="shareLink", required=false, defaultValue="") String shareLink) throws IOException {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		shareService.verifyAuth(shareLink, 0, sessionUser);
+		shareService.verifyAuth(shareLink, 0, sessionUser());
 
 		if(StringUtils.hasText(shareLink)) {
 			name = shareService.getShareByLink(shareLink).getPath() + name;
@@ -116,9 +113,8 @@ public class FileController {
 					  @RequestParam(value="shareLink", required=false, defaultValue="") String shareLink,
 					  @RequestParam("fileNames") String fileNames) throws Exception {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
 		try {
-			shareService.verifyAuth(shareLink, 0, sessionUser);
+			shareService.verifyAuth(shareLink, 0, sessionUser());
 		} catch(Exception e) {
 			response.setContentType("text/html; charset=utf-8");
 			PrintWriter out = response.getWriter();
@@ -188,8 +184,7 @@ public class FileController {
 	@PostMapping("/newFolder")
 	public AppResponse<Void> newFolder(@Valid @RequestBody NewFileDTO newFolder) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.newFile(newFolder, sessionUser, "folder");
+		fileService.newFile(newFolder, sessionUser(), "folder");
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -199,8 +194,7 @@ public class FileController {
 	@PostMapping("/newFile")
 	public AppResponse<Void> newFile(@Valid @RequestBody NewFileDTO newFile) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.newFile(newFile, sessionUser, "file");
+		fileService.newFile(newFile, sessionUser(), "file");
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -210,8 +204,7 @@ public class FileController {
 	@PostMapping("/changeName")
 	public AppResponse<Void> changeName(@Valid @RequestBody NewFileDTO newFile) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.changeName(newFile, sessionUser);
+		fileService.changeName(newFile, sessionUser());
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -221,8 +214,7 @@ public class FileController {
 	@PostMapping("/copyFiles")
 	public AppResponse<Void> copyFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.moveFiles(updateFileList, sessionUser, "copy");
+		fileService.moveFiles(updateFileList, sessionUser(), "copy");
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -232,8 +224,7 @@ public class FileController {
 	@PostMapping("/moveFiles")
 	public AppResponse<Void> moveFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.moveFiles(updateFileList, sessionUser, "move");
+		fileService.moveFiles(updateFileList, sessionUser(), "move");
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
@@ -243,12 +234,15 @@ public class FileController {
 	@PostMapping("/deleteFiles")
 	public AppResponse<Void> deleteFiles(@Valid @RequestBody UpdateFileListDTO updateFileList) {
 
-		UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		fileService.deleteFiles(updateFileList, sessionUser);
+		fileService.deleteFiles(updateFileList, sessionUser());
 
 		return new AppResponse<Void>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message());
+	}
+
+	private UserDTO sessionUser() {
+		return (UserDTO) session.getAttribute("user");
 	}
 
 }

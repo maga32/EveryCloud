@@ -101,18 +101,19 @@ public class ShareServiceImpl implements ShareService {
         } else {
             ShareDTO share = getShareByLink(shareLink);
 
-            if (share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {           // share for who has the link
+            if(share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {           // share for who has the link
                 isValid = true;
-            } else if (share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {    // share for who know the password
-                String sharePass = sessionUser.getPass();
-                if(sharePass == null || sharePass.equals("") || !bCrypt.matches(sharePass, share.getPass())) {
+            } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {    // share for who know the password
+                String sharePass = null;
+                if(sessionUser != null) sharePass = sessionUser.getSharePass();
+                if(!StringUtils.hasText(sharePass) || !bCrypt.matches(sharePass, share.getPass())) {
                     throw new NeedPasswordException();
                 }
                 isValid = true;
-            } else if (share.getMethod() == 2) {                                                // share for group who has authority
-                if (sessionUser != null) {
+            } else if(share.getMethod() == 2) {                                                // share for group who has authority
+                if(sessionUser != null && StringUtils.hasText(sessionUser.getId())) {
                     ShareGroupDTO shareGroup = getShareGroup(shareLink, sessionUser.getGroupNo());
-                    if (shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
+                    if(shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
                         isValid = true;
                     }
                 }

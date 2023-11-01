@@ -14,4 +14,5 @@ public class UserDTO {
 	private String auth;
 	private Integer groupNo;
 	private String groupName;
+	private String sharePass;
 }

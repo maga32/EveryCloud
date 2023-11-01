@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 		int userType = 0;
 		UserDTO admin = getAdmin();
 
-		if(user != null) {
+		if(user != null && StringUtils.hasText(user.getId())) {
 			if(user.getId().equals(admin.getId())) {
 				userType = 2;
 			} else {
