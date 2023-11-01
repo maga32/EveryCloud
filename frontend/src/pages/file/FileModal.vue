@@ -23,8 +23,12 @@
                 </template>
                 <template v-else-if="modalFunc === 'showImg'">
                   <span>
+                    <i class="btn btn-outline-secondary fa-solid fa-minus ms-2" @click="zoom -= (zoom < 0.2 ? 0 : (zoom < 3.1 ? 0.1 : (zoom < 8.1 ? 0.5 : 1)))"/>
+                    <i class="btn btn-outline-secondary fa-solid fa-plus ms-2" @click="zoom += (zoom < 3 ? 0.1 : (zoom < 8 ? 0.5 : 1))"/>
+                    <i class="btn btn-outline-secondary fa-solid fa-arrows-left-right ms-2" @click="zoom = 1"/>
                     <i class="btn btn-outline-secondary fa-solid fa-rotate-right ms-2" @click="degree += 90"/>
                     <i class="btn btn-outline-secondary fa-solid fa-rotate-left ms-2" @click="degree -= 90"/>
+                    <span v-if="zoom != 1" class="ms-3">{{ Math.round(100 * zoom) }}%</span>
                   </span>
                 </template>
 
@@ -78,7 +82,7 @@
                 needPassword
               </div>
               <div v-else-if="modalFunc === 'showImg'" ref="imageBox">
-                <!--<div class="text-center" style="position: relative"><i class="fa-solid fa-circle-notch fa-spin fs-5" style="position: absolute; z-index:0;"/></div>-->
+                <div v-if="!imageSize.height" class="text-center mt-4"><i class="fa-solid fa-circle-notch fa-spin fs-5"/></div>
                 <img
                   ref="image"
                   :srcset="
@@ -115,6 +119,7 @@ import { onMounted, reactive, ref, inject, computed } from 'vue'
 import Const from '@/const'
 import Swal from 'sweetalert2'
 import Utils from '@/modules/utils'
+import { useElementSize } from '@vueuse/core'
 
 const props = defineProps(['modalFunc', 'form', 'setting', 'extensions', 'modalBody'])
 const emit = defineEmits(['close'])
@@ -139,6 +144,9 @@ const origName = ref('')
 
 const imageBox = ref(null)
 const image = ref(null)
+const imageSize = reactive(useElementSize(image, {width: 0, height: 0}, {box: 'border-box'}))
+const imageBoxSize = reactive(useElementSize(imageBox, {width: 0, height: 0}, {box: 'border-box'}))
+const zoom = ref(1)
 const fullSize = ref(false)
 const degree = ref(0)
 
@@ -159,19 +167,19 @@ onMounted(()=> {
 
 const imgStyle = computed({
   get() {
-    let result = 'width: 100%;'
-    if(imageBox.value?.offsetWidth) {
-      if(degree.value % 180 === 0) {
-        result += 'height: auto;'
-      } else {
-        const imgW = image.value.width
-        const imgH = image.value.width**2 / image.value.height
-        const marginX = (imgH - imgW) / 2
-        const marginY = (imgW - imgH) / 2
-        result = 'width:' + imgH + 'px;'
-               + 'height:' + imgW + 'px;'
-               + 'margin:' + marginX + 'px ' + marginY + 'px;'
-      }
+    let result = 'width:100%;'
+    if(degree.value % 180 === 0) {
+      result = 'width:'+ 100*zoom.value +'%; height: auto;'
+    } else {
+      const ratio = image.value.width / image.value.height
+      const imgW = imageBoxSize.width * zoom.value
+      const imgH = imgW * ratio
+
+      const marginX = (imgH - imgW) / 2
+      const marginY = (imgW - imgH) / 2
+      result = 'width:' + imgH + 'px;'
+             + 'height:' + imgW + 'px;'
+             + 'margin:' + marginX + 'px ' + marginY + 'px;'
     }
     return result
   }
