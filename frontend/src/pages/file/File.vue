@@ -307,6 +307,8 @@ const getFileList = async (checkedFiles = []) =>{
             $store.dispatch('link/addSiteHtml')
           } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
             setTimeout(() => router.go(-1), 2000)
+          } else if(response.code === Const.RESPONSE_TYPE.NEED_PASSWORD) {
+            fileModal('needPassword')
           }
           setting.loadingList = false
         })

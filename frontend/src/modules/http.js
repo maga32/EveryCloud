@@ -22,10 +22,10 @@ const HttpModule = {
 
     /*------------ response ------------ */
     http.interceptors.response.use((response) => {
-      if (response.data.code !== Const.RESPONSE_TYPE.SUCCESS) {
+      if(response.data.code !== Const.RESPONSE_TYPE.SUCCESS) {
         Swal.fire({ icon: 'error', text: response.data.code + ' : ' + response.data.message })
       }
-      if (response.data.code === Const.RESPONSE_TYPE.NEED_LOGIN) {
+      if(response.data.code === Const.RESPONSE_TYPE.NEED_LOGIN) {
         $store.dispatch('link/addTempSiteHtml')
         router.replace('/loginForm')
       }
@@ -33,7 +33,7 @@ const HttpModule = {
       return response.data
 
     }, (error) => {
-      if (error.response) {
+      if(error.response) {
         if(error.response.status === Const.RESPONSE_TYPE.INTERNAL_SERVER_ERROR) {
           Swal.fire({icon: 'error', text: '서버의 재실행이 필요합니다.'})
         } else {
