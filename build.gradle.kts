@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.project"
-version = "0.0.1-SNAPSHOT"
+version = "v0.0.1"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_1_8
@@ -25,15 +25,15 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1")
 	implementation("org.springframework.security:spring-security-core")
-	implementation("org.xerial:sqlite-jdbc")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
-	compileOnly("commons-io:commons-io:2.8.0")
+	implementation("commons-io:commons-io:2.8.0")
+	implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.3.1")
+	implementation("io.github.willena:sqlite-jdbc:3.41.2.1")
 }
 
 tasks.withType<Test> {

@@ -2,8 +2,9 @@ package com.project.everycloud.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import lombok.ToString;
 @Data
+@ToString
 @NoArgsConstructor
 public class UserDTO {
 	private String id;
@@ -13,4 +14,5 @@ public class UserDTO {
 	private String auth;
 	private Integer groupNo;
 	private String groupName;
+	private String sharePass;
 }

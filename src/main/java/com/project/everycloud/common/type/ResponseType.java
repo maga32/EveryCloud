@@ -4,15 +4,24 @@ public enum ResponseType {
     SUCCESS("200", "성공"),
 
     BAD_REQUEST("400", "잘못된 요청입니다."),
-    WRONG_PATH("401", "삭제되었거나 잘못된 링크입니다."),
-    NOT_LOGIN("403", "로그인이 필요한 서비스입니다."),
+    NEED_LOGIN("401", "로그인이 필요한 서비스입니다."),
+    NEED_ADMIN("402", "관리자계정 설정이 필요합니다."),
+    CERT_SITE_ERROR("403", "인증서버 접속실패."),
+    CERT_ERROR("403", "사용인증 실패."),
     NOT_ALLOWED("403", "접근권한이 없습니다."),
-    NEED_PASSWORD("403", "패스워드가 필요한 서비스입니다."),
-    WROING_LOGIN("403", "id와 password를 확인해주세요."),
+    INVALID_LOGIN("403", "id와 password를 확인해주세요."),
+    INVALID_PATH("404", "잘못된 경로입니다."),
+    INVALID_LINK("404", "삭제되었거나 잘못된 링크입니다."),
+    INVALID_PASSWORD("406", "비밀번호가 일치하지 않습니다."),
+    NEED_PASSWORD("406", "비밀번호가 필요한 서비스입니다."),
 
+    NOT_VALID_AGUMENT("701", ""), // 유효성예외
     DUP_PK("702", "이미 등록된 데이터입니다."),
-    NOT_EXIST_FILE("703", "업로드 파일이 없습니다."),
-    NOT_ALLOW_FILE("704", "잘못된 파일 형식입니다.");
+    EXIST_NAME("702", "이미 존재하는 이름입니다."),
+    NOT_EXIST_FILE("703", "존재하지 않는 파일입니다."),
+    NOT_ALLOW_FILE("704", "잘못된 파일 형식입니다."),
+
+    ERROR("999", "실행 중 오류가 발생했습니다. ");
 
     String code;
     String message;

@@ -5,46 +5,51 @@
 <mapper namespace="com.project.everycloud.service.mapper.UserMapper">
 	
 	<select id="getUser" resultType="UserDTO">
-		SELECT id, nickname, email, auth, g.no, g.name
-			FROM user u, group_setting g
-		WHERE id = #{id} and u.group_no = g.no
+		SELECT ID, NICKNAME, EMAIL, AUTH, g.NO GROUP_NO, g.NAME GROUP_NAME
+			FROM USER u, GROUP_SETTING g
+		WHERE ID = #{id} and u.GROUP_NO = g.NO
 	</select>
-	
-	<select id="getUserPass" resultType="string">
-		SELECT pass FROM user
-			WHERE id = #{id}
+
+	<select id="getUserInfo" resultType="UserDTO">
+		SELECT ID, NICKNAME, EMAIL, AUTH FROM USER
+			WHERE ID = #{id}
+	</select>
+
+	<select id="getPass" resultType="string">
+		SELECT PASS FROM USER
+			WHERE ID = #{id}
 	</select>
 
 	<select id="getAdmin" resultType="UserDTO">
-		SELECT id, pass, nickname, email FROM user
-			WHERE auth = 'Y'
+		SELECT ID, NICKNAME, EMAIL, AUTH FROM USER
+			WHERE AUTH = 'Y'
 	</select>
 
-	<update id="updateUser" parameterType="HashMap">
-		UPDATE user
+	<update id="updateUser">
+		UPDATE USER
 		    <set>
 				<if test="user.id != null and !user.id.equals('')">
-			 		id = #{user.id},
+					ID = #{user.id},
 				</if>
 			    <if test="user.pass != null and !user.pass.equals('')">
-					pass = #{user.pass},
+					PASS = #{user.pass},
 				</if>
 				<if test="user.nickname != null and !user.nickname.equals('')">
-					nickname = #{user.nickname},
+					NICKNAME = #{user.nickname},
 				</if>
 				<if test="user.email != null and !user.email.equals('')">
-					email = #{user.email},
+					EMAIL = #{user.email},
 				</if>
 				<if test="user.groupNo != null and !user.groupNo.equals('')">
-					no = #{user.no},
+					NO = #{user.no},
 				</if>
 			</set>
 			<where>
-				<if test="userOrigId != null and !userOrigId.equals('')">
-					id = #{userOrigId}
+				<if test="origId != null and !origId.equals('')">
+					ID = #{origId}
 				</if>
-				<if test="userOrigId == null or userOrigId.equals('')">
-					AND id = #{user.id}
+				<if test="origId == null or origId.equals('')">
+					AND ID = #{user.id}
 				</if>
 			</where>
 	</update>

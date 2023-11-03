@@ -1,53 +1,140 @@
 package com.project.everycloud.service.impl;
 
-import com.project.everycloud.model.share.ShareDTO;
-import com.project.everycloud.model.share.ShareGroupDTO;
-import com.project.everycloud.service.ShareService;
-import com.project.everycloud.service.mapper.ShareMapper;
+import com.project.everycloud.common.exception.InvalidLinkException;
+import com.project.everycloud.common.exception.InvalidPasswordException;
+import com.project.everycloud.common.exception.NeedPasswordException;
+import com.project.everycloud.common.exception.NotAllowedException;
 import com.project.everycloud.common.util.FileUtil;
-import com.project.everycloud.common.util.UserUtil;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.response.share.ShareDTO;
+import com.project.everycloud.model.response.share.ShareGroupDTO;
+import com.project.everycloud.service.SettingsService;
+import com.project.everycloud.service.ShareService;
+import com.project.everycloud.service.UserService;
+import com.project.everycloud.service.mapper.FileDao;
+import com.project.everycloud.service.mapper.ShareMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.util.UUID;
 
 @Service
 public class ShareServiceImpl implements ShareService {
 
     @Autowired
+    UserService userService;
+
+    @Autowired
+    SettingsService settingsService;
+
+    @Autowired
+    FileDao fileDao;
+
+    @Autowired
     ShareMapper shareMapper;
 
-    @Lazy
-    UserUtil userUtil;
-
-    @Lazy
-    FileUtil fileUtil;
-
     @Override
-    public ShareDTO getShareByLink(String link) {
-        return shareMapper.getShareByLink(link);
+    public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
+
+        String result = "";
+        String path = shareNewFile.getPath();
+
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        if(StringUtils.hasText(shareNewFile.getShareLink())) {
+            path = getShareByLink(shareNewFile.getShareLink()).getPath() + path;
+        }
+
+        if(fileDao.isPathExist(path+"/"+shareNewFile.getName())) {
+            File nowPath = fileDao.getFile(shareNewFile.getPath()+"/"+shareNewFile.getName());
+            String realPath;
+            try {
+                realPath = FileUtil.macPath(nowPath.getCanonicalPath());
+            } catch (IOException e) {
+                realPath = FileUtil.macPath(nowPath.getPath());
+            }
+
+            ShareDTO shareFile = shareMapper.getShareByPath(realPath);
+            String shareLink = (shareFile == null) ? createShare(realPath).getLink() : shareFile.getLink();
+
+            result = getFullShareLink(shareLink);
+
+        } else {
+            throw new InvalidPathException("Error","error");
+        }
+
+        return result;
     }
 
-    @Override
-    public ShareDTO getShareByPath(String path) {
-        return shareMapper.getShareByPath(path);
-    }
-
-    @Override
-    public ShareDTO createShare(String realPath) {
+    private ShareDTO createShare(String realPath) {
         String link = "";
         while(true) {
             link = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
-            if(getShareByLink(link) == null) break;
+            if(shareMapper.getShareByLink(link) == null) break;
         }
-        ShareDTO newShare = new ShareDTO(link, realPath, null, 0, null, 0);
+        ShareDTO newShare = new ShareDTO();
+        newShare.setLink(link);
+        newShare.setPath(realPath);
+        newShare.setMethod(0);
+        newShare.setAuth(0);
+
         shareMapper.createShare(newShare);
 
         return newShare;
     }
+
+
+    static BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder(10);
+    @Override
+    public void verifyAuth(String shareLink, int authType, UserDTO sessionUser) {
+        boolean isValid = false;
+
+        if(userService.isAdmin(sessionUser)) {
+            isValid = true;
+        } else if(!StringUtils.hasText(shareLink)) {
+            throw new NotAllowedException();
+        } else {
+            ShareDTO share = getShareByLink(shareLink);
+
+            if(share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {           // share for who has the link
+                isValid = true;
+            } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {    // share for who know the password
+                String sharePass = null;
+                if(sessionUser != null) sharePass = sessionUser.getSharePass();
+                if(!StringUtils.hasText(sharePass)) {
+                    throw new NeedPasswordException();
+                } else if(!bCrypt.matches(sharePass, share.getPass())) {
+                    throw new InvalidPasswordException();
+                }
+                isValid = true;
+            } else if(share.getMethod() == 2) {                                                // share for group who has authority
+                if(sessionUser != null && StringUtils.hasText(sessionUser.getId())) {
+                    ShareGroupDTO shareGroup = getShareGroup(shareLink, sessionUser.getGroupNo());
+                    if(shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
+                        isValid = true;
+                    }
+                }
+            }
+        }
+
+        if(!isValid) throw new NotAllowedException();
+    }
+
+
+    @Override
+    public UserDTO inputSharePass(String sharePass, UserDTO sessionUser) {
+        sessionUser = sessionUser != null ? sessionUser : new UserDTO();
+        sessionUser.setSharePass(sharePass);
+
+        return sessionUser;
+    }
+
 
     @Override
     public ShareGroupDTO getShareGroup(String shareLink, Integer groupNo) {
@@ -55,31 +142,21 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public Map<String, String> getShareAuth(String shareLink, int authType) {
-        Map<String, String> shareMap = new HashMap<String, String>();
-        shareMap.put("shareLink", shareLink);
-        int hasValidAuth = fileUtil.hasValidAuth(shareLink, authType);
-        String invalidString = "";
+    public ShareDTO getShareByLink(String link) {
+        ShareDTO share = shareMapper.getShareByLink(link);
+        if(share == null) throw new InvalidLinkException();
+        return share;
+    }
 
-        if(shareLink.equals("") && !userUtil.isAdmin()) {
-            invalidString = "관리자만 접근할 수 있습니다.";
-            shareMap.put("invalidAuth", invalidString);
-            shareMap.put("invalidString", invalidString);
-        } else if(!shareLink.equals("")) {
-            if(hasValidAuth == 0) {
-                invalidString = "공유링크가 잘못되었거나 접근 권한이 없습니다.";
-                shareMap.put("invalidAuth", invalidString);
-                shareMap.put("invalidString", invalidString);
-            } else if(hasValidAuth == 2) {
-                invalidString = "패스워드 입력이 필요한 서비스입니다.";
-                shareMap.put("needPassword", invalidString);
-                shareMap.put("invalidString", invalidString);
-            } else if(hasValidAuth == 1) {
-                shareMap.put("sharePath", shareMapper.getShareByLink(shareLink).getPath());
-            }
-        }
+    @Override
+    public ShareDTO getShareByPath(String realPath) {
+        ShareDTO share = shareMapper.getShareByPath(realPath);
+        if(share == null) throw new InvalidLinkException();
+        return share;
+    }
 
-        return shareMap;
+    private String getFullShareLink(String shareLink) {
+        return FileUtil.addSlash(settingsService.getSettings("admin").getExternalUrl()) + "file?shareLink=" + shareLink;
     }
 
 }

@@ -1,30 +1,28 @@
 package com.project.everycloud.service;
 
-import com.project.everycloud.model.share.ShareDTO;
-import com.project.everycloud.model.share.ShareGroupDTO;
-
-import java.util.Map;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.response.share.ShareDTO;
+import com.project.everycloud.model.response.share.ShareGroupDTO;
 
 public interface ShareService {
 
-    ShareDTO getShareByLink(String link);
-
-    ShareDTO getShareByPath(String path);
-
-    ShareDTO createShare(String realPath);
+    String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
 
     ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
+    ShareDTO getShareByLink(String link);
+
+    ShareDTO getShareByPath(String realPath);
+
     /**
-     * Check user's authentication for shareLink and return share path
+     * Verify user's authentication for shareLink
      *
      * @param shareLink shareLink
-     * @param authType 0: read<br>1: write
-     * @return Map(String, String) :<br>
-     * (String) invalidAuth : if does not have auth, returns invalidAuth and reason<br>
-     * (String) needPassword : if does not have auth with need Password, returns needPassword and reason<br>
-     * (String) invalidString : if there is any reason of reject, invalidString is exist<br>
-     * (String) sharePath : if user has valid auth, returns share path
+     * @param authType 0: read / 1: write
+     * @param sessionUser session's UserDTO
      */
-    Map<String, String> getShareAuth(String shareLink, int authType);
+    void verifyAuth(String shareLink, int authType, UserDTO sessionUser);
+
+    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
 }

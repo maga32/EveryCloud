@@ -66,8 +66,8 @@ out/
 
 
 # frontend files
-node_modules
-/dist
+frontend/node_modules
+frontend/dist
 src/main/resources/static/
 
 # Mac

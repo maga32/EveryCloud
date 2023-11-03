@@ -1,11 +1,20 @@
 server:
-  port: 11024
+  port: ${ec-port}
 
 spring:
+  config:
+    import: file:${user.home}/.everyCloud/config.yml
   ##db settings
   datasource:
-    url: jdbc:sqlite::resource:datasource/db/EveryCloud.db
+    url: jdbc:sqlite:${user.home}/.everyCloud/EveryCloud.db?${ec-db}
     driver-class-name: org.sqlite.JDBC
+  pid:
+    file: ${user.home}/.everyCloud/EveryCloud.pid
+
+logging:
+  level:
+    root: info
+    com.project.everycloud.service.mapper: debug
 
 ## mybatis
 mybatis:

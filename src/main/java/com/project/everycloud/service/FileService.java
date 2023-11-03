@@ -1,26 +1,24 @@
 package com.project.everycloud.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.project.everycloud.model.AppList;
+import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.request.file.FileListLoadDTO;
+import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.request.file.UpdateFileListDTO;
+import com.project.everycloud.model.response.file.FileDetailDTO;
+import com.project.everycloud.model.response.file.FileOptionDTO;
 
 public interface FileService {
-	List<Map<String, Object>> fileList(String sharePath, String path, String sort, String order, String keyword, boolean viewHidden);
-	
-	List<Map<String, Object>> folderList(String sharePath, String path);
-	
-	File getFile(String path);
-	
-	boolean isPathExist(String path);
 
-	Map<String, Object> newFolder(String path, String newFolderName);
+	AppList<FileDetailDTO, FileOptionDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
 
-	Map<String, Object> newFile(String path, String newFileName) throws IOException;
+	AppList<FileDetailDTO, FileOptionDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser);
 
-	void changeName(String path, String origFileName, String newFileName);
+	void newFile(NewFileDTO newFile, UserDTO sessionUser, String type);
 
-	Map<String, Object> moveFiles(String path, String moveToPath, String fileNames, String type);
+	void changeName(NewFileDTO newFile, UserDTO sessionUser);
 
-	Map<String, Object> deleteFiles(String path, String fileNames);
+	void moveFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser, String type);
+
+	void deleteFiles(UpdateFileListDTO updateFileList, UserDTO sessionUser);
 }
