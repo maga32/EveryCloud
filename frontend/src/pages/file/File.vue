@@ -66,10 +66,10 @@
                     <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" />&nbsp;</span>
                     <i class="fa-solid fa-file-shield pe-2" />숨김파일보기
                   </div></li>
-                  <li v-if="!setting.search"><div class="dropdown-item pointer" @click="fileModal('newFolder')">
+                  <li v-if="!setting.search && shareAuth === 1"><div class="dropdown-item pointer" @click="fileModal('newFolder')">
                     <i class="fa-solid fa-folder-plus pe-2" />새폴더
                   </div></li>
-                  <li v-if="!setting.search"><div class="dropdown-item pointer" @click="fileModal('newFile')">
+                  <li v-if="!setting.search && shareAuth === 1"><div class="dropdown-item pointer" @click="fileModal('newFile')">
                     <i class="fa-solid fa-file-circle-plus pe-2" />새파일
                   </div></li>
                 </ul>
@@ -103,58 +103,65 @@
 
   <!-- File Control Menu -->
   <div class="position-fixed shadow border border-secondary rounded bg-body-tertiary p-3" :class="setting.checkedFiles.length > 0 ? 'active': 'inactive'" id="fileControlMenu">
-    <div v-if="setting.checkedFiles.length > 1">
+    <template v-if="setting.checkedFiles.length > 1">
       <div class="px-1"> {{ setting.checkedFiles.length }} 개의 파일 선택</div>
       <div class="text-center px-2 py-3"><img src="/img/fileicons/files.png"></div>
-      <table>
-        <tr class="pointer">
-          <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
-          <td class="p-1" @click="downloadFiles()">다운로드</td>
-        </tr>
-        <tr class="pointer">
-          <td class="p-1"><i class="fa-solid fa-share" /></td>
-          <td class="p-1" @click="fileModal('moveFiles')">이동</td>
-        </tr>
-        <tr class="pointer">
-          <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
-          <td class="p-1" @click="fileModal('copyFiles')">복사</td>
-        </tr>
-        <tr class="pointer">
-          <td class="p-1"><i class="fa-solid fa-trash" /></td>
-          <td class="p-1 pointer" @click="fileModal('deleteFiles')">삭제</td>
-        </tr>
-      </table>
-    </div>
-
-    <div v-else-if="setting.checkedFiles.length === 1">
+    </template>
+    <template v-else-if="setting.checkedFiles.length === 1">
       <div class="px-1" style="word-break:break-all;">{{ setting.checkedFiles[0] }}</div>
       <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px;" @click="showImg"></div>
-      <table>
-        <tr>
-          <td class="p-1"><i class="fa-solid fa-star" /></td>
-          <td class="p-1">즐겨찾기</td>
-        </tr>
-        <tr>
-          <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
-          <td class="p-1 pointer" @click="fileModal('changeName')">이름바꾸기</td>
-        </tr>
-        <tr>
-          <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
-          <td class="p-1 pointer" @click="shareFile">공유</td>
-        </tr>
-        <tr>
-          <td colspan="2" class="p-2">
-            <div class="btn-group">
-              <button type="button" class="btn btn-outline-secondary" @click="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
-              <button type="button" class="btn btn-outline-secondary" @click="fileModal('moveFiles')"><i class="fa-solid fa-share" /></button>
-              <button type="button" class="btn btn-outline-secondary" @click="fileModal('copyFiles')"><i class="fa-solid fa-clipboard" /></button>
-              <button type="button" class="btn btn-outline-secondary" @click="fileModal('deleteFiles')"><i class="fa-solid fa-trash" /></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </div>
+    </template>
 
+    <table v-if="shareAuth !== 1">
+      <tr class="pointer">
+        <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
+        <td class="p-1" @click="downloadFiles()">다운로드</td>
+      </tr>
+    </table>
+
+    <table v-else-if="setting.checkedFiles.length > 1">
+      <tr class="pointer">
+        <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
+        <td class="p-1" @click="downloadFiles()">다운로드</td>
+      </tr>
+      <tr class="pointer">
+        <td class="p-1"><i class="fa-solid fa-share" /></td>
+        <td class="p-1" @click="fileModal('moveFiles')">이동</td>
+      </tr>
+      <tr class="pointer">
+        <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
+        <td class="p-1" @click="fileModal('copyFiles')">복사</td>
+      </tr>
+      <tr class="pointer">
+        <td class="p-1"><i class="fa-solid fa-trash" /></td>
+        <td class="p-1 pointer" @click="fileModal('deleteFiles')">삭제</td>
+      </tr>
+    </table>
+
+    <table v-else-if="setting.checkedFiles.length === 1">
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-star" /></td>
+        <td class="p-1">즐겨찾기</td>
+      </tr>
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
+        <td class="p-1 pointer" @click="fileModal('changeName')">이름바꾸기</td>
+      </tr>
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
+        <td class="p-1 pointer" @click="shareFile">공유</td>
+      </tr>
+      <tr>
+        <td colspan="2" class="p-2">
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-secondary" @click="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="fileModal('moveFiles')"><i class="fa-solid fa-share" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="fileModal('copyFiles')"><i class="fa-solid fa-clipboard" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="fileModal('deleteFiles')"><i class="fa-solid fa-trash" /></button>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <!-- File List -->
@@ -199,6 +206,8 @@ const form = reactive({
     keyword: '',
     viewHidden: false,
 })
+
+const shareAuth = ref(0);
 
 const setting = reactive({
   loadingList: false,
@@ -298,6 +307,7 @@ const getFileList = async (checkedFiles = []) =>{
           }
           if(response.data) {
             homeLink(form.shareLink, response.data.option.nowPath)
+            shareAuth.value = response.data.option.shareAuth
             fileList.value = response.data.lists.map(li => {
                                 return {
                                   ...li,

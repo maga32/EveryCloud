@@ -11,4 +11,5 @@ public class FileOptionDTO {
 	String nowPath;
 	String path;
 	String parentPath;
+	Integer shareAuth;
 }

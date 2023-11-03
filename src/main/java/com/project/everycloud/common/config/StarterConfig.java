@@ -21,11 +21,13 @@ public class StarterConfig {
     private static String 	DB 						= "EveryCloud.db";
     private static String 	CONFIG 					= "config.yml";
     private static String 	CONFIG_DEFAULT 			= "config-default.yml";
+    private static String 	FAVICON 	        	= "favicon.ico";
     private static String 	PID_FILE 	        	= "EveryCloud.pid";
     private static Path     LOCAL_FOLDER 			= Paths.get(System.getProperty("user.home") + File.separator + ".everyCloud");
     private static Path 	LOCAL_DB 				= Paths.get(LOCAL_FOLDER + File.separator + DB);
     private static Path 	LOCAL_CONFIG 			= Paths.get(LOCAL_FOLDER + File.separator + CONFIG);
     private static Path 	LOCAL_CONFIG_DEFAULT 	= Paths.get(LOCAL_FOLDER + File.separator + CONFIG_DEFAULT);
+    private static Path 	LOCAL_FAVICON           = Paths.get(LOCAL_FOLDER + File.separator + FAVICON);
     private static Path 	LOCAL_PID_FILE          = Paths.get(LOCAL_FOLDER + File.separator + PID_FILE);
     private static String 	OS 						= System.getProperty("os.name").toLowerCase();
 
@@ -34,6 +36,7 @@ public class StarterConfig {
 
         if(!Files.exists(LOCAL_DB)) 		copyFiles(RESOURCE+DB, 		LOCAL_DB.toString());
         if(!Files.exists(LOCAL_CONFIG)) 	copyFiles(RESOURCE+CONFIG, 	LOCAL_CONFIG.toString());
+        if(!Files.exists(LOCAL_FAVICON)) 	copyFiles(RESOURCE+FAVICON, LOCAL_FAVICON.toString());
         copyFiles(RESOURCE+CONFIG, 	LOCAL_CONFIG_DEFAULT.toString());
 
         try {

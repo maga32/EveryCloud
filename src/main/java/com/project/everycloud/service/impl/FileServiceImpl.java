@@ -1,6 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.project.everycloud.common.exception.ExistNameException;
+import com.project.everycloud.common.exception.NeedLoginException;
 import com.project.everycloud.common.exception.NotExistFileException;
 import com.project.everycloud.common.util.FileUtil;
 import com.project.everycloud.model.AppList;
@@ -44,9 +45,12 @@ public class FileServiceImpl implements FileService {
 		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
-		if(userService.isAdmin(sessionUser) && StringUtils.hasText(fileListLoad.getShareLink())) {
+		boolean isAdmin = userService.isAdmin(sessionUser);
+		if(isAdmin && StringUtils.hasText(fileListLoad.getShareLink())) {
 			fileListLoad.setPath(shareService.getShareByLink(fileListLoad.getShareLink()).getPath());
 			fileListLoad.setShareLink("");
+		} else if(!isAdmin && !StringUtils.hasText(fileListLoad.getShareLink())) {
+			throw new NeedLoginException();
 		}
 
 		String sharePath = "";
@@ -81,6 +85,7 @@ public class FileServiceImpl implements FileService {
 		options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
 		options.setPath(path.replace(sharePath, ""));
 		options.setShareLink(shareLink);
+		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
 
 		result.setOption(options);
 		result.setLists(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
@@ -157,9 +162,12 @@ public class FileServiceImpl implements FileService {
 		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
-		if(userService.isAdmin(sessionUser) && StringUtils.hasText(folderListLoad.getShareLink())) {
+		boolean isAdmin = userService.isAdmin(sessionUser);
+		if(isAdmin && StringUtils.hasText(folderListLoad.getShareLink())) {
 			folderListLoad.setPath(shareService.getShareByLink(folderListLoad.getShareLink()).getPath());
 			folderListLoad.setShareLink("");
+		} else if(!isAdmin && !StringUtils.hasText(folderListLoad.getShareLink())) {
+			throw new NeedLoginException();
 		}
 
 		String sharePath = "";
@@ -190,6 +198,8 @@ public class FileServiceImpl implements FileService {
 
 		options.setPath(path.replace(sharePath, ""));
 		options.setShareLink(shareLink);
+		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
+
 		result.setOption(options);
 
 		return result;

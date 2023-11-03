@@ -241,6 +241,22 @@ public class FileController {
 				.setMessage(ResponseType.SUCCESS.message());
 	}
 
+
+	@GetMapping("/getFavicon")
+	public void getFavicon(HttpServletResponse response) throws IOException {
+		File file = new File(System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "favicon.ico");
+		byte[] fileByte = FileUtils.readFileToByteArray(file);
+
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment; fileName=\"" +new String(("favicon.ico").getBytes("utf-8"),"8859_1") +"\";");
+		response.setHeader("Content-Transfer-Encoding", "binary");
+		response.setContentLength(fileByte.length);
+		response.getOutputStream().write(fileByte);
+		response.getOutputStream().flush();
+		response.getOutputStream().close();
+	}
+
+
 	private UserDTO sessionUser() {
 		return (UserDTO) session.getAttribute("user");
 	}

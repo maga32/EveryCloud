@@ -90,7 +90,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
 
-    static BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder(10);
+    static BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(10);
     @Override
     public void verifyAuth(String shareLink, int authType, UserDTO sessionUser) {
         boolean isValid = false;
@@ -102,18 +102,23 @@ public class ShareServiceImpl implements ShareService {
         } else {
             ShareDTO share = getShareByLink(shareLink);
 
-            if(share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {           // share for who has the link
+            // - auth 0 : read, auth 1 : write
+            // method 0 : share for who has the link
+            if(share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {
                 isValid = true;
-            } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {    // share for who know the password
-                String sharePass = null;
-                if(sessionUser != null) sharePass = sessionUser.getSharePass();
+
+            // method 1 : share for who know the password
+            } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {
+                String sharePass = (sessionUser == null) ? null : sessionUser.getSharePass();
                 if(!StringUtils.hasText(sharePass)) {
                     throw new NeedPasswordException();
-                } else if(!bCrypt.matches(sharePass, share.getPass())) {
+                } else if(!BCRYPT.matches(sharePass, share.getPass())) {
                     throw new InvalidPasswordException();
                 }
                 isValid = true;
-            } else if(share.getMethod() == 2) {                                                // share for group who has authority
+
+            // method 2 : share for group who has authority
+            } else if(share.getMethod() == 2) {
                 if(sessionUser != null && StringUtils.hasText(sessionUser.getId())) {
                     ShareGroupDTO shareGroup = getShareGroup(shareLink, sessionUser.getGroupNo());
                     if(shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
