@@ -52,6 +52,7 @@
                 <div v-for="li in setting.checkedFiles"> {{ li }} </div>
               </div>
               <div v-else-if="modalFunc === 'copyFiles' || modalFunc === 'moveFiles'">
+
                 <table>
                   <!-- upper directory -->
                   <tr v-if="moveTo.parentPath !== moveTo.nowPath" class="pointer" @click="loadFolders(moveTo.parentPath)">
@@ -74,12 +75,13 @@
                   <!-- Error text -->
                   <tr v-if="moveTo.invalidText"><td>{{ moveTo.invalidText }}</td></tr>
                 </table>
+
               </div>
               <div v-else-if="modalFunc === 'shareFile'">
-                <input class="form-control text-break" id="newShareLink" v-model="modalBody.shareLink" @click="copyShareLink">
+                <input class="form-control text-break" id="newShareLink" v-model="modalBody.shareLink" @click="copyShareLink" readonly>
               </div>
               <div v-else-if="modalFunc === 'needPassword'">
-                needPassword
+                <input type="password" class="form-control" v-model="sharePass" placeholder="비밀번호를 입력해주세요">
               </div>
               <div v-else-if="modalFunc === 'showImg'" ref="imageBox">
                 <div v-if="!imageSize.height" class="text-center mt-4"><i class="fa-solid fa-circle-notch fa-spin fs-5"/></div>
@@ -141,6 +143,7 @@ const reloadCheckedFiles = ref([])
 const isNewFolder = ref(false)
 const newName = ref('')
 const origName = ref('')
+const sharePass = ref('')
 
 const imageBox = ref(null)
 const image = ref(null)
@@ -317,13 +320,21 @@ const submit = async () => {
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
         })
+
   // share file
   } else if(props.modalFunc === 'shareFile') {
     copyShareLink()
-    return false
+
   // show image
   } else if(props.modalFunc === 'showImg') {
     result = true
+
+  // need password
+  } else if(props.modalFunc === 'needPassword') {
+    await $http.post('/share/inputSharePass', null, {params:{sharePass: sharePass.value}})
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        })
   }
 
   if(!result) return false

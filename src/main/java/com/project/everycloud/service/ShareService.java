@@ -24,4 +24,5 @@ public interface ShareService {
      */
     void verifyAuth(String shareLink, int authType, UserDTO sessionUser);
 
+    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
 }

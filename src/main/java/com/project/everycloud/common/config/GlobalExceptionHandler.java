@@ -70,7 +70,11 @@ public class GlobalExceptionHandler {
         } else if(e instanceof InvalidLoginException) {
             apiResponseType = ResponseType.INVALID_LOGIN;
             apiResponseMessage = ResponseType.INVALID_LOGIN.message();
-        // InvalidPath
+        // InvalidPassword
+        } else if(e instanceof InvalidPasswordException) {
+            apiResponseType = ResponseType.INVALID_PASSWORD;
+            apiResponseMessage = ResponseType.INVALID_PASSWORD.message();
+        // InvalidLink
         } else if(e instanceof InvalidLinkException) {
             apiResponseType = ResponseType.INVALID_LINK;
             apiResponseMessage = ResponseType.INVALID_LINK.message();

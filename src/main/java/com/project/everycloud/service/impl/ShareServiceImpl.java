@@ -1,6 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.project.everycloud.common.exception.InvalidLinkException;
+import com.project.everycloud.common.exception.InvalidPasswordException;
 import com.project.everycloud.common.exception.NeedPasswordException;
 import com.project.everycloud.common.exception.NotAllowedException;
 import com.project.everycloud.common.util.FileUtil;
@@ -106,8 +107,10 @@ public class ShareServiceImpl implements ShareService {
             } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {    // share for who know the password
                 String sharePass = null;
                 if(sessionUser != null) sharePass = sessionUser.getSharePass();
-                if(!StringUtils.hasText(sharePass) || !bCrypt.matches(sharePass, share.getPass())) {
+                if(!StringUtils.hasText(sharePass)) {
                     throw new NeedPasswordException();
+                } else if(!bCrypt.matches(sharePass, share.getPass())) {
+                    throw new InvalidPasswordException();
                 }
                 isValid = true;
             } else if(share.getMethod() == 2) {                                                // share for group who has authority
@@ -122,6 +125,16 @@ public class ShareServiceImpl implements ShareService {
 
         if(!isValid) throw new NotAllowedException();
     }
+
+
+    @Override
+    public UserDTO inputSharePass(String sharePass, UserDTO sessionUser) {
+        sessionUser = sessionUser != null ? sessionUser : new UserDTO();
+        sessionUser.setSharePass(sharePass);
+
+        return sessionUser;
+    }
+
 
     @Override
     public ShareGroupDTO getShareGroup(String shareLink, Integer groupNo) {
