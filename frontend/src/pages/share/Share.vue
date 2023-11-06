@@ -3,105 +3,27 @@
   <div class="row fixed-top" id="fileMenuContainer">
     <div class="col-0 col-md-3"></div>
     <div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
-      <div class="row rounded border p-2 m-0 bg-light-subtle">
 
-        <!-- Navigation -->
-        <div class="col-12 col-md-8">
-          <div id="nowPath">
-            <div class='d-flex'>
+      <!-- tabs -->
+      <div class="row rounded-top border border-bottom-0 p-2 m-0 bg-light-subtle" style="height: var(--file-share-height)">
+        <table class="col-12 text-center">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" checked>
+            <label class="btn btn-outline-secondary px-3" for="btnradio1" @click="tab='shareList'">공유파일</label>
 
-                <div v-if="homePath.index > 2" >
-                  <dropdown-menu withDropdownCloser>
-                    <template #trigger>
-                      <i class="pointer fa-solid fa-house" />
-                    </template>
-                    <template #body>
-                      <ul class="dropdown-menu show" dropdown-closer>
-                        <li v-for="(li,i) in homePath.parents">
-                          <div v-if="i < homePath.index-1" class="dropdown-item pointer" @click="loadFileList(form.shareLink, li.link, '','','',true)">
-                            {{ li.name }}
-                          </div>
-                        </li>
-                      </ul>
-                    </template>
-                  </dropdown-menu>
-                </div>
-                <div v-else class='pointer' @click="loadFileList(form.shareLink, homePath.parents[0].link, '','','',true)">
-                  <i class="pointer fa-solid fa-house" />
-                </div>
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+            <label class="btn btn-outline-secondary px-3" for="btnradio2" @click="tab='shareGroup'">공유그룹</label>
 
-                <div v-if="homePath.index > 0" class="px-2 text-truncate">
-                  <span class='pointer' @click="loadFileList(form.shareLink, (homePath.index === 1 ? homePath.parents[1].link : homePath.parents[homePath.index-1].link), '','','',true)">
-                    {{ homePath.index === 1 ? homePath.parents[1].name : homePath.parents[homePath.index-1].name }}
-                  </span>
-                </div>
-                <div v-if="homePath.index > 1">
-                  <i class='fa-solid fa-angle-right' />
-                </div>
-                <div v-if="homePath.index > 1" class="px-2 text-truncate">
-                  <span class='pointer' @click="loadFileList(form.shareLink, homePath.parents[homePath.index].link, '','','',true)">
-                    {{ homePath.parents[homePath.index].name }}
-                  </span>
-                </div>
-
-            </div>
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio3">
+            <label class="btn btn-outline-secondary px-3" for="btnradio3" @click="tab='shareLog'">공유기록</label>
           </div>
-        </div>
-
-        <!-- Tools -->
-        <div class="col-12 col-md-4 px-0 row text-end">
-          <div class="col-4 col-sm-6 d-md-none"></div>
-          <div class="col-6 col-sm-4 col-md-8 px-2">
-            <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadFileList('','','','')">
-          </div>
-          <div class="col-1 col-md-2 pointer" @click="loadFileList('','','','')"><i class="fa-solid fa-magnifying-glass" /></div>
-          <div class="col-1 col-md-2">
-            <dropdown-menu withDropdownCloser direction="right">
-              <template #trigger>
-                <i class="pointer fa-solid fa-wrench" />
-              </template>
-              <template #body>
-                <ul class="dropdown-menu show" dropdown-closer style="right:50px">
-                  <li><div class="dropdown-item pointer" @click="toggleHiddenCheck">
-                    <span id="viewHiddenCheck" :class="form.viewHidden || 'inactive'"><i class="fa-solid fa-check" />&nbsp;</span>
-                    <i class="fa-solid fa-file-shield pe-2" />숨김파일보기
-                  </div></li>
-                  <li v-if="!setting.search && shareAuth === 1"><div class="dropdown-item pointer" @click="fileModal('newFolder')">
-                    <i class="fa-solid fa-folder-plus pe-2" />새폴더
-                  </div></li>
-                  <li v-if="!setting.search && shareAuth === 1"><div class="dropdown-item pointer" @click="fileModal('newFile')">
-                    <i class="fa-solid fa-file-circle-plus pe-2" />새파일
-                  </div></li>
-                </ul>
-              </template>
-            </dropdown-menu>
-          </div>
-        </div>
-
-        <!-- Filter -->
-        <table class="w-100">
-          <tr>
-            <td class="text-center" style="width:35px;"><input v-if="!setting.search" type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
-            <td style="width:20px;"></td>
-            <td class="w-auto d-flex">
-              <span class="pointer" @click="loadFileList('', '', 'name', (form.order == 'asc' ? 'desc' : 'asc'))">이름{{sortArrow('name')}}</span>
-              <span class="pointer px-3" @click="loadFileList('', '', 'size', (form.order == 'asc' ? 'desc' : 'asc'))">크기{{sortArrow('size')}}</span>
-            </td>
-            <td class="text-end" style="width:15%">
-              <span v-if="!!setting.search" class="pointer" @click="loadFileList('', '', 'path', (form.order == 'asc' ? 'desc' : 'asc'))">경로{{sortArrow('path')}}</span>
-              <span v-else class="pointer" @click="loadFileList('', '', 'type', (form.order == 'asc' ? 'desc' : 'asc'))">종류{{sortArrow('type')}}</span>
-            </td>
-            <td class="text-center" style="width:20%">
-              <span class="pointer" @click="loadFileList('', '', 'date', (form.order == 'asc' ? 'desc' : 'asc'))">날짜{{sortArrow('date')}}</span>
-            </td>
-          </tr>
         </table>
-
       </div>
+
     </div>
   </div>
 
-  <!-- File Control Menu -->
+  <!-- Share Control Menu -->
   <div class="position-fixed shadow border border-secondary rounded bg-body-tertiary p-3" :class="setting.checkedFiles.length > 0 ? 'active': 'inactive'" id="fileControlMenu">
     <template v-if="setting.checkedFiles.length > 1">
       <div class="px-1"> {{ setting.checkedFiles.length }} 개의 파일 선택</div>
@@ -126,15 +48,15 @@
       </tr>
       <tr class="pointer">
         <td class="p-1"><i class="fa-solid fa-share" /></td>
-        <td class="p-1" @click="fileModal('moveFiles')">이동</td>
+        <td class="p-1" @click="shareModal('moveFiles')">이동</td>
       </tr>
       <tr class="pointer">
         <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
-        <td class="p-1" @click="fileModal('copyFiles')">복사</td>
+        <td class="p-1" @click="shareModal('copyFiles')">복사</td>
       </tr>
       <tr class="pointer">
         <td class="p-1"><i class="fa-solid fa-trash" /></td>
-        <td class="p-1 pointer" @click="fileModal('deleteFiles')">삭제</td>
+        <td class="p-1 pointer" @click="shareModal('deleteFiles')">삭제</td>
       </tr>
     </table>
 
@@ -145,7 +67,7 @@
       </tr>
       <tr>
         <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
-        <td class="p-1 pointer" @click="fileModal('changeName')">이름바꾸기</td>
+        <td class="p-1 pointer" @click="shareModal('changeName')">이름바꾸기</td>
       </tr>
       <tr>
         <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
@@ -155,26 +77,28 @@
         <td colspan="2" class="p-2">
           <div class="btn-group">
             <button type="button" class="btn btn-outline-secondary" @click="downloadFiles()"><i class="fa-solid fa-cloud-arrow-down" /></button>
-            <button type="button" class="btn btn-outline-secondary" @click="fileModal('moveFiles')"><i class="fa-solid fa-share" /></button>
-            <button type="button" class="btn btn-outline-secondary" @click="fileModal('copyFiles')"><i class="fa-solid fa-clipboard" /></button>
-            <button type="button" class="btn btn-outline-secondary" @click="fileModal('deleteFiles')"><i class="fa-solid fa-trash" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="shareModal('moveFiles')"><i class="fa-solid fa-share" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="shareModal('copyFiles')"><i class="fa-solid fa-clipboard" /></button>
+            <button type="button" class="btn btn-outline-secondary" @click="shareModal('deleteFiles')"><i class="fa-solid fa-trash" /></button>
           </div>
         </td>
       </tr>
     </table>
   </div>
 
-  <!-- File List -->
-  <FileList
-    :form="form"
-    :setting="setting"
-    :fileList="fileList"
-    :imageThumbnail="imageThumbnail"
-    :extensions="extensions"
+
+  <!-- tabs -->
+  <ShareList
+      v-if="tab==='shareList'"
+      :form="form"
+      :setting="setting"
+      :shareList="shareList"
+      :imageThumbnail="imageThumbnail"
+      :extensions="extensions"
   />
 
   <!-- Modal -->
-  <FileModal
+  <ShareModal
     v-if="modalOn"
     @close="closeModal"
     :form="form"
@@ -191,11 +115,13 @@ import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
-import FileList from './FileList.vue'
-import FileModal from './FileModal.vue'
+import ShareList from './ShareList.vue'
+import ShareModal from './ShareModal.vue'
 import Const from "@/const";
 
 const route = useRoute()
+
+const tab = ref('shareList')
 
 const form = reactive({
     shareLink: '',
@@ -220,7 +146,7 @@ const homePath = reactive({
   parents: []
 })
 
-const fileList = ref([])
+const shareList = ref([])
 
 const modalOn = ref(false)
 const modalFunc = ref('')
@@ -230,28 +156,28 @@ const modalBody = ref({})
 
 const checkAllFile = computed({
   get() {
-    return setting.checkedFiles.length === fileList.value.length
+    return setting.checkedFiles.length === shareList.value.length
   },
   set(value) {
     setting.checkedFiles = []
-    value ? fileList.value.forEach((li)=>setting.checkedFiles.push(li.name)) : []
+    value ? shareList.value.forEach((li)=>setting.checkedFiles.push(li.name)) : []
   }
 })
 
 const tempImg = computed({
   get() {
-    const tempMap = fileList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
+    const tempMap = shareList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
     return tempMap ? imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path) : ''
   }
 })
 
 onMounted(() => {
-  getFileList()
+  getShareList()
 })
 
 watch(() => route.fullPath, (to, from)=>{
   if(from !== to) {
-    getFileList()
+    getShareList()
   }
 })
 
@@ -260,12 +186,12 @@ watch(() => route.fullPath, (to, from)=>{
 const openModal = () => { modalOn.value = true }
 const closeModal = (reload, checkedFiles) => {
   modalOn.value = false
-  if(reload) getFileList(checkedFiles)
+  if(reload) getShareList(checkedFiles)
 }
 
 const sortArrow = (sort) => { return (sort==form.sort) ? ((form.order == 'asc') ? '↑' : '↓') : '' }
 
-const loadFileList = (shareLink, path, sort, order, keyword, resetKeyword = false) => {
+const loadShareList = (shareLink, path, sort, order, keyword, resetKeyword = false) => {
   form.shareLink  = shareLink || form.shareLink
   form.path       = path      || form.path
   form.sort       = sort      || form.sort
@@ -284,7 +210,7 @@ const loadFileList = (shareLink, path, sort, order, keyword, resetKeyword = fals
   })
 }
 
-const getFileList = async (checkedFiles = []) =>{
+const getShareList = async (checkedFiles = []) =>{
   setting.loadingList = true
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -307,7 +233,7 @@ const getFileList = async (checkedFiles = []) =>{
           if(response.data) {
             homeLink(form.shareLink, response.data.option.nowPath)
             shareAuth.value = response.data.option.shareAuth
-            fileList.value = response.data.lists.map(li => {
+            shareList.value = response.data.lists.map(li => {
                                 return {
                                   ...li,
                                   extension: li.isDirectory ? 'folder' : extensions.hasOwnProperty(li.extension) ? li.extension : 'default'
@@ -317,7 +243,7 @@ const getFileList = async (checkedFiles = []) =>{
           } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
             setTimeout(() => router.go(-1), 2000)
           } else if(response.code === Const.RESPONSE_TYPE.NEED_PASSWORD) {
-            fileModal('needPassword')
+            shareModal('needPassword')
           }
           setting.loadingList = false
         })
@@ -341,7 +267,7 @@ const homeLink = (shareLink, nowPath) => {
 
 const toggleHiddenCheck = () => {
   form.viewHidden = !form.viewHidden
-  getFileList()
+  getShareList()
 }
 
 const imgSelector = (extension, isHidden, path) => {
@@ -369,7 +295,7 @@ const shareFile = () => {
     .then((response) => {
       if(response.data) {
         modalBody.value = { shareLink: response.data }
-        fileModal('shareFile')
+        shareModal('shareFile')
       }
     })
 }
@@ -377,19 +303,19 @@ const shareFile = () => {
 const showImg = (e) => {
   if(e.target.src.includes('thumbnailMaker')) {
     modalBody.value = { image: e.target.src }
-    fileModal('showImg')
+    shareModal('showImg')
   }
 }
 
-const fileModal = (type) => {
+const shareModal = (type) => {
   modalFunc.value = type
   openModal()
 }
 
 // pass to child component
-provide('loadFileList', loadFileList)
+provide('loadShareList', loadShareList)
 provide('imgSelector', imgSelector)
-provide('getFileList', getFileList)
+provide('getShareList', getShareList)
 
 </script>
 

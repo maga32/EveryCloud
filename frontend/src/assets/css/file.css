@@ -3,6 +3,7 @@
 :root{
 	--file-menu-height: 100px;
 	--file-select-color: rgba(184,184,204,0.4);
+	--file-share-height: 45px;
 }
 	
 #fileMenuContainer {
@@ -12,6 +13,12 @@
 
 #fileListContainer {
 	margin-top: var(--file-menu-height);
+}
+
+#shareMenuContainer {
+	margin-top: var(--file-menu-height);
+	padding-top: var(--file-share-height);
+	z-index: 9;
 }
 
 #loadingList {
