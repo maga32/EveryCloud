@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@unhead/vue": "^1.8.3",
     "@vee-validate/i18n": "^4.11.7",
     "@vee-validate/rules": "^4.11.7",
     "@vuepic/vue-datepicker": "^6.1.0",
