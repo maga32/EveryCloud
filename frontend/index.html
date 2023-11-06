@@ -4,7 +4,70 @@
     <meta charset="UTF-8">
     <link rel="icon" href="/api/v1/file/getFavicon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=false">
-    <title>Vite App</title>
+
+    <meta name="title"                        content=""  class="metaTitle">
+    <meta name="author"                       content=""  class="metaAuthor">
+    <meta name="description"                  content=""  class="metaDescription">
+    <meta name="keywords"                     content=""  class="metaKeywords">
+    <meta property="og:type"                  content="website">
+    <meta property="og:rich_attachment"       content="true">
+    <meta property="og:site_name"             content=""  class="metaTitle">
+    <meta property="og:title"                 content=""  class="metaTitle">
+    <meta property="og:description"           content=""  class="metaDescription">
+    <meta property="og:keywords"              content=""  class="meteKeywords">
+    <meta property="og:image"                 content=""  class="metaImage">
+    <meta property="og:url"                   content=""  class="metaUrl">
+    <meta name="twitter:card"                 content="summary_large_image">
+    <meta name="twitter:site"                 content=""  class="metaTitle">
+    <meta name="twitter:title"                content=""  class="metaTitle">
+    <meta name="twitter:description"          content=""  class="metaDescription">
+    <meta name="twitter:keywords"             content=""  class="metaKeywords">
+    <meta name="twitter:image"                content=""  class="metaImage">
+    <meta name="twitter:creator"              content=""  class="metaAuthor">
+    <meta itemprop="name"                     content=""  class="metaTitle">
+    <meta itemprop="description"              content=""  class="metaDescription">
+    <meta itemprop="keywords"                 content=""  class="metaKeywords">
+    <meta itemprop="image"                    content=""  class="metaImage">
+    <meta name="apple-mobile-web-app-title"   content=""  class="metaTitle">
+
+    <title></title>
+
+    <script>
+      async function metaSet() {
+        let metaSource = {
+          metaTitle: "Every Cloud",
+          metaAuthor: "EveryCloud",
+          metaDescription: "EveryCloud Share personal cloud for everyone.",
+          metaKeywords: "EveryCloud, Share, Personal, Cloud",
+          externalUrl: "",
+          metaImage: "",
+        }
+
+        try {
+          await fetch("/api/v1/settings/getMeta")
+            .then((response) => response.json())
+              .then((response) => {
+                metaSource = response.data
+              })
+        } catch (e) {
+          console.log("cannot get meta")
+        }
+
+        metaSource.metaImage = metaSource.externalUrl + "/api/v1/file/getMetaImage"
+
+        document.querySelector("title").innerText = metaSource?.metaTitle
+        document.querySelectorAll("head .metaTitle").forEach((e) => e.setAttribute("content", metaSource?.metaTitle))
+        document.querySelectorAll("head .metaAuthor").forEach((e) => e.setAttribute("content", metaSource?.metaAuthor))
+        document.querySelectorAll("head .metaDescription").forEach((e) => e.setAttribute("content", metaSource?.metaDescription))
+        document.querySelectorAll("head .metaKeywords").forEach((e) => e.setAttribute("content", metaSource?.metaKeywords))
+        document.querySelectorAll("head .metaUrl").forEach((e) => e.setAttribute("content", metaSource?.externalUrl))
+        document.querySelectorAll("head .metaImage").forEach((e) => e.setAttribute("content", metaSource?.metaImage))
+      }
+
+      metaSet()
+    </script>
+
+
   </head>
   <body>
     <div id="app"></div>

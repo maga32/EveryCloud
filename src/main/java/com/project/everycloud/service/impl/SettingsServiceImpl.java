@@ -31,11 +31,16 @@ public class SettingsServiceImpl implements SettingsService {
     }
 
     @Override
-    public void setPort(int port) {
-        setConfig(ConfigType.PORT.ecKey(), port);
+    public SettingsDTO getMeta() {
+        return settingsMapper.getMeta();
     }
 
-    private void setConfig(String key, Object value) {
+    @Override
+    public void setPort(int port) {
+        setYaml(ConfigType.PORT.ecKey(), port);
+    }
+
+    private void setYaml(String key, Object value) {
         String filePath = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "config.yml";
 
         try {

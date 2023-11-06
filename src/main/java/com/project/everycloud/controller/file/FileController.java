@@ -98,7 +98,7 @@ public class FileController {
 		}
 
 		BufferedImage img = new BufferedImage(width, height, (transparent ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB));
-		Image scaledImage = sourceImage.getScaledInstance(width,height, Image.SCALE_SMOOTH);
+		Image scaledImage = sourceImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
 		img.createGraphics().drawImage(scaledImage, 0, 0, null);
 
@@ -107,6 +107,26 @@ public class FileController {
 		os.close();
 	}
 
+
+	@GetMapping("/getMetaImage")
+	void getMetaImage(HttpServletResponse response) throws IOException {
+
+		String path = System.getProperty("user.home") + File.separator + ".everyCloud" + File.separator + "metaImage.png";
+		File file = new File(path);
+		BufferedImage sourceImage= ImageIO.read(file);
+
+		int width = sourceImage.getWidth();
+		int height = sourceImage.getHeight();
+
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Image scaledImage = sourceImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+		img.createGraphics().drawImage(scaledImage, 0, 0, null);
+
+		OutputStream os = response.getOutputStream();
+		ImageIO.write(img, FilenameUtils.getExtension(file.getPath()), os);
+		os.close();
+	}
 
 	@GetMapping("/fileDownload")
 	void fileDownload(HttpServletResponse response, @RequestParam("path") String path,

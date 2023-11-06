@@ -8,4 +8,9 @@ import lombok.NoArgsConstructor;
 public class SettingsDTO {
     private String type;
     private String externalUrl;
+
+    private String metaTitle;
+    private String metaAuthor;
+    private String metaDescription;
+    private String metaKeywords;
 }

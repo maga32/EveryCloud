@@ -8,5 +8,8 @@ import java.util.List;
 @Mapper
 public interface SettingsMapper {
     List<SettingsDTO> getSettings();
+
     SettingsDTO getSettings(String type);
+
+    SettingsDTO getMeta();
 }
