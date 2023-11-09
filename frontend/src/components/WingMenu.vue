@@ -11,7 +11,7 @@
   <div id="wingMask" :style="{display: (minWing ? 'block' : 'none')}" @click="closeWing"></div>
 
   <!-- wing -->
-  <div id="wing" class="border-end" :class="(!minWing || 'open')" style="overflow:visible;">
+  <div id="wing" class="border-end" :class="(!minWing || 'open')" style="overflow:visible">
 
     <!-- language select -->
     <div class="d-flex flex-wrap pt-2">

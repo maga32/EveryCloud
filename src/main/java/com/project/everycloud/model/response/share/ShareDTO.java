@@ -1,10 +1,10 @@
 package com.project.everycloud.model.response.share;
 
-import java.sql.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +16,5 @@ public class ShareDTO {
     private Integer method;
     private String pass;
     private Integer auth;
+    private boolean exist;
 }

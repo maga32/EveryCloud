@@ -15,11 +15,11 @@
       <label v-for="li in fileList" class="w-100 pe-1 pe-md-5" @click="labelClick">
         <table class="w-100 rounded fileTable" :class="!setting.checkedFiles.includes(li.name) || 'checked'">
           <tr>
-            <td v-show="!setting.search" class="text-center" style="width:35px;">
+            <td v-show="!setting.search" class="text-center" style="width:35px">
               <input v-if="setting.search" type="hidden" class="li_parent" :value="li.parent">
               <input v-else type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
             </td>
-            <td class="text-center py-2" style="width:80px;">
+            <td class="text-center py-2" style="width:80px">
               <img class="fileImg" :src="imgSelector(li.extension, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
             </td>
             <td class="w-auto">
@@ -32,11 +32,11 @@
                 </span>
               </div>
               <div class="text-gray d-flex align-items-center">
-                <div class="flex-shrink-0" style="width:60px;">
+                <div class="flex-shrink-0" style="width:60px">
                   {{ li.extension === 'folder' ? '-' : Utils.fileSize(li.size) }}
                 </div>
                 <div class="flex-grow-1" style="word-break:break-all; flex-basis: 110px; padding: 0 10px;">
-                  <div v-if="setting.search" style="min-width:55px; font-size:10px;">
+                  <div v-if="setting.search" style="min-width:55px; font-size:0.7rem;">
                     {{ (!!form.shareLink ? 'shareLink : ' + form.shareLink + ' / ' : '') + li.path }}
                   </div>
                   <div v-else style="min-width:55px; text-align: right;">

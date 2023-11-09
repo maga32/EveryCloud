@@ -81,8 +81,8 @@
         <!-- Filter -->
         <table class="w-100">
           <tr>
-            <td class="text-center" style="width:35px;"><input v-if="!setting.search" type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
-            <td style="width:20px;"></td>
+            <td class="text-center" style="width:35px"><input v-if="!setting.search" type="checkbox" class="form-check-input" v-model="checkAllFile"></td>
+            <td style="width:20px"></td>
             <td class="w-auto d-flex">
               <span class="pointer" @click="loadFileList('', '', 'name', (form.order == 'asc' ? 'desc' : 'asc'))">이름{{sortArrow('name')}}</span>
               <span class="pointer px-3" @click="loadFileList('', '', 'size', (form.order == 'asc' ? 'desc' : 'asc'))">크기{{sortArrow('size')}}</span>
@@ -108,8 +108,8 @@
       <div class="text-center px-2 py-3"><img src="/img/fileicons/files.png"></div>
     </template>
     <template v-else-if="setting.checkedFiles.length === 1">
-      <div class="px-1" style="word-break:break-all;">{{ setting.checkedFiles[0] }}</div>
-      <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px;" @click="showImg"></div>
+      <div class="px-1" style="word-break:break-all">{{ setting.checkedFiles[0] }}</div>
+      <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px" @click="showImg"></div>
     </template>
 
     <table v-if="shareAuth !== 1">
@@ -193,7 +193,7 @@ import { useRoute } from 'vue-router'
 import { imageThumbnail, extensions } from '@/assets/extensions'
 import FileList from './FileList.vue'
 import FileModal from './FileModal.vue'
-import Const from "@/const";
+import Const from '@/const'
 
 const route = useRoute()
 
@@ -206,7 +206,7 @@ const form = reactive({
     viewHidden: false,
 })
 
-const shareAuth = ref(0);
+const shareAuth = ref(0)
 
 const setting = reactive({
   loadingList: false,
@@ -355,7 +355,7 @@ const imgSelector = (extension, isHidden, path) => {
 /*------------------------ File Control Menu Functions ------------------------*/
 
 const downloadFiles = () => {
-  window.open((import.meta.env.VITE_SERVER_BASE_URL) + '/file/fileDownload?path=' + encodeURIComponent(form.path) + '&fileNames=' + encodeURIComponent(setting.checkedFiles.join(':/:')) + '&shareLink=' + form.shareLink);
+  window.open((import.meta.env.VITE_SERVER_BASE_URL) + '/file/fileDownload?path=' + encodeURIComponent(form.path) + '&fileNames=' + encodeURIComponent(setting.checkedFiles.join(':/:')) + '&shareLink=' + form.shareLink)
 }
 
 const shareFile = () => {

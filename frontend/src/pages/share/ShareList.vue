@@ -6,9 +6,9 @@
       <div class="row rounded-bottom border border-top-0 p-2 m-0 bg-light-subtle">
         <div class="col-5"></div>
         <div class="col-6 px-2">
-          <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareList('','','','')">
+          <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareList">
         </div>
-        <div class="col-1 pointer" @click="loadShareList('','','','')"><i class="fa-solid fa-magnifying-glass" /></div>
+        <div class="col-1 pointer" @click="loadShareList"><i class="fa-solid fa-magnifying-glass" /></div>
       </div>
     </div>
   </div>
@@ -27,45 +27,26 @@
     <!-- File List -->
     <div id="shareList">
 
-      <label v-for="li in shareList" class="w-100 pe-1 pe-md-5" @click="labelClick">
-        <table class="w-100 rounded fileTable" :class="!setting.checkedFiles.includes(li.name) || 'checked'">
-          <tr>
-            <td v-show="!setting.search" class="text-center" style="width:35px;">
-              <input v-if="setting.search" type="hidden" class="li_parent" :value="li.parent">
-              <input v-else type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
-            </td>
-            <td class="text-center py-2" style="width:80px;">
-              <img class="fileImg" :src="imgSelector(li.extension, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
-            </td>
-            <td class="w-auto">
-              <div>
-                <span v-if="li.extension !== 'folder'" class="fileName" style="word-break:break-all">
-                  {{ li.name }}
-                </span>
-                <span v-else class="fileName pointer" @click="loadShareList('', li.path.replace(/\\/g, '/'),'','','',true)" style="word-break:break-all">
-                  {{ li.name }}
-                </span>
+      <table v-for="li in shareList" class="w-100 rounded border-bottom">
+        <tr @click="editShareModal(li.link)">
+          <td class="text-center text-secondary" style="width:40px">
+            <i v-if="li.method === 0" class="fa-solid fa-globe" />
+            <i v-else-if="li.method === 1" class="fa-solid fa-lock" />
+            <i v-else-if="li.method === 2" class="fa-solid fa-user-group" />
+          </td>
+          <td class="w-auto py-2 pe-3">
+            <div class="text-gray" style="font-size:0.8rem; word-break:break-all">
+              {{ form.shareLink + '/file?shareLink=' + li.link }}
+            </div>
+            <div class="d-flex">
+              <div class="flex-grow-1">
+                <span v-if="!li.exist" class="badge text-bg-danger">Invalid</span>
+                {{ li.path }}
               </div>
-              <div class="text-gray d-flex align-items-center">
-                <div class="flex-shrink-0" style="width:60px;">
-                  {{ li.extension === 'folder' ? '-' : Utils.fileSize(li.size) }}
-                </div>
-                <div class="flex-grow-1" style="word-break:break-all; flex-basis: 110px; padding: 0 10px;">
-                  <div v-if="setting.search" style="min-width:55px; font-size:10px;">
-                    {{ (!!form.shareLink ? 'shareLink : ' + form.shareLink + ' / ' : '') + li.path }}
-                  </div>
-                  <div v-else style="min-width:55px; text-align: right;">
-                    {{ extensions[li.extension] }}
-                  </div>
-                </div>
-                <div style="word-break:keep-all; text-align:right">
-                  {{ dayjs(li.date).format('YY/MM/DD HH:mm') }}
-                </div>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </label>
+            </div>
+          </td>
+        </tr>
+      </table>
 
     </div>
 
@@ -73,26 +54,48 @@
 </template>
 
 <script setup>
-import {computed, inject, onUpdated} from 'vue'
+import { computed, inject, onMounted, onUpdated, reactive, ref } from 'vue'
 import Utils from '@/modules/utils'
 import dayjs from 'dayjs'
+import Const from "@/const";
+import router from "@/router";
 
-const props = defineProps(['form', 'setting', 'shareList', 'imageThumbnail', 'extensions'])
+const props = defineProps(['setting', 'modalBody'])
 
-const labelClick = (e) => {
-  // block to show File Control Menu
-  if(e.target.classList.contains('pointer') || props.setting.search) e.preventDefault()
+const shareList = ref([])
 
-  // if search file mode, go to path
-  if(props.setting.search) loadShareList('', e.target.closest('table').querySelector('.li_parent').value, '', '', '', true)
+const form = reactive({
+  shareLink: '',
+  keyword: '',
+})
+
+onMounted(() => {
+  loadShareList()
+})
+
+const loadShareList = () => {
+  props.setting.loadingList = true
+
+  $http.post('/share/shareList', form, null)
+      .then((response) => {
+        console.log(response)
+        if(response.code === Const.RESPONSE_TYPE.NOT_ALLOWED) {
+          router.go(-1)
+        } else if(response.data) {
+          shareList.value = response.data.lists
+          form.shareLink = response.data.option
+        }
+        props.setting.loadingList = false
+      })
 }
 
-// get from parent component
-/**
- * @params shareLink<br> path<br> sort<br> order<br> keyword<br> resetKeyword = false
- */
-const loadShareList = inject('loadShareList')
-const imgSelector = inject('imgSelector')
+const editShareModal = (shareLink) => {
+  setModalBody({ shareLink: shareLink })
+  shareModal('shareList')
+}
+
+const shareModal = inject('shareModal')
+const setModalBody = inject('setModalBody')
 
 </script>
 

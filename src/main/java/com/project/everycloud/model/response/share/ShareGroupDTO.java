@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 public class ShareGroupDTO {
     private String shareLink;
     private Integer groupNo;
+    private String groupName;
     private Integer auth;
 }

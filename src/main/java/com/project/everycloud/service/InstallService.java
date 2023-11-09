@@ -93,6 +93,8 @@ public class InstallService {
                             }
                         }
                         break;
+                    } else if(network.getName().contains("rmnet_data")) {
+                        return "00:00:00:00:00:00";
                     }
                 }
             }

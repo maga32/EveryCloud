@@ -5,6 +5,7 @@ import com.project.everycloud.common.exception.InvalidPasswordException;
 import com.project.everycloud.common.exception.NeedPasswordException;
 import com.project.everycloud.common.exception.NotAllowedException;
 import com.project.everycloud.common.util.FileUtil;
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
 import com.project.everycloud.model.response.share.ShareDTO;
@@ -22,6 +23,9 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,6 +42,44 @@ public class ShareServiceImpl implements ShareService {
 
     @Autowired
     ShareMapper shareMapper;
+
+    @Override
+    public AppList<ShareDTO, String> getShareList(UserDTO sessionUser, HashMap<String, Object> paramMap) {
+
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        AppList<ShareDTO, String> share = new AppList<ShareDTO, String>();
+        List<ShareDTO> tempList =  shareMapper.getShareList(paramMap);
+        List<ShareDTO> shareList =  new ArrayList<ShareDTO>();
+
+        for(ShareDTO tempShare : tempList) {
+            tempShare.setExist(fileDao.isPathExist(tempShare.getPath()));
+            shareList.add(tempShare);
+        }
+
+        share.setLists(shareList);
+        share.setOption(settingsService.getSettings("admin").getExternalUrl());
+
+        return share;
+    }
+
+    @Override
+    public AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(UserDTO userDTO, HashMap<String, Object> paramMap) {
+        AppList<ShareGroupDTO, HashMap<String, Object>> result = new AppList<ShareGroupDTO, HashMap<String, Object>>();
+
+        List<ShareGroupDTO> groupList = shareMapper.getShareGroupList(paramMap);
+        HashMap<String, Object> shareMap = new HashMap<String, Object>();
+
+        ShareDTO share = shareMapper.getShareByLink((String) paramMap.get("shareLink"));
+        share.setExist(fileDao.isPathExist(share.getPath()));
+        shareMap.put("share", share);
+        shareMap.put("externalUrl", settingsService.getSettings("admin").getExternalUrl());
+
+        result.setLists(groupList);
+        result.setOption(shareMap);
+
+        return result;
+    }
 
     @Override
     public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
@@ -112,7 +154,7 @@ public class ShareServiceImpl implements ShareService {
                 String sharePass = (sessionUser == null) ? null : sessionUser.getSharePass();
                 if(!StringUtils.hasText(sharePass)) {
                     throw new NeedPasswordException();
-                } else if(!BCRYPT.matches(sharePass, share.getPass())) {
+                } else if(!BCRYPT.matches(sharePass, getSharePassByLink(shareLink))) {
                     throw new InvalidPasswordException();
                 }
                 isValid = true;
@@ -156,8 +198,18 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public ShareDTO getShareByPath(String realPath) {
         ShareDTO share = shareMapper.getShareByPath(realPath);
-        if(share == null) throw new InvalidLinkException();
+        if(share == null) throw new InvalidPathException("error","error");
         return share;
+    }
+
+    @Override
+    public String getSharePassByLink(String link) {
+        return shareMapper.getSharePassByLink(link);
+    }
+
+    @Override
+    public String getSharePassByPath(String path) {
+        return shareMapper.getSharePassByPath(path);
     }
 
     private String getFullShareLink(String shareLink) {

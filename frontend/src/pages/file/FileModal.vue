@@ -56,7 +56,7 @@
                 <table>
                   <!-- upper directory -->
                   <tr v-if="moveTo.parentPath !== moveTo.nowPath" class="pointer" @click="loadFolders(moveTo.parentPath)">
-                    <td class='text-center py-2' style='width:50px;'>
+                    <td class='text-center py-2' style='width:50px'>
                       <img class="fileImg" :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
                     </td>
                     <td class='w-auto'>..</td>
@@ -64,7 +64,7 @@
 
                   <!-- directory list -->
                   <tr v-for="li in moveTo.folderList" class="pointer" @click="loadFolders(li.path.replace(/\\/g, '/'))">
-                    <td class='text-center py-2' style='width:50px;'>
+                    <td class='text-center py-2' style='width:50px'>
                       <img class='fileImg' :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
                     </td>
                     <td class='w-auto'>
@@ -227,8 +227,8 @@ const moveFilesNewFolder = () => {
 }
 
 const copyShareLink = () => {
-  document.querySelector("#newShareLink").select()
-  document.execCommand("copy");
+  document.querySelector('#newShareLink').select()
+  document.execCommand('copy')
   Swal.fire({ icon: 'success', text: '링크가 복사되었습니다.', timer: 1200, showConfirmButton: false })
   emit('close', false, props.setting.checkedFiles)
 }

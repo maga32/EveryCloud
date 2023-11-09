@@ -4,15 +4,31 @@
 
 <mapper namespace="com.project.everycloud.service.mapper.ShareMapper">
 
-	<select id="getShareByLink" resultType="ShareDTO">
+	<select id="getShareList" resultType="ShareDTO">
 		SELECT LINK, PATH, DATE, METHOD, PASS, AUTH
+			FROM SHARE
+		WHERE PATH LIKE '%' || #{keyword} || '%'
+	</select>
+
+	<select id="getShareByLink" resultType="ShareDTO">
+		SELECT LINK, PATH, DATE, METHOD, AUTH
 			FROM SHARE
 		WHERE LINK = #{link}
 	</select>
 
 	<select id="getShareByPath" resultType="ShareDTO">
-		SELECT LINK, PATH, DATE, METHOD, PASS, AUTH
+		SELECT LINK, PATH, DATE, METHOD, AUTH
 			FROM SHARE
+		WHERE PATH = #{path}
+	</select>
+
+	<select id="getSharePassByLink">
+		SELECT PASS FROM SHARE
+		WHERE LINK = #{link}
+	</select>
+
+	<select id="getSharePassByPath">
+		SELECT PASS FROM SHARE
 		WHERE PATH = #{path}
 	</select>
 
@@ -21,15 +37,26 @@
 	</insert>
 
 	<select id="getShareGroup" resultType="ShareGroupDTO" parameterType="HashMap">
-		SELECT SHARE_LINK, GROUP_NO, AUTH FROM SHARE_GROUP
+		SELECT sg.SHARE_LINK, sg.GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
+			FROM SHARE_GROUP sg, GROUP_SETTING gs
 			<where>
 				<if test="shareLink != null and !shareLink.equals('')">
-					SHARE_LINK = #{shareLink}
+					sg.SHARE_LINK = #{shareLink}
 				</if>
 				<if test="groupNo != null and !groupNo.equals('')">
-					AND GROUP_NO = #{groupNo}
+					AND sg.GROUP_NO = #{groupNo}
+				</if>
+				<if test="1==1">
+					AND sg.GROUP_NO = gs.NO
 				</if>
 			</where>
+	</select>
+
+	<select id="getShareGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
+		SELECT sg.SHARE_LINK, gs.NO as GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
+		FROM GROUP_SETTING gs
+		LEFT JOIN SHARE_GROUP sg
+		ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
 	</select>
 
 </mapper>

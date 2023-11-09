@@ -1,19 +1,24 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
 import com.project.everycloud.model.response.share.ShareDTO;
 import com.project.everycloud.model.response.share.ShareGroupDTO;
 
+import java.util.HashMap;
+
 public interface ShareService {
+
+    AppList<ShareDTO, String> getShareList(UserDTO sessionUser, HashMap<String, Object> paramMap);
+
+    AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(UserDTO userDTO, HashMap<String, Object> paramMap);
 
     String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
 
     ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
-    ShareDTO getShareByLink(String link);
-
-    ShareDTO getShareByPath(String realPath);
+    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
 
     /**
      * Verify user's authentication for shareLink
@@ -24,5 +29,12 @@ public interface ShareService {
      */
     void verifyAuth(String shareLink, int authType, UserDTO sessionUser);
 
-    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
+    ShareDTO getShareByLink(String link);
+
+    ShareDTO getShareByPath(String realPath);
+
+    String getSharePassByLink(String link);
+
+    String getSharePassByPath(String path);
+
 }

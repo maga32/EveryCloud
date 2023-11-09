@@ -1,15 +1,19 @@
 package com.project.everycloud.controller.file;
 
 import com.project.everycloud.common.type.ResponseType;
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.model.request.file.NewFileDTO;
+import com.project.everycloud.model.response.share.ShareDTO;
+import com.project.everycloud.model.response.share.ShareGroupDTO;
 import com.project.everycloud.service.ShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/share")
@@ -20,6 +24,28 @@ public class ShareController {
 
     @Autowired
     HttpSession session;
+
+    @PostMapping("/shareList")
+    public AppResponse<AppList<ShareDTO, String>> getShareList(@RequestBody HashMap<String, Object> paramMap) {
+
+        AppList<ShareDTO, String> shareList = shareService.getShareList(sessionUser(), paramMap);
+
+        return new AppResponse<AppList<ShareDTO, String>>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(shareList);
+    }
+
+    @PostMapping("/shareInfo")
+    public AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>> getShareInfo(@RequestBody HashMap<String, Object> paramMap) {
+
+        AppList<ShareGroupDTO, HashMap<String, Object>> shareInfo = shareService.getShareInfo(sessionUser(), paramMap);
+
+        return new AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(shareInfo);
+    }
 
     @PostMapping("/shareNewFile")
     public AppResponse<String> shareNewFile(@Valid @RequestBody NewFileDTO shareNewFile) {
