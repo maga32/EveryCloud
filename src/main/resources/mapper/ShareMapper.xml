@@ -5,19 +5,19 @@
 <mapper namespace="com.project.everycloud.service.mapper.ShareMapper">
 
 	<select id="getShareList" resultType="ShareDTO">
-		SELECT LINK, PATH, DATE, METHOD, PASS, AUTH
+		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, PASS, AUTH
 			FROM SHARE
 		WHERE PATH LIKE '%' || #{keyword} || '%'
 	</select>
 
 	<select id="getShareByLink" resultType="ShareDTO">
-		SELECT LINK, PATH, DATE, METHOD, AUTH
+		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, AUTH
 			FROM SHARE
 		WHERE LINK = #{link}
 	</select>
 
 	<select id="getShareByPath" resultType="ShareDTO">
-		SELECT LINK, PATH, DATE, METHOD, AUTH
+		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, AUTH
 			FROM SHARE
 		WHERE PATH = #{path}
 	</select>

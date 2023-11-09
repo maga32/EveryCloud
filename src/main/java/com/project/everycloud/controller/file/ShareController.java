@@ -28,7 +28,7 @@ public class ShareController {
     @PostMapping("/shareList")
     public AppResponse<AppList<ShareDTO, String>> getShareList(@RequestBody HashMap<String, Object> paramMap) {
 
-        AppList<ShareDTO, String> shareList = shareService.getShareList(sessionUser(), paramMap);
+        AppList<ShareDTO, String> shareList = shareService.getShareList(paramMap, sessionUser());
 
         return new AppResponse<AppList<ShareDTO, String>>()
                 .setCode(ResponseType.SUCCESS.code())
@@ -39,7 +39,7 @@ public class ShareController {
     @PostMapping("/shareInfo")
     public AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>> getShareInfo(@RequestBody HashMap<String, Object> paramMap) {
 
-        AppList<ShareGroupDTO, HashMap<String, Object>> shareInfo = shareService.getShareInfo(sessionUser(), paramMap);
+        AppList<ShareGroupDTO, HashMap<String, Object>> shareInfo = shareService.getShareInfo(paramMap, sessionUser());
 
         return new AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>>()
                 .setCode(ResponseType.SUCCESS.code())

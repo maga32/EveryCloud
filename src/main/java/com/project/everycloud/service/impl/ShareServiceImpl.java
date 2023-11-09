@@ -44,7 +44,7 @@ public class ShareServiceImpl implements ShareService {
     ShareMapper shareMapper;
 
     @Override
-    public AppList<ShareDTO, String> getShareList(UserDTO sessionUser, HashMap<String, Object> paramMap) {
+    public AppList<ShareDTO, String> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
@@ -64,9 +64,11 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(UserDTO userDTO, HashMap<String, Object> paramMap) {
-        AppList<ShareGroupDTO, HashMap<String, Object>> result = new AppList<ShareGroupDTO, HashMap<String, Object>>();
+    public AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser) {
 
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        AppList<ShareGroupDTO, HashMap<String, Object>> result = new AppList<ShareGroupDTO, HashMap<String, Object>>();
         List<ShareGroupDTO> groupList = shareMapper.getShareGroupList(paramMap);
         HashMap<String, Object> shareMap = new HashMap<String, Object>();
 
@@ -84,10 +86,10 @@ public class ShareServiceImpl implements ShareService {
     @Override
     public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
 
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
         String result = "";
         String path = shareNewFile.getPath();
-
-        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
         if(StringUtils.hasText(shareNewFile.getShareLink())) {
             path = getShareByLink(shareNewFile.getShareLink()).getPath() + path;
