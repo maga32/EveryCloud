@@ -38,7 +38,7 @@ public class InstallService {
         try(Connection conn = DriverManager.getConnection("jdbc:sqlite:"+path+"?"+decryptor(getDbValue()))) {
 
             Statement stmt = conn.createStatement();
-            stmt.execute("CREATE TABLE SETTINGS (TYPE TEXT, EXTERNAL_URL TEXT, META_TITLE TEXT, META_AUTHOR TEXT, META_DESCRIPTION TEXT, META_KEYWORDS TEXT" +
+            stmt.execute("CREATE TABLE SETTINGS (TYPE TEXT, EXTERNAL_URL TEXT, USE_TRASH TEXT, TRASH_PATH TEXT, META_TITLE TEXT, META_AUTHOR TEXT, META_DESCRIPTION TEXT, META_KEYWORDS TEXT" +
                             ", PRIMARY KEY(TYPE))");
             stmt.execute("CREATE TABLE GROUP_SETTING (NO INTEGER, NAME TEXT NOT NULL" +
                             ", PRIMARY KEY(NO AUTOINCREMENT))");
@@ -52,10 +52,10 @@ public class InstallService {
                             ", PRIMARY KEY(ID)" +
                             ", FOREIGN KEY(GROUP_NO) REFERENCES GROUP_SETTING(NO))");
 
-            stmt.execute("INSERT INTO SETTINGS (TYPE, EXTERNAL_URL, META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS) " +
-                            "VALUES('default', 'http://127.0.0.1:11024', 'Every Cloud', 'EveryCloud', 'EveryCloud Share personal cloud for everyone.', 'EveryCloud, Share, Personal, Cloud')");
-            stmt.execute("INSERT INTO SETTINGS (TYPE, EXTERNAL_URL, META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS) " +
-                            "VALUES('admin', 'http://127.0.0.1:11024', 'Every Cloud', 'EveryCloud', 'EveryCloud Share personal cloud for everyone.', 'EveryCloud, Share, Personal, Cloud')");
+            stmt.execute("INSERT INTO SETTINGS (TYPE, EXTERNAL_URL, USE_TRASH, TRASH_PATH, META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS) " +
+                            "VALUES('default', 'http://127.0.0.1:11024', 'N', '', 'Every Cloud', 'EveryCloud', 'EveryCloud Share personal cloud for everyone.', 'EveryCloud, Share, Personal, Cloud')");
+            stmt.execute("INSERT INTO SETTINGS (TYPE, EXTERNAL_URL, USE_TRASH, TRASH_PATH, META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS) " +
+                            "VALUES('admin', 'http://127.0.0.1:11024', 'N', '', 'Every Cloud', 'EveryCloud', 'EveryCloud Share personal cloud for everyone.', 'EveryCloud, Share, Personal, Cloud')");
             stmt.execute("INSERT INTO GROUP_SETTING  (NO, NAME) " +
                             "VALUES(1, 'default')");
             stmt.execute("INSERT INTO USER (ID, PASS, NICKNAME, EMAIL, AUTH, NEED_VERIFY, GROUP_NO) " +

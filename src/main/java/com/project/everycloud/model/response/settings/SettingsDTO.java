@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 public class SettingsDTO {
     private String type;
     private String externalUrl;
+    private String useTrash;
+    private String trashPath;
 
     private String metaTitle;
     private String metaAuthor;

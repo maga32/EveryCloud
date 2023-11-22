@@ -54,9 +54,10 @@
 
 	<select id="getShareGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
 		SELECT sg.SHARE_LINK, gs.NO as GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
-		FROM GROUP_SETTING gs
-		LEFT JOIN SHARE_GROUP sg
-		ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
+			FROM GROUP_SETTING gs
+			LEFT JOIN SHARE_GROUP sg
+				ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
+		ORDER BY GROUP_NAME
 	</select>
 
 </mapper>

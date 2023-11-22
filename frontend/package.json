@@ -21,6 +21,7 @@
     "path": "^0.12.7",
     "qrcode": "^1.5.3",
     "rollup-plugin-visualizer": "^5.9.2",
+    "tippy.vue": "^3.2.1",
     "v-dropdown-menu": "^2.0.3",
     "vee-validate": "^4.11.7",
     "vue": "^3.3.4",

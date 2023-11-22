@@ -12,6 +12,7 @@ import com.project.everycloud.model.request.file.UpdateFileListDTO;
 import com.project.everycloud.model.response.file.FileDetailDTO;
 import com.project.everycloud.model.response.file.FileOptionDTO;
 import com.project.everycloud.service.FileService;
+import com.project.everycloud.service.SettingsService;
 import com.project.everycloud.service.ShareService;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.FileDao;
@@ -36,6 +37,9 @@ public class FileServiceImpl implements FileService {
 
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	SettingsService settingsService;
 
 	@Autowired
 	FileDao fileDao;
@@ -305,6 +309,11 @@ public class FileServiceImpl implements FileService {
 		String path = updateFileList.getPath();
 		String shareLink = updateFileList.getShareLink();
 		List<String> fileList = updateFileList.getFileList();
+//		쓰레기통기능 추가예정
+//		SettingsDTO settings = settingsService.getSettings("admin");
+//		if(settings.getUseTrash().equals("Y")) {
+//
+//		}
 
 		shareService.verifyAuth(shareLink, 1, sessionUser);
 

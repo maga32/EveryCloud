@@ -42,23 +42,24 @@
                     Link :
                     <div style="word-break:break-all">{{ fullLink }}</div>
                     <div>
+                      <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
                       <button class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</button>
                       <button class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</button>
                       <img v-show="QRShow" :src="QRCodeSrc" class="pt-2">
                     </div>
                   </div>
 
-                  <div class="col-12 col-lg-7 pt-2 px-1">
+                  <div class="col-12 col-lg-6 pt-2 px-1">
                     <div class="border rounded p-2">
                       <table class="w-100">
                         <tr>
-                          <td style="min-width: 90px">링크 수정 : </td>
+                          <td style="width: 105px">링크 수정 : </td>
                           <td colspan="2" class="py-1"><input class="form-control-sm" v-model="share[0].link"></td>
                         </tr>
                         <tr>
                           <td>경로 수정 : </td>
                           <td class="py-1" style="word-break:break-all">{{ share[0].path }}</td>
-                          <td><button class="btn btn-sm btn-outline-secondary" @click="console.log(share[0].date)">select</button></td>
+                          <td><button class="btn btn-sm btn-outline-secondary ms-1" @click="console.log(share[0].date)">select</button></td>
                         </tr>
                         <tr>
                           <td>만료 기한 : </td>
@@ -94,14 +95,150 @@
                       </table>
                     </div>
                   </div>
-                  <div class="col-12 col-lg-5 pt-2 px-1">
+                  <div class="col-12 col-lg-6 pt-2 px-1">
                     <div class="border rounded p-2">
-                      test
+                      <table class="w-100">
+                        <tr>
+                          <td style="width: 105px">유저 권한 : </td>
+                          <td class="py-1" colspan="2">
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share[0].auth" :value="0" name="shareAuth" id="shareAuthDown">
+                              <label class="form-check-label pointer" for="shareAuthDown">
+                                다운로드
+                              </label>
+                            </div>
+                            <div class="form-check" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share[0].auth" :value="1" name="shareAuth" id="shareAuthUpdate">
+                              <label class="form-check-label pointer" for="shareAuthUpdate">
+                                수정
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="min-width: 90px">공유 방식 : </td>
+                          <td class="py-1">
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share[0].method" :value="0" name="shareMethod" id="shareByLink">
+                              <label class="form-check-label pointer" for="shareByLink">
+                                링크
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">링크를 알고 있는 모든 사용자</tippy>
+                                </i>
+                              </label>
+                            </div>
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share[0].method" :value="1" name="shareMethod" id="shareByPass">
+                              <label class="form-check-label pointer" for="shareByPass">
+                                암호
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">비밀번호 입력 필요</tippy>
+                                </i>
+                              </label>
+                            </div>
+                            <div class="form-check" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share[0].method" :value="2" name="shareMethod" id="shareByGroup">
+                              <label class="form-check-label pointer" for="shareByGroup">
+                                그룹
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">그룹별 공유 지정</tippy>
+                                </i>
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr v-if="share[0].method === 1">
+                          <td class="pt-3">비밀번호 : </td>
+                          <td class="pt-3">
+                            <input type="password" class="form-control-sm">
+                          </td>
+                        </tr>
+                        <tr v-if="share[0].method === 2">
+                          <td colspan="2">
+                            <div class="rounded border p-2 mt-3">
+                              <table class="w-100">
+
+                                <tr>
+                                  <td class="py-2" colspan="4">
+                                    <div class="hstack gap-2 d-flex justify-content-end align-items-center">
+                                      <input type="text" class="border border-secondary rounded-5 px-2" placeholder="Filter" v-model="searchFilter">
+                                      <i class="fa-solid fa-magnifying-glass me-2" />
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr class="border-bottom text-center fw-bold">
+                                  <td class="pt-2 pb-3">그룹명</td>
+                                  <td class="pt-2 pb-3">권한없음</td>
+                                  <td class="pt-2 pb-3">다운로드</td>
+                                  <td class="pt-2 pb-3">수정</td>
+                                </tr>
+
+                                <!-- group list -->
+                                <tr v-for="(li, i) in shareGroup.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
+                                  <td class="ps-1 py-2" style="word-break: break-all">
+                                    {{ shareGroup[((paging.page-1) * paging.size) + i].groupName }}
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[((paging.page-1) * paging.size) + i].auth" :value="null" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[((paging.page-1) * paging.size) + i].auth" :value="0" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[((paging.page-1) * paging.size) + i].auth" :value="1" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <!-- paging -->
+                                <tr>
+                                  <td colspan="4">
+                                    <ul class="pagination pagination-sm d-flex justify-content-center mt-3 mb-2">
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.first">
+                                          <i class="fa-solid fa-angles-left" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.before">
+                                          <i class="fa-solid fa-angle-left" />
+                                        </div>
+                                      </li>
+
+                                      <li class="page-item" v-for="li in pageList">
+                                        <div class="page-link pointer" @click="paging.page=li" :class="paging.page!==li || 'bg-secondary-subtle'">{{ li }}</div>
+                                      </li>
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.after">
+                                          <i class="fa-solid fa-angle-right" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.last">
+                                          <i class="fa-solid fa-angles-right" />
+                                        </div>
+                                      </li>
+
+                                    </ul>
+                                  </td>
+                                </tr>
+
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
                     </div>
                   </div>
 
                 </div>
-                <input type="text" class="float-end" :value="fullLink" id="fullLink" style="opacity:0; width:10px; height:0px;">
               </div>
 
             </div>
@@ -118,13 +255,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
-import Const from '@/const'
+import { computed, onMounted, ref } from 'vue'
 import Swal from 'sweetalert2'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs'
+import { Tippy } from 'tippy.vue'
 
 const props = defineProps(['tab', 'modalFunc', 'modalBody', 'setting'])
 const emit = defineEmits(['close'])
@@ -150,12 +287,80 @@ const shareGroup = ref([{
   auth: '',
 }])
 
+const paging = ref({
+  page: 1,
+  size: 5,
+  total: 0,
+  pageSize: 5,
+})
+
+const searchFilter = ref('')
+const searchGroup = computed({
+  get() {
+    let list = []
+    for(let i = 0; i < shareGroup.value.length; i++) {
+      if(shareGroup.value[i].groupName.includes(searchFilter.value)) {
+          list.push({
+            no: i,
+            shareLink: shareGroup.value[i].shareLink,
+            groupNo: shareGroup.value[i].groupNo,
+            groupName: shareGroup.value[i].groupName,
+            auth: shareGroup.value[i].auth,
+          })
+        }
+    }
+    paging.value.total = list.length
+
+    return list
+  }
+})
+
+
+// temp for test.. it will deleted
+const testGroup = () => {
+  let group = []
+  for(let i=1; i <= 54; i++) {
+    group.push({
+      shareLink: null,
+      groupNo: i,
+      groupName: i + '_name',
+      auth: i % 3 === 0 ? 0 : i % 3 === 1 ? 1 : null
+    })
+  }
+  return group
+}
+
+// paging component
+const pagingNav = ref({
+  first: 1,
+  last: 1,
+  before: 1,
+  after: 1,
+})
+
+// paging component
+const pageList = computed({
+  get() {
+    const last  = Math.ceil(paging.value.total / paging.value.size) || 1
+    const start = Math.floor((paging.value.page-1) / paging.value.pageSize) * paging.value.pageSize + 1
+    const end   = last < (start + paging.value.pageSize) ? last : start + paging.value.pageSize - 1
+
+    pagingNav.value.last    = last
+    pagingNav.value.before  = (start !== 1) ? (start - 1) : 1
+    pagingNav.value.after   = (end < last) ? (end + 1) : last
+
+    let list = []
+    for (let i = start; i <= end; i++) { list.push(i) }
+
+    return list
+  }
+})
+
 const origLink = ref('')
 
 const externalUrl = ref('')
 const nowUrl = ref('')
 const useExternalUrl = ref(true)
-
 const useExpire = ref(false)
 
 const QRLink = ref('')
@@ -169,11 +374,14 @@ onMounted(()=> {
     $http.post('/share/shareInfo', props.modalBody, null)
       .then((response) => {
         console.log('res : ', response)
-        shareGroup.value  = response.data.lists
-        share.value[0]    = response.data.option.share
-        origLink.value    = response.data.option.share.link
-        useExpire.value   = !!response.data.option.share.date
-        externalUrl.value = response.data.option.externalUrl
+        shareGroup.value    = response.data.lists
+        paging.value.total  = response.data.lists.length
+shareGroup.value= testGroup()
+paging.value.total= shareGroup.value.length
+        share.value[0]      = response.data.option.share
+        origLink.value      = response.data.option.share.link
+        useExpire.value     = !!response.data.option.share.date
+        externalUrl.value   = response.data.option.externalUrl
       })
   }
 })
@@ -228,5 +436,9 @@ const deleteFunction = () => {
 .modal-leave-to {
   transform: translateY(-20px);
   opacity: 0;
+}
+
+.page-link {
+  color: unset
 }
 </style>

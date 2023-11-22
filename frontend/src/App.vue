@@ -80,4 +80,5 @@ onMounted(() => {
 @import "@/assets/lib/fontawesome/css/brands.min.css";
 @import "@/assets/lib/fontawesome/css/solid.min.css";
 @import "@/assets/lib/fontawesome/css/regular.min.css";
+@import "tippy.js/dist/tippy.css";
 </style>
