@@ -19,6 +19,9 @@
         <option disabled value="">Select</option>
         <option value="en">English</option>
         <option value="ko">Korean</option>
+        <option v-for="locale in $i18n.availableLocales" :value="locale">
+          {{ locale.fullLanguage }}
+        </option>
       </select>
       <i class="fa-solid fa-language ps-1" style="font-size: 2rem"/>
     </div>

@@ -81,6 +81,7 @@
                         <tr v-if="useExpire">
                           <td></td>
                           <td class="py-1" colspan="2">
+                            {{$i18n.locale}}
                             <VueDatePicker
                                 v-model="share[0].date"
                                 auto-apply
@@ -88,6 +89,8 @@
                                 :month-change-on-scroll="false"
                                 :format="timeFormat"
                                 :six-weeks="'append'"
+                                :alt-position="()=>({ top: 50 })"
+
                                 year-first
                             />
                           </td>

@@ -39,7 +39,7 @@
               {{ form.shareLink + '/file?shareLink=' + li.link }}
             </div>
             <div class="d-flex">
-              <div class="flex-grow-1">
+              <div class="flex-grow-1" style="word-break:break-all">
                 <span v-if="!li.exist" class="badge text-bg-danger">Invalid</span>
                 {{ li.path }}
               </div>
