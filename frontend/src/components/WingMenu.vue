@@ -17,10 +17,8 @@
     <div class="d-flex flex-wrap pt-2">
       <select v-model="state.language" class="form-select-sm flex-grow-1" @change="languageSelect(this.value)">
         <option disabled value="">Select</option>
-        <option value="en">English</option>
-        <option value="ko">Korean</option>
         <option v-for="locale in $i18n.availableLocales" :value="locale">
-          {{ locale.fullLanguage }}
+          {{ $t('selectLanguage.'+locale) }}
         </option>
       </select>
       <i class="fa-solid fa-language ps-1" style="font-size: 2rem"/>
@@ -80,6 +78,13 @@
           </router-link>
         </div>
       </div>
+      <div class="col-12">
+        <div class="list-group list-group-flush">
+          <router-link to="/settings" class="list-group-item list-group-item-action" active-class="bg-body-secondary">
+            <i class="fa-solid fa-gear" /> 설정
+          </router-link>
+        </div>
+      </div>
     </div>
     <!-- Menu end -->
 
@@ -125,6 +130,7 @@ const closeThemeSelect = () => { themeSelect.value = false }
 const languageSelect = (language='') => {
   language = language || (state.value.language || (form.languages.includes(usePreferredLanguages()) || 'en'))
   state.value.language = language
+  window.$i18n.global.locale = language
   setLocale(language)
 }
 </script>

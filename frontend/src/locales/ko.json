@@ -1,4 +1,8 @@
 {
   "language": "ko",
-  "fullLanguage": "Korean"
+  "fullLanguage": "Korean",
+  "selectLanguage" : {
+    "en" : "영어",
+    "ko" : "한국어"
+  }
 }

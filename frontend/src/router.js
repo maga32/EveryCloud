@@ -3,6 +3,7 @@ const Sample          = () => import(/* webpackChunkName: "Sample" */ '@/pages/S
 const Sample2         = () => import(/* webpackChunkName: "Sample2" */ '@/pages/Sample2.vue')
 const File            = () => import(/* webpackChunkName: "File" */ '@/pages/file/File.vue')
 const Share           = () => import(/* webpackChunkName: "Share" */ '@/pages/share/Share.vue')
+const Settings        = () => import(/* webpackChunkName: "Settings" */ '@/pages/settings/Settings.vue')
 const UpdateUserForm  = () => import(/* webpackChunkName: "User" */ '@/pages/user/UpdateUserForm.vue')
 const LoginForm       = () => import(/* webpackChunkName: "User" */ '@/pages/user/LoginForm.vue')
 
@@ -14,6 +15,7 @@ const router = createRouter({
     { path: '/sample2',         name: 'sample2',        component: Sample2,         meta: { } },
     { path: '/file',            name: 'file',           component: File,            meta: { } },
     { path: '/share',           name: 'share',          component: Share,           meta: { } },
+    { path: '/settings',        name: 'settings',       component: Settings,        meta: { } },
     { path: '/updateUserForm',  name: 'updateUserForm', component: UpdateUserForm,  meta: { } },
     { path: '/loginForm',       name: 'loginForm',      component: LoginForm,       meta: { } },
     // 모바일 샘플
