@@ -108,7 +108,7 @@
       <div class="text-center px-2 py-3"><img src="/img/fileicons/files.png"></div>
     </template>
     <template v-else-if="setting.checkedFiles.length === 1">
-      <div class="px-1" style="word-break:break-all">{{ setting.checkedFiles[0] }}</div>
+      <div class="px-1 text-break-all">{{ setting.checkedFiles[0] }}</div>
       <div class="text-center px-2 py-3"><img :src="tempImg" style="min-width:64px" @click="showImg"></div>
     </template>
 

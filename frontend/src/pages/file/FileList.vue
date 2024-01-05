@@ -24,10 +24,10 @@
             </td>
             <td class="w-auto">
               <div>
-                <span v-if="li.extension !== 'folder'" class="fileName" style="word-break:break-all">
+                <span v-if="li.extension !== 'folder'" class="fileName text-break-all">
                   {{ li.name }}
                 </span>
-                <span v-else class="fileName pointer" @click="loadFileList('', li.path.replace(/\\/g, '/'),'','','',true)" style="word-break:break-all">
+                <span v-else class="fileName pointer text-break-all" @click="loadFileList('', li.path.replace(/\\/g, '/'),'','','',true)">
                   {{ li.name }}
                 </span>
               </div>
@@ -35,7 +35,7 @@
                 <div class="flex-shrink-0" style="width:60px">
                   {{ li.extension === 'folder' ? '-' : Utils.fileSize(li.size) }}
                 </div>
-                <div class="flex-grow-1" style="word-break:break-all; flex-basis: 110px; padding: 0 10px;">
+                <div class="flex-grow-1 text-break-all" style="flex-basis: 110px; padding: 0 10px;">
                   <div v-if="setting.search" style="min-width:55px; font-size:0.7rem;">
                     {{ (!!form.shareLink ? 'shareLink : ' + form.shareLink + ' / ' : '') + li.path }}
                   </div>

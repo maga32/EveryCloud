@@ -40,7 +40,7 @@
                   </div>
                   <div class="col-12 mb-1">
                     Link :
-                    <div style="word-break:break-all">{{ fullLink }}</div>
+                    <div class="text-break-all">{{ fullLink }}</div>
                     <div>
                       <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
                       <button class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</button>
@@ -58,7 +58,7 @@
                         </tr>
                         <tr>
                           <td>경로 수정 : </td>
-                          <td class="py-1" style="word-break:break-all">{{ share[0].path }}</td>
+                          <td class="py-1 text-break-all">{{ share[0].path }}</td>
                           <td><button class="btn btn-sm btn-outline-secondary ms-1" @click="console.log(share[0].date)">select</button></td>
                         </tr>
                         <tr>
@@ -178,7 +178,7 @@
 
                                 <!-- group list -->
                                 <tr v-for="(li, i) in shareGroup.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
-                                  <td class="ps-1 py-2" style="word-break: break-all">
+                                  <td class="ps-1 py-2 text-break-all">
                                     {{ shareGroup[((paging.page-1) * paging.size) + i].groupName }}
                                   </td>
                                   <td class="text-center">

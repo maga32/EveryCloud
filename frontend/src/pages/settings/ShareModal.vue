@@ -40,7 +40,7 @@
                   </div>
                   <div class="col-12 mb-1">
                     Link :
-                    <div style="word-break:break-all">{{ fullLink }}</div>
+                    <div class="text-break-all">{{ fullLink }}</div>
                     <div>
                       <button class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</button>
                       <button class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</button>
@@ -57,7 +57,7 @@
                         </tr>
                         <tr>
                           <td>경로 수정 : </td>
-                          <td class="py-1" style="word-break:break-all">{{ share[0].path }}</td>
+                          <td class="py-1 text-break-all">{{ share[0].path }}</td>
                           <td><button class="btn btn-sm btn-outline-secondary" @click="console.log(share[0].date)">select</button></td>
                         </tr>
                         <tr>
