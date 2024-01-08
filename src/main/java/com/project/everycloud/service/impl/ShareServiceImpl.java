@@ -7,9 +7,9 @@ import com.project.everycloud.common.exception.NotAllowedException;
 import com.project.everycloud.common.util.FileUtil;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
-import com.project.everycloud.model.request.file.NewFileDTO;
-import com.project.everycloud.model.response.share.ShareDTO;
-import com.project.everycloud.model.response.share.ShareGroupDTO;
+import com.project.everycloud.model.file.NewFileDTO;
+import com.project.everycloud.model.share.ShareDTO;
+import com.project.everycloud.model.share.ShareGroupDTO;
 import com.project.everycloud.service.SettingsService;
 import com.project.everycloud.service.ShareService;
 import com.project.everycloud.service.UserService;
@@ -18,6 +18,7 @@ import com.project.everycloud.service.mapper.ShareMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -131,6 +132,21 @@ public class ShareServiceImpl implements ShareService {
         shareMapper.createShare(newShare);
 
         return newShare;
+    }
+
+    @Override
+    @Transactional
+    public void shareUpdate(ShareDTO share, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+//        shareMapper.deleteShareGroup(share);
+//        if(share.getShareGroupList().size() > 0) {
+//            for(ShareGroupDTO shareGroup : share.getShareGroupList()) {
+//                shareMapper.insertShareGroup(shareGroup);
+//            }
+//        }
+//
+//        shareMapper.updateShare(share);
     }
 
 

@@ -2,7 +2,7 @@ package com.project.everycloud.controller.settings;
 
 import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppResponse;
-import com.project.everycloud.model.response.settings.SettingsDTO;
+import com.project.everycloud.model.settings.SettingsDTO;
 import com.project.everycloud.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

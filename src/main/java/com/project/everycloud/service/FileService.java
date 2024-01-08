@@ -2,11 +2,11 @@ package com.project.everycloud.service;
 
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
-import com.project.everycloud.model.request.file.FileListLoadDTO;
-import com.project.everycloud.model.request.file.NewFileDTO;
-import com.project.everycloud.model.request.file.UpdateFileListDTO;
-import com.project.everycloud.model.response.file.FileDetailDTO;
-import com.project.everycloud.model.response.file.FileOptionDTO;
+import com.project.everycloud.model.file.FileListLoadDTO;
+import com.project.everycloud.model.file.NewFileDTO;
+import com.project.everycloud.model.file.UpdateFileListDTO;
+import com.project.everycloud.model.file.FileDetailDTO;
+import com.project.everycloud.model.file.FileOptionDTO;
 
 public interface FileService {
 

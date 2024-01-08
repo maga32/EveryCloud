@@ -3,7 +3,7 @@ import { localize } from '@vee-validate/i18n'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import ko from '@vee-validate/i18n/dist/locale/ko.json'
 
-import { required, email, min, max, is, is_not, confirmed, alpha_num } from '@vee-validate/rules'
+import { required, email, min, max, is, is_not, confirmed, alpha_num, alpha_dash } from '@vee-validate/rules'
 
 defineRule('required', required)
 defineRule('email', email)
@@ -13,6 +13,7 @@ defineRule('is', is)
 defineRule('is_not', is_not)
 defineRule('confirmed', confirmed)
 defineRule('alpha_num', alpha_num)
+defineRule('alpha_dash', alpha_dash)
 
 // custom made
 defineRule('first_required', required)

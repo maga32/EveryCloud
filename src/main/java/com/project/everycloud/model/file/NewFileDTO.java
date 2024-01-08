@@ -1,4 +1,4 @@
-package com.project.everycloud.model.request.file;
+package com.project.everycloud.model.file;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,14 +7,12 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
-public class FileListLoadDTO {
+public class NewFileDTO {
 	@NotNull(message = "필수항목: shareLink")
 	private String shareLink;
 	@NotNull(message = "필수항목: path")
 	private String path;
-	private String sort = "name";
-	private String order = "asc";
-	private String keyword = "";
-
-	private boolean viewHidden;
+	@NotNull(message = "필수항목: name")
+	private String name;
+	private String origName;
 }

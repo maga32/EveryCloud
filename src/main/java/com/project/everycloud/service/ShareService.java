@@ -2,9 +2,9 @@ package com.project.everycloud.service;
 
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
-import com.project.everycloud.model.request.file.NewFileDTO;
-import com.project.everycloud.model.response.share.ShareDTO;
-import com.project.everycloud.model.response.share.ShareGroupDTO;
+import com.project.everycloud.model.file.NewFileDTO;
+import com.project.everycloud.model.share.ShareDTO;
+import com.project.everycloud.model.share.ShareGroupDTO;
 
 import java.util.HashMap;
 
@@ -15,6 +15,8 @@ public interface ShareService {
     AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
     String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
+
+    void shareUpdate(ShareDTO share, UserDTO sessionUser);
 
     ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
@@ -36,5 +38,4 @@ public interface ShareService {
     String getSharePassByLink(String link);
 
     String getSharePassByPath(String path);
-
 }

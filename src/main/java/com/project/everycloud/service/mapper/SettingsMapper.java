@@ -1,6 +1,6 @@
 package com.project.everycloud.service.mapper;
 
-import com.project.everycloud.model.response.settings.SettingsDTO;
+import com.project.everycloud.model.settings.SettingsDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

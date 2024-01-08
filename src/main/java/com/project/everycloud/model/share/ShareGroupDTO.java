@@ -1,4 +1,4 @@
-package com.project.everycloud.model.response.share;
+package com.project.everycloud.model.share;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

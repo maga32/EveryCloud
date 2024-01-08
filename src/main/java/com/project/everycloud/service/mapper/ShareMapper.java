@@ -1,7 +1,7 @@
 package com.project.everycloud.service.mapper;
 
-import com.project.everycloud.model.response.share.ShareDTO;
-import com.project.everycloud.model.response.share.ShareGroupDTO;
+import com.project.everycloud.model.share.ShareDTO;
+import com.project.everycloud.model.share.ShareGroupDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.HashMap;

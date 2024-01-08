@@ -1,4 +1,4 @@
-package com.project.everycloud.model.response.file;
+package com.project.everycloud.model.file;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

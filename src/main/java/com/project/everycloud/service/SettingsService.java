@@ -1,6 +1,6 @@
 package com.project.everycloud.service;
 
-import com.project.everycloud.model.response.settings.SettingsDTO;
+import com.project.everycloud.model.settings.SettingsDTO;
 
 import java.util.List;
 

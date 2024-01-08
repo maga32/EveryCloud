@@ -4,9 +4,9 @@ import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.AppResponse;
 import com.project.everycloud.model.UserDTO;
-import com.project.everycloud.model.request.file.NewFileDTO;
-import com.project.everycloud.model.response.share.ShareDTO;
-import com.project.everycloud.model.response.share.ShareGroupDTO;
+import com.project.everycloud.model.file.NewFileDTO;
+import com.project.everycloud.model.share.ShareDTO;
+import com.project.everycloud.model.share.ShareGroupDTO;
 import com.project.everycloud.service.ShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +56,16 @@ public class ShareController {
                 .setCode(ResponseType.SUCCESS.code())
                 .setMessage(ResponseType.SUCCESS.message())
                 .setData(sharedFullLink);
+    }
+
+    @PostMapping("/shareUpdate")
+    public AppResponse<Void> shareUpdate(@RequestBody ShareDTO share) {
+
+        shareService.shareUpdate(share, sessionUser());
+
+        return new AppResponse<Void>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message());
     }
 
     @PostMapping("/inputSharePass")
