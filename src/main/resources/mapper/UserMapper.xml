@@ -5,28 +5,33 @@
 <mapper namespace="com.project.everycloud.service.mapper.UserMapper">
 	
 	<select id="getUser" resultType="UserDTO">
-		SELECT ID, NICKNAME, EMAIL, AUTH, g.NO GROUP_NO, g.NAME GROUP_NAME
+		SELECT /* UserMapper.getUser */
+		    ID, NICKNAME, EMAIL, AUTH, g.NO GROUP_NO, g.NAME GROUP_NAME
 			FROM USER u, GROUP_SETTING g
 		WHERE ID = #{id} and u.GROUP_NO = g.NO
 	</select>
 
 	<select id="getUserInfo" resultType="UserDTO">
-		SELECT ID, NICKNAME, EMAIL, AUTH FROM USER
+		SELECT /* UserMapper.getUserInfo */
+		    ID, NICKNAME, EMAIL, AUTH FROM USER
 			WHERE ID = #{id}
 	</select>
 
 	<select id="getPass" resultType="string">
-		SELECT PASS FROM USER
+		SELECT /* UserMapper.getPass */
+		    PASS FROM USER
 			WHERE ID = #{id}
 	</select>
 
 	<select id="getAdmin" resultType="UserDTO">
-		SELECT ID, NICKNAME, EMAIL, AUTH FROM USER
+		SELECT /* UserMapper.getAdmin */
+		    ID, NICKNAME, EMAIL, AUTH FROM USER
 			WHERE AUTH = 'Y'
 	</select>
 
 	<update id="updateUser">
-		UPDATE USER
+		UPDATE /* UserMapper.updateUser */
+		    USER
 		    <set>
 				<if test="user.id != null and !user.id.equals('')">
 					ID = #{user.id},

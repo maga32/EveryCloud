@@ -5,59 +5,116 @@
 <mapper namespace="com.project.everycloud.service.mapper.ShareMapper">
 
 	<select id="getShareList" resultType="ShareDTO">
-		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, PASS, AUTH
-			FROM SHARE
+		SELECT /* ShareMapper.getShareList */
+		    LINK,
+		    PATH,
+			DATE,
+			METHOD,
+			PASS,
+			AUTH
+		FROM SHARE
 		WHERE PATH LIKE '%' || #{keyword} || '%'
 	</select>
 
 	<select id="getShareByLink" resultType="ShareDTO">
-		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, AUTH
-			FROM SHARE
+		SELECT /* ShareMapper.getShareByLink */
+		    LINK,
+		    PATH,
+			DATE,
+			METHOD,
+			AUTH
+		FROM SHARE
 		WHERE LINK = #{link}
 	</select>
 
 	<select id="getShareByPath" resultType="ShareDTO">
-		SELECT LINK, PATH, datetime(DATE, 'localtime') as DATE, METHOD, AUTH
-			FROM SHARE
+		SELECT /* ShareMapper.getShareByPath */
+		    LINK,
+		    PATH,
+			DATE,
+			METHOD,
+			AUTH
+		FROM SHARE
 		WHERE PATH = #{path}
 	</select>
 
 	<select id="getSharePassByLink">
-		SELECT PASS FROM SHARE
+		SELECT /* ShareMapper.getSharePassByLink */
+		    PASS FROM SHARE
 		WHERE LINK = #{link}
 	</select>
 
 	<select id="getSharePassByPath">
-		SELECT PASS FROM SHARE
+		SELECT /* ShareMapper.getSharePassByPath */
+		    PASS FROM SHARE
 		WHERE PATH = #{path}
 	</select>
 
 	<insert id="createShare" parameterType="ShareDTO">
-		INSERT INTO SHARE VALUES (#{link}, #{path}, #{date}, #{method}, #{pass}, #{auth})
+		INSERT /* ShareMapper.createShare */
+			INTO SHARE(LINK, PATH, DATE, METHOD, PASS, AUTH)
+			VALUES (
+			        #{link},
+			        #{path},
+					strftime('%Y-%m-%d 23:59:59', datetime(datetime(#{date}/1000, 'unixepoch'), 'localtime')),
+			        #{method},
+			        #{pass},
+			        #{auth}
+				   )
 	</insert>
 
+	<update id="updateShare">
+		UPDATE /* ShareMapper.updateShare */
+			SHARE
+		SET
+			LINK = #{link},
+			PATH = #{path},
+			DATE = strftime('%Y-%m-%d 23:59:59', datetime(datetime(#{date}/1000, 'unixepoch'), 'localtime')),
+			METHOD = #{method},
+			PASS = #{pass},
+			AUTH = #{auth}
+		WHERE LINK = #{origLink}
+	</update>
+
 	<select id="getShareGroup" resultType="ShareGroupDTO" parameterType="HashMap">
-		SELECT sg.SHARE_LINK, sg.GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
-			FROM SHARE_GROUP sg, GROUP_SETTING gs
-			<where>
-				<if test="shareLink != null and !shareLink.equals('')">
-					sg.SHARE_LINK = #{shareLink}
-				</if>
-				<if test="groupNo != null and !groupNo.equals('')">
-					AND sg.GROUP_NO = #{groupNo}
-				</if>
-				<if test="1==1">
-					AND sg.GROUP_NO = gs.NO
-				</if>
-			</where>
+		SELECT /* ShareMapper.getShareList */
+		    sg.SHARE_LINK,
+		    sg.GROUP_NO,
+		    gs.NAME as GROUP_NAME,
+		    sg.AUTH
+		FROM SHARE_GROUP sg, GROUP_SETTING gs
+		<where>
+			<if test="shareLink != null and !shareLink.equals('')">
+				sg.SHARE_LINK = #{shareLink}
+			</if>
+			<if test="groupNo != null and !groupNo.equals('')">
+				AND sg.GROUP_NO = #{groupNo}
+			</if>
+			<if test="1==1">
+				AND sg.GROUP_NO = gs.NO
+			</if>
+		</where>
 	</select>
 
 	<select id="getShareGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
-		SELECT sg.SHARE_LINK, gs.NO as GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
+		SELECT /* ShareMapper.getShareGroupList */
+		    sg.SHARE_LINK, gs.NO as GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
 			FROM GROUP_SETTING gs
 			LEFT JOIN SHARE_GROUP sg
 				ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
 		ORDER BY GROUP_NAME
 	</select>
+
+	<insert id="insertShareGroup" parameterType="ShareGroupDTO">
+		INSERT /* ShareMapper.insertShareGroup */
+			INTO SHARE_GROUP(SHARE_LINK, GROUP_NO, AUTH)
+			VALUES (#{shareLink}, #{groupNo}, #{auth})
+	</insert>
+
+	<delete id="deleteShareGroup" parameterType="ShareDTO">
+		DELETE /* ShareMapper.deleteShareGroup */
+			FROM SHARE_GROUP
+		WHERE SHARE_LINK = #{origLink}
+	</delete>
 
 </mapper>

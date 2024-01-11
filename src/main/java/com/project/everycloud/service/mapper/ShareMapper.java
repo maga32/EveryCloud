@@ -25,4 +25,10 @@ public interface ShareMapper {
     ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
     List<ShareGroupDTO> getShareGroupList(HashMap<String, Object> paramMap);
+
+    void insertShareGroup(ShareGroupDTO shareGroup);
+
+    void updateShare(ShareDTO share);
+
+    void deleteShareGroup(ShareDTO share);
 }

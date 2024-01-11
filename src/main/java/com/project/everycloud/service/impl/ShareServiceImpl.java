@@ -16,6 +16,8 @@ import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.FileDao;
 import com.project.everycloud.service.mapper.ShareMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,14 +141,32 @@ public class ShareServiceImpl implements ShareService {
     public void shareUpdate(ShareDTO share, UserDTO sessionUser) {
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
-//        shareMapper.deleteShareGroup(share);
-//        if(share.getShareGroupList().size() > 0) {
-//            for(ShareGroupDTO shareGroup : share.getShareGroupList()) {
-//                shareMapper.insertShareGroup(shareGroup);
-//            }
-//        }
-//
-//        shareMapper.updateShare(share);
+        // share group setting
+        shareMapper.deleteShareGroup(share);
+        if(share.getShareGroupList() != null && !share.getShareGroupList().isEmpty()) {
+            for(ShareGroupDTO shareGroup : share.getShareGroupList()) {
+                shareMapper.insertShareGroup(shareGroup);
+            }
+        }
+
+        // share password setting
+        if(share.getMethod() == 1) {
+            String oldPass = shareMapper.getSharePassByLink(share.getOrigLink());
+            if(!StringUtils.hasText(oldPass) && !StringUtils.hasText(share.getPass())) {
+                throw new NeedPasswordException();
+            } else if(!StringUtils.hasText(share.getPass())) {
+                share.setPass(oldPass);
+            } else {
+                BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
+                share.setPass(pass.encode(share.getPass()));
+            }
+        }
+
+        try {
+            shareMapper.updateShare(share);
+        } catch(UncategorizedSQLException e) {
+            throw new DuplicateKeyException("");
+        }
     }
 
 

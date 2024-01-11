@@ -194,6 +194,7 @@ import { imageThumbnail, extensions } from '@/assets/extensions'
 import FileList from './FileList.vue'
 import FileModal from './FileModal.vue'
 import Const from '@/const'
+import Utils from '@/modules/utils'
 
 const route = useRoute()
 
@@ -241,7 +242,7 @@ const checkAllFile = computed({
 const tempImg = computed({
   get() {
     const tempMap = fileList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
-    return tempMap ? imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path) : ''
+    return tempMap ? Utils.imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path, form.shareLink) : ''
   }
 })
 
@@ -344,14 +345,6 @@ const toggleHiddenCheck = () => {
   getFileList()
 }
 
-const imgSelector = (extension, isHidden, path) => {
-  if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
-    return (import.meta.env.VITE_SERVER_BASE_URL) + '/file/thumbnailMaker?shareLink=' + form.shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))
-  } else {
-    return '/img/fileicons/' + extensions[extension] + '.png'
-  }
-}
-
 /*------------------------ File Control Menu Functions ------------------------*/
 
 const downloadFiles = () => {
@@ -388,7 +381,6 @@ const fileModal = (type) => {
 
 // pass to child component
 provide('loadFileList', loadFileList)
-provide('imgSelector', imgSelector)
 provide('getFileList', getFileList)
 
 </script>

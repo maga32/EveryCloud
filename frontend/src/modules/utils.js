@@ -1,3 +1,5 @@
+import { imageThumbnail, extensions } from '@/assets/extensions'
+
 /** add comma to number
  *
  * @param value ex)1234567.89
@@ -14,6 +16,25 @@ const addComma = (value) => {
  */
 const isInteger = (number) => {
   return number % 1 === 0
+}
+
+/** translate filesize
+ *
+ * @param {number}size filesize(byte)
+ * @returns {string} xx gb(mb,kb,byte)
+ */
+const fileSize = (size) => {
+  const divSize = 1024
+
+  if(size > divSize ** 3) {
+    return (size/divSize ** 3).toFixed(2) + "gb"
+  } else if(size > divSize ** 2) {
+    return (size/divSize ** 2).toFixed(1) + "mb"
+  } else if(size > divSize) {
+    return (size/divSize).toFixed(1) + "kb"
+  } else {
+    return size + "byte"
+  }
 }
 
 /** If String doesn't end with '/', add '/' end of the String
@@ -43,22 +64,19 @@ const backSlashToSlash = (str) => {
   return str.replaceAll("\\", "/")
 }
 
-/** translate filesize
+/** select image's thumbnail
  *
- * @param {number}size filesize(byte)
- * @returns {string} xx gb(mb,kb,byte)
+ * @param extension
+ * @param isHidden
+ * @param path
+ * @param shareLink
+ * @returns String
  */
-const fileSize = (size) => {
-  const divSize = 1024
-
-  if(size > divSize ** 3) {
-    return (size/divSize ** 3).toFixed(2) + "gb"
-  } else if(size > divSize ** 2) {
-    return (size/divSize ** 2).toFixed(1) + "mb"
-  } else if(size > divSize) {
-    return (size/divSize).toFixed(1) + "kb"
+const imgSelector = (extension, isHidden, path, shareLink='') => {
+  if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
+    return (import.meta.env.VITE_SERVER_BASE_URL) + '/file/thumbnailMaker?shareLink=' + shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))
   } else {
-    return size + "byte"
+    return '/img/fileicons/' + extensions[extension] + '.png'
   }
 }
 
@@ -69,4 +87,5 @@ export default {
   addSlash,
   backSlashToSlash,
   removeSlash,
+  imgSelector,
 }

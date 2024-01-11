@@ -18,7 +18,7 @@
                   </template>
 
                 </h1>
-                <button type="button" class="btn-close" @click="$emit('close', false)"></button>
+                <div class="btn-close" @click="$emit('close', false)"></div>
               </div>
 
               <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
@@ -45,8 +45,8 @@
                       <div class="text-break-all">{{ fullLink }}</div>
                       <div>
                         <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
-                        <button class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</button>
-                        <button class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</button>
+                        <div class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</div>
+                        <div class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</div>
                         <img v-show="QRShow" :src="QRCodeSrc" class="pt-2">
                       </div>
                     </div>
@@ -57,14 +57,14 @@
                           <tr>
                             <td style="width: 105px">링크 수정 : </td>
                             <td colspan="2" class="py-1">
-                              <Field type="text" class="form-control-sm" name="changeLink" label="링크" rules="alpha_dash|required" v-model="share[0].link"/>
+                              <Field type="text" class="form-control-sm" name="changeLink" label="링크" :rules="{ required: true, regex: /^(?:(?!\=|\?|\\|\/|\.).)*$/ }" v-model="share[0].link"/>
                               <ErrorMessage name="changeLink" as="p" class="text-danger" />
                             </td>
                           </tr>
                           <tr>
                             <td>경로 수정 : </td>
                             <td class="py-1 text-break-all">{{ share[0].path }}</td>
-                            <td><button class="btn btn-sm btn-outline-secondary ms-1" @click="console.log(share[0].date)">select</button></td>
+                            <td><div class="btn btn-sm btn-outline-secondary ms-1" @click="modalOn=true">select</div></td>
                           </tr>
                           <tr>
                             <td>만료 기한 : </td>
@@ -267,15 +267,17 @@
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-danger me-4" @click="deleteFunction">삭제</button>
-                <button type="button" class="btn btn-secondary" @click="$emit('close', false)">취소</button>
-                <button type="button" class="btn btn-primary" @click="submit">확인</button>
+                <div class="btn btn-danger me-4" @click="deleteFunction">삭제</div>
+                <div class="btn btn-secondary" @click="$emit('close', false)">취소</div>
+                <div class="btn btn-primary" @click="submit">확인</div>
               </div>
             </div>
           </div>
         </div>
       </Form>
     </transition>
+
+
   </div>
 </template>
 
@@ -287,7 +289,7 @@ import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs'
 import { Tippy } from 'tippy.vue'
-import Const from "@/const";
+import Const from '@/const'
 
 const props = defineProps(['tab', 'modalFunc', 'modalBody', 'setting'])
 const emit = defineEmits(['close'])
@@ -305,6 +307,13 @@ const share = ref([{
   auth: '',
   exist: '',
 }])
+
+const form = ref({
+  shareLink: '',
+  path: '/',
+})
+
+const modalOn = ref(false)
 
 const sharePass = ref('')
 
@@ -450,6 +459,11 @@ const shareGroupList = () => {
 
   return list
 }
+
+const closeModal = (reload, checkedFiles) => {
+  modalOn.value = false
+}
+
 /*-------------------- modal submit --------------------*/
 const submit = async () => {
   let result = false
@@ -468,14 +482,14 @@ const submit = async () => {
 
     await $http.post('/share/shareUpdate', params, null)
       .then((response) => {
-        if(response) result = true
+        if(response.code === Const.RESPONSE_TYPE.SUCCESS) result = true
       }
     )
   }
 
   if(!result) return false
 
-  emit('close', result)
+  emit('close', true)
 }
 
 const deleteFunction = () => {

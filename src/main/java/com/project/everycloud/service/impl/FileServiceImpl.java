@@ -91,6 +91,12 @@ public class FileServiceImpl implements FileService {
 		options.setShareLink(shareLink);
 		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
 
+		String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
+				? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
+				: "/";
+
+		options.setParentPath(parentPath);
+
 		result.setOption(options);
 		result.setLists(fileList(sharePath, path, fileListLoad.getSort(), fileListLoad.getOrder(), fileListLoad.getKeyword(), fileListLoad.isViewHidden()));
 		result.setTotal(result.getLists().size());

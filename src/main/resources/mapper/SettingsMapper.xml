@@ -4,12 +4,16 @@
 
 <mapper namespace="com.project.everycloud.service.mapper.SettingsMapper">
 	<select id="getSettings" resultType="SettingsDTO">
-		SELECT * FROM SETTINGS WHERE TYPE = #{type}
+		SELECT /* SettingsMapper.getSettings */
+		    *
+		FROM SETTINGS
+		WHERE TYPE = #{type}
 	</select>
 
 	<select id="getMeta" resultType="SettingsDTO">
-		SELECT META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS, EXTERNAL_URL
-			FROM SETTINGS
+		SELECT /* SettingsMapper.getMeta */
+		    META_TITLE, META_AUTHOR, META_DESCRIPTION, META_KEYWORDS, EXTERNAL_URL
+		FROM SETTINGS
 		WHERE TYPE = 'admin'
 	</select>
 

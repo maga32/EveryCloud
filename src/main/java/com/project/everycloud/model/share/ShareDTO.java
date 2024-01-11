@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShareDTO {
-    private String OrigLink;
+    private String origLink;
     private String link;
     private String path;
     private Timestamp date;

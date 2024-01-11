@@ -20,7 +20,7 @@
               <input v-else type="checkbox" class="form-check-input checkFile" v-model="setting.checkedFiles" :value="li.name">
             </td>
             <td class="text-center py-2" style="width:80px">
-              <img class="fileImg" :src="imgSelector(li.extension, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
+              <img class="fileImg" :src="Utils.imgSelector(li.extension, li.isHidden, li.path, form.shareLink)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
             </td>
             <td class="w-auto">
               <div>
@@ -77,7 +77,6 @@ const labelClick = (e) => {
  * @params shareLink<br> path<br> sort<br> order<br> keyword<br> resetKeyword = false
  */
 const loadFileList = inject('loadFileList')
-const imgSelector = inject('imgSelector')
 
 </script>
 
