@@ -277,7 +277,14 @@
       </Form>
     </transition>
 
-
+    <FileModal
+      v-if="modalOn"
+      :form="form"
+      :extensions="extensions"
+      modalFunc="selectFile"
+      @selectedFile="selectPath"
+      @close="closeModal"
+    />
   </div>
 </template>
 
@@ -290,6 +297,8 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs'
 import { Tippy } from 'tippy.vue'
 import Const from '@/const'
+import { extensions } from '@/assets/extensions'
+import FileModal from '@/pages/file/FileModal.vue'
 
 const props = defineProps(['tab', 'modalFunc', 'modalBody', 'setting'])
 const emit = defineEmits(['close'])
@@ -310,7 +319,7 @@ const share = ref([{
 
 const form = ref({
   shareLink: '',
-  path: '/',
+  path: '',
 })
 
 const modalOn = ref(false)
@@ -416,6 +425,7 @@ onMounted(()=> {
 shareGroup.value = testGroup()
 paging.value.total = shareGroup.value.length
           share.value[0] = response.data.option.share
+          form.value.path = share.value[0].path
           origLink.value = response.data.option.share.link
           useExpire.value = !!response.data.option.share.date
           externalUrl.value = response.data.option.externalUrl
@@ -460,6 +470,10 @@ const shareGroupList = () => {
   return list
 }
 
+const selectPath = (path) => {
+  share.value[0].path = path
+}
+
 const closeModal = (reload, checkedFiles) => {
   modalOn.value = false
 }
@@ -471,7 +485,7 @@ const submit = async () => {
   if(props.modalFunc === 'shareList') {
     const params = {
       origLink        : origLink.value,
-      link            : share.value[0].link,
+      link            : share.value[0].link.trim(),
       path            : share.value[0].path,
       method          : share.value[0].method,
       date            : (useExpire.value ? share.value[0].date : null),
@@ -482,7 +496,7 @@ const submit = async () => {
 
     await $http.post('/share/shareUpdate', params, null)
       .then((response) => {
-        if(response.code === Const.RESPONSE_TYPE.SUCCESS) result = true
+        result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
       }
     )
   }

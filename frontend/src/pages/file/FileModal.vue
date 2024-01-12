@@ -21,6 +21,9 @@
                     </div>
                   </div>
                 </template>
+                <template v-else-if="modalFunc === 'selectFile'">
+                  {{ moveTo.nowPath }}
+                </template>
                 <template v-else-if="modalFunc === 'showImg'">
                   <span>
                     <i class="btn btn-outline-secondary fa-solid fa-minus ms-2" @click="zoom -= (zoom < 0.2 ? 0 : (zoom < 3.1 ? 0.1 : (zoom < 8.1 ? 0.5 : 1)))"/>
@@ -51,21 +54,21 @@
                 <div class="text-danger">아래 {{ setting.checkedFiles.length }} 개의 파일을 삭제하시겠습니까?</div>
                 <div v-for="li in setting.checkedFiles"> {{ li }} </div>
               </div>
-              <div v-else-if="modalFunc === 'copyFiles' || modalFunc === 'moveFiles'">
+              <div v-else-if="modalFunc === 'copyFiles' || modalFunc === 'moveFiles' || modalFunc === 'selectFile'">
 
                 <table>
                   <!-- upper directory -->
-                  <tr v-if="moveTo.parentPath !== moveTo.nowPath" class="pointer" @click="loadFolders(moveTo.parentPath)">
+                  <tr v-if="moveTo.parentPath !== moveTo.nowPath" class="pointer" @click="loadFiles(moveTo.parentPath)">
                     <td class='text-center py-2' style='width:50px'>
                       <img class="fileImg" :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
                     </td>
                     <td class='w-auto'>..</td>
                   </tr>
 
-                  <!-- directory list -->
-                  <tr v-for="li in moveTo.folderList" class="pointer" @click="loadFolders(li.path.replace(/\\/g, '/'))">
+                  <!-- file list -->
+                  <tr v-for="li in moveTo.folderList" class="pointer" @click="loadFiles(li.path.replace(/\\/g, '/'))">
                     <td class='text-center py-2' style='width:50px'>
-                      <img class='fileImg' :src="'/img/fileicons/' + extensions['folder'] + '.png'" loading="lazy">
+                      <img class='fileImg' :src="Utils.imgSelector(li.extension, li.isDirectory, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
                     </td>
                     <td class='w-auto'>
                       <div>{{ li.name }}</div>
@@ -136,6 +139,7 @@ const functionModalLabel = {
   shareFile     : '공유',
   needPassword  : '비밀번호 입력',
   showImg       : '사진보기',
+  selectFile    : '파일선택:',
 }
 
 const reload = ref(false)
@@ -160,8 +164,8 @@ const moveTo = reactive({
 })
 
 onMounted(()=> {
-  if(props.modalFunc === 'moveFiles' || props.modalFunc === 'copyFiles') {
-    loadFolders(props.form.path)
+  if(props.modalFunc === 'moveFiles' || props.modalFunc === 'copyFiles' || props.modalFunc === 'selectFile') {
+    loadFiles(props.form.path)
   } else if(props.modalFunc === 'changeName') {
     origName.value = props.setting.checkedFiles[0]
     newName.value = origName.value
@@ -188,12 +192,15 @@ const imgStyle = computed({
   }
 })
 /*------------------------ functions ------------------------*/
-const loadFolders = (path) => {
+const loadFiles = (path, type='folderList') => {
+  if(props.modalFunc === 'selectFile') type = 'fileList'
   moveTo.invalidText = ''
 
-  $http.post('/file/folderList', {path: path, shareLink: props.form.shareLink}, null)
+  $http.post('/file/'+type, {path: path, shareLink: props.form.shareLink}, null)
     .then((response) => {
-      if(response.data) {
+      if(type === 'fileList' && response && response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
+        loadFiles('', type)
+      } else if(response.data) {
         moveTo.parentPath = response.data.option.parentPath
         moveTo.nowPath    = response.data.option.nowPath
         moveTo.folderList = response.data.lists
@@ -216,7 +223,7 @@ const moveFilesNewFolder = () => {
       }
       $http.post('/file/newFolder', params, null)
         .then((response) => {
-          loadFolders(params.path)
+          loadFiles(params.path)
           if(Utils.addSlash(Utils.backSlashToSlash(params.path)) === Utils.addSlash(props.form.path)) {
             reload.value = true
             reloadCheckedFiles.value = props.setting.checkedFiles
@@ -335,6 +342,11 @@ const submit = async () => {
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
         })
+
+  // select file
+  } else if(props.modalFunc === 'selectFile') {
+    emit('selectedFile',moveTo.nowPath)
+    result = true
   }
 
   if(!result) return false

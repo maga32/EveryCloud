@@ -25,7 +25,7 @@
     </div>
 
     <!-- File List -->
-    <div id="shareList">
+    <div id="shareList" class="pe-0 pe-md-3">
 
       <table v-for="li in shareList" class="w-100 rounded border-bottom">
         <tr @click="editShareModal(li.link)">

@@ -169,7 +169,6 @@
     :form="form"
     :setting="setting"
     :fileList="fileList"
-    :imageThumbnail="imageThumbnail"
     :extensions="extensions"
   />
 
@@ -190,7 +189,7 @@
 import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
-import { imageThumbnail, extensions } from '@/assets/extensions'
+import { extensions } from '@/assets/extensions'
 import FileList from './FileList.vue'
 import FileModal from './FileModal.vue'
 import Const from '@/const'
@@ -242,7 +241,7 @@ const checkAllFile = computed({
 const tempImg = computed({
   get() {
     const tempMap = fileList.value.filter(obj => obj.name === setting.checkedFiles[0])[0]
-    return tempMap ? Utils.imgSelector(tempMap.extension, tempMap.isHidden, tempMap.path, form.shareLink) : ''
+    return tempMap ? Utils.imgSelector(tempMap.extension, tempMap.isDirectory, tempMap.isHidden, tempMap.path, form.shareLink) : ''
   }
 })
 
