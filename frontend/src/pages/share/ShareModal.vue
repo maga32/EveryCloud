@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-12 mb-1">
                       Link :
-                      <div class="text-break-all">{{ fullLink }}</div>
+                      <div class="text-break-all">{{ fullLink.replaceAll(' ', '&nbsp;') }}</div>
                       <div>
                         <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
                         <div class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</div>
@@ -361,20 +361,6 @@ const searchGroup = computed({
   }
 })
 
-// temp for test.. it will be deleted
-const testGroup = () => {
-  let group = []
-  for(let i=1; i <= 54; i++) {
-    group.push({
-      shareLink: null,
-      groupNo: i,
-      groupName: i + '_name',
-      auth: i % 3 === 0 ? 0 : i % 3 === 1 ? 1 : null
-    })
-  }
-  return group
-}
-
 // paging component
 const pagingNav = ref({
   first: 1,
@@ -422,8 +408,6 @@ onMounted(()=> {
           console.log('res : ', response)
           shareGroup.value = response.data.lists
           paging.value.total = response.data.lists.length
-shareGroup.value = testGroup()
-paging.value.total = shareGroup.value.length
           share.value[0] = response.data.option.share
           form.value.path = share.value[0].path
           origLink.value = response.data.option.share.link
@@ -515,12 +499,28 @@ const deleteFunction = () => {
     showDenyButton: true,
     denyButtonText: '삭제',
     cancelButtonText: '취소',
-  }).then((result) => {
-    if (result.isDenied) {
-      Swal.fire({ icon: 'success', text: '삭제되었습니다.', timer: 1200, showConfirmButton: false })
-      emit('close', true)
+  }).then(
+    async(result) => {
+
+      if (result.isDenied) {
+        let resultOk = false
+
+        if(props.modalFunc === 'shareList') {
+          await $http.post('/share/shareDelete', null, {params: {link: origLink.value}})
+            .then((response) => {
+              if (response?.code === Const.RESPONSE_TYPE.SUCCESS) {
+                resultOk = true
+              }
+            })
+        }
+
+        if(!resultOk) return false
+        Swal.fire({ icon: 'success', text: '삭제되었습니다.', timer: 1200, showConfirmButton: false })
+        emit('close', true)
+      }
+
     }
-  })
+  )
 }
 
 </script>

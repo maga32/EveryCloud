@@ -68,6 +68,16 @@ public class ShareController {
                 .setMessage(ResponseType.SUCCESS.message());
     }
 
+    @PostMapping("/shareDelete")
+    public AppResponse<Void> shareDelete(@RequestParam("link") String link) {
+
+        shareService.shareDelete(link, sessionUser());
+
+        return new AppResponse<Void>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message());
+    }
+
     @PostMapping("/inputSharePass")
     public AppResponse<Void> inputSharePass(@RequestParam("sharePass") String sharePass) {
 

@@ -117,4 +117,10 @@
 		WHERE SHARE_LINK = #{origLink}
 	</delete>
 
+	<delete id="deleteShare">
+		DELETE /* ShareMapper.deleteShare */
+			FROM SHARE
+		WHERE LINK = #{link}
+	</delete>
+
 </mapper>

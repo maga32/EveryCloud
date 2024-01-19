@@ -31,4 +31,6 @@ public interface ShareMapper {
     void updateShare(ShareDTO share);
 
     void deleteShareGroup(ShareDTO share);
+
+    void deleteShare(String link);
 }

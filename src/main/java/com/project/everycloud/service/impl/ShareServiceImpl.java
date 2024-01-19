@@ -169,6 +169,20 @@ public class ShareServiceImpl implements ShareService {
         }
     }
 
+    @Override
+    @Transactional
+    public void shareDelete(String link, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        // delete share group
+        ShareDTO share = new ShareDTO();
+        share.setOrigLink(link);
+        shareMapper.deleteShareGroup(share);
+
+        // delete share
+        shareMapper.deleteShare(link);
+    }
+
 
     static BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(10);
     @Override

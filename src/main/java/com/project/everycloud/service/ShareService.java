@@ -18,6 +18,8 @@ public interface ShareService {
 
     void shareUpdate(ShareDTO share, UserDTO sessionUser);
 
+    void shareDelete(String link, UserDTO sessionUser);
+
     ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
     UserDTO inputSharePass(String sharePass, UserDTO sessionUser);

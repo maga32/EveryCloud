@@ -36,7 +36,7 @@
           </td>
           <td class="w-auto py-2 pe-3">
             <div class="text-gray text-break-all" style="font-size:0.8rem">
-              {{ form.shareLink + '/file?shareLink=' + li.link }}
+              {{ form.shareLink + '/file?shareLink=' + li.link.replaceAll(' ', '&nbsp;') }}
             </div>
             <div class="d-flex">
               <div class="flex-grow-1 text-break-all">
