@@ -69,6 +69,7 @@ const modalBody = ref({})
 const openModal = () => { modalOn.value = true }
 const closeModal = (reload) => {
   modalOn.value = false
+  setModalBody(null)
   if(reload) reloadTab.value++
 }
 

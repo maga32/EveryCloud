@@ -11,6 +11,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,21 @@ public class SettingsServiceImpl implements SettingsService {
     public SettingsDTO getSettings(String type) {
         return settingsMapper.getSettings(type);
     }
+
+    @Override
+    public String getSpecificSetting(String column) {
+        String result = "";
+
+        SettingsDTO settings = getSettings("admin");
+        try {
+            Field field = settings.getClass().getDeclaredField(column);
+            field.setAccessible(true);
+            result = field.get(settings).toString();
+        } catch (Exception e) { throw new RuntimeException(e); }
+
+        return result;
+    }
+
 
     @Override
     public SettingsDTO getMeta() {

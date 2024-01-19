@@ -2,7 +2,7 @@
   <div>
     <div class="modal-backdrop fade show"></div>
     <transition name="modal" appear>
-      <Form>
+      <Form @submit="submit">
         <div @click.self="$emit('close', false)" class="modal fade show" style="display: block" id="functionModal">
           <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
@@ -269,7 +269,7 @@
               <div class="modal-footer">
                 <div class="btn btn-danger me-4" @click="deleteFunction">삭제</div>
                 <div class="btn btn-secondary" @click="$emit('close', false)">취소</div>
-                <div class="btn btn-primary" @click="submit">확인</div>
+                <button class="btn btn-primary" @click="submit">확인</button>
               </div>
             </div>
           </div>
@@ -289,7 +289,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import Swal from 'sweetalert2'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import VueDatePicker from '@vuepic/vue-datepicker'
@@ -402,20 +402,32 @@ onMounted(()=> {
   nowUrl.value = window.location.origin
 
   if(props.modalFunc === 'shareList') {
-    $http.post('/share/shareInfo', props.modalBody, null)
-      .then((response) => {
-        if(response.data) {
-          console.log('res : ', response)
-          shareGroup.value = response.data.lists
-          paging.value.total = response.data.lists.length
-          share.value[0] = response.data.option.share
-          form.value.path = share.value[0].path
-          origLink.value = response.data.option.share.link
-          useExpire.value = !!response.data.option.share.date
-          externalUrl.value = response.data.option.externalUrl
-        }
-      })
+    if(props.modalBody?.shareLink && (typeof props.modalBody?.shareLink === 'string')) {
+      $http.post('/share/shareInfo', props.modalBody, null)
+        .then((response) => {
+          if(response.data) {
+            shareGroup.value = response.data.lists
+            paging.value.total = response.data.lists.length
+            share.value[0] = response.data.option.share
+            form.value.path = share.value[0].path
+            origLink.value = response.data.option.share.link
+            useExpire.value = !!response.data.option.share.date
+            externalUrl.value = response.data.option.externalUrl
+          }
+        })
+    } else {
+      $http.post('/settings/getSetting', null, {params:{setting: 'externalUrl'}})
+        .then((response) => {
+          if(response.data) {
+            externalUrl.value = response.data
+          }
+        })
+    }
   }
+})
+
+onUnmounted(() => {
+  setModalBody(null)
 })
 
 const fullLink = computed({
@@ -523,6 +535,7 @@ const deleteFunction = () => {
   )
 }
 
+const setModalBody = inject('setModalBody')
 </script>
 
 <style scoped>

@@ -10,20 +10,20 @@ import java.util.List;
 /**
  * return List type
  *
- * @param <T1> ListDTO
- * @param <T2> Option Object
+ * @param <L> ListDTO
+ * @param <O> Option Object
  */
 @Data
 @ToString
 @NoArgsConstructor
 @Accessors (chain = true)
-public class AppList<T1 ,T2> {
+public class AppList<L ,O> {
     // list count
     private long total;
 
     // content
-    private List<T1> lists;
+    private List<L> lists;
 
     // option
-    private T2 option;
+    private O option;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -12,7 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ShareDTO {
     private String origLink;
+    @NotBlank(message = "필수항목: link")
     private String link;
+    @NotBlank(message = "필수항목: path")
     private String path;
     private Timestamp date;
     private Integer method;

@@ -59,7 +59,7 @@ public class ShareController {
     }
 
     @PostMapping("/shareUpdate")
-    public AppResponse<Void> shareUpdate(@RequestBody ShareDTO share) {
+    public AppResponse<Void> shareUpdate(@Valid @RequestBody ShareDTO share) {
 
         shareService.shareUpdate(share, sessionUser());
 

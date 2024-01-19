@@ -9,6 +9,8 @@ public interface SettingsService {
 
     SettingsDTO getSettings(String type);
 
+    String getSpecificSetting(String column);
+
     SettingsDTO getMeta();
 
     void setPort(int port);

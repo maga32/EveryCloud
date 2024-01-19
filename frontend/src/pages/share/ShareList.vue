@@ -4,11 +4,12 @@
     <div class="col-0 col-md-3"></div>
     <div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
       <div class="row rounded-bottom border border-top-0 p-2 m-0 bg-light-subtle">
-        <div class="col-5"></div>
+        <div class="col-4"></div>
         <div class="col-6 px-2">
           <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareList">
         </div>
         <div class="col-1 pointer" @click="loadShareList"><i class="fa-solid fa-magnifying-glass" /></div>
+        <div class="col-1 pointer" @click="editShareModal"><i class="fa-solid fa-share-from-square" /></div>
       </div>
     </div>
   </div>
@@ -77,16 +78,15 @@ const loadShareList = () => {
   props.setting.loadingList = true
 
   $http.post('/share/shareList', form, null)
-      .then((response) => {
-        console.log(response)
-        if(response.code === Const.RESPONSE_TYPE.NOT_ALLOWED) {
-          router.go(-1)
-        } else if(response.data) {
-          shareList.value = response.data.lists
-          form.shareLink = response.data.option
-        }
-        props.setting.loadingList = false
-      })
+    .then((response) => {
+      if(response.code === Const.RESPONSE_TYPE.NOT_ALLOWED) {
+        router.go(-1)
+      } else if(response.data) {
+        shareList.value = response.data.lists
+        form.shareLink = response.data.option
+      }
+      props.setting.loadingList = false
+    })
 }
 
 const editShareModal = (shareLink) => {
