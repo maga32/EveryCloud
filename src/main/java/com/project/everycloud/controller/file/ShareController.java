@@ -26,22 +26,22 @@ public class ShareController {
     HttpSession session;
 
     @PostMapping("/shareList")
-    public AppResponse<AppList<ShareDTO, String>> getShareList(@RequestBody HashMap<String, Object> paramMap) {
+    public AppResponse<AppList<ShareDTO>> getShareList(@RequestBody HashMap<String, Object> paramMap) {
 
-        AppList<ShareDTO, String> shareList = shareService.getShareList(paramMap, sessionUser());
+        AppList<ShareDTO> shareList = shareService.getShareList(paramMap, sessionUser());
 
-        return new AppResponse<AppList<ShareDTO, String>>()
+        return new AppResponse<AppList<ShareDTO>>()
                 .setCode(ResponseType.SUCCESS.code())
                 .setMessage(ResponseType.SUCCESS.message())
                 .setData(shareList);
     }
 
     @PostMapping("/shareInfo")
-    public AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>> getShareInfo(@RequestBody HashMap<String, Object> paramMap) {
+    public AppResponse<AppList<ShareGroupDTO>> getShareInfo(@RequestBody HashMap<String, Object> paramMap) {
 
-        AppList<ShareGroupDTO, HashMap<String, Object>> shareInfo = shareService.getShareInfo(paramMap, sessionUser());
+        AppList<ShareGroupDTO> shareInfo = shareService.getShareInfo(paramMap, sessionUser());
 
-        return new AppResponse<AppList<ShareGroupDTO, HashMap<String, Object>>>()
+        return new AppResponse<AppList<ShareGroupDTO>>()
                 .setCode(ResponseType.SUCCESS.code())
                 .setMessage(ResponseType.SUCCESS.message())
                 .setData(shareInfo);

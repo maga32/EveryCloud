@@ -47,11 +47,11 @@ public class ShareServiceImpl implements ShareService {
     ShareMapper shareMapper;
 
     @Override
-    public AppList<ShareDTO, String> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+    public AppList<ShareDTO> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
-        AppList<ShareDTO, String> share = new AppList<ShareDTO, String>();
+        AppList<ShareDTO> share = new AppList<ShareDTO>();
         List<ShareDTO> tempList =  shareMapper.getShareList(paramMap);
         List<ShareDTO> shareList =  new ArrayList<ShareDTO>();
 
@@ -67,11 +67,11 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+    public AppList<ShareGroupDTO> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
-        AppList<ShareGroupDTO, HashMap<String, Object>> result = new AppList<ShareGroupDTO, HashMap<String, Object>>();
+        AppList<ShareGroupDTO> result = new AppList<ShareGroupDTO>();
         List<ShareGroupDTO> groupList = shareMapper.getShareGroupList(paramMap);
         HashMap<String, Object> shareMap = new HashMap<String, Object>();
 

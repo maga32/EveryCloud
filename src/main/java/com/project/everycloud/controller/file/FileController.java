@@ -41,11 +41,11 @@ public class FileController {
 	HttpSession session;
 
 	@PostMapping("/fileList")
-	public AppResponse<AppList<FileDetailDTO, FileOptionDTO>> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
+	public AppResponse<AppList<FileDetailDTO>> getFileList(@Valid @RequestBody FileListLoadDTO fileListLoad) {
 
-		AppList<FileDetailDTO, FileOptionDTO> fileList = fileService.getFileList(fileListLoad, sessionUser());
+		AppList<FileDetailDTO> fileList = fileService.getFileList(fileListLoad, sessionUser());
 
-		return new AppResponse<AppList<FileDetailDTO, FileOptionDTO>>()
+		return new AppResponse<AppList<FileDetailDTO>>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message())
 				.setData(fileList);
@@ -53,11 +53,11 @@ public class FileController {
 
 
 	@PostMapping("/folderList")
-	public AppResponse<AppList<FileDetailDTO, FileOptionDTO>> getFolderList(@Valid @RequestBody FileListLoadDTO folderListLoad) {
+	public AppResponse<AppList<FileDetailDTO>> getFolderList(@Valid @RequestBody FileListLoadDTO folderListLoad) {
 
-		AppList<FileDetailDTO, FileOptionDTO> folderList = fileService.getFolderList(folderListLoad, sessionUser());
+		AppList<FileDetailDTO> folderList = fileService.getFolderList(folderListLoad, sessionUser());
 
-		return new AppResponse<AppList<FileDetailDTO, FileOptionDTO>>()
+		return new AppResponse<AppList<FileDetailDTO>>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message())
 				.setData(folderList);

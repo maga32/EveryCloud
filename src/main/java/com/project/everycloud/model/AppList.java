@@ -11,13 +11,12 @@ import java.util.List;
  * return List type
  *
  * @param <L> ListDTO
- * @param <O> Option Object
  */
 @Data
 @ToString
 @NoArgsConstructor
 @Accessors (chain = true)
-public class AppList<L ,O> {
+public class AppList<L> {
     // list count
     private long total;
 
@@ -25,5 +24,5 @@ public class AppList<L ,O> {
     private List<L> lists;
 
     // option
-    private O option;
+    private Object option;
 }

@@ -10,9 +10,9 @@ import java.util.HashMap;
 
 public interface ShareService {
 
-    AppList<ShareDTO, String> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser);
+    AppList<ShareDTO> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
-    AppList<ShareGroupDTO, HashMap<String, Object>> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
+    AppList<ShareGroupDTO> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
     String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
 

@@ -10,9 +10,9 @@ import com.project.everycloud.model.file.FileOptionDTO;
 
 public interface FileService {
 
-	AppList<FileDetailDTO, FileOptionDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
+	AppList<FileDetailDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser);
 
-	AppList<FileDetailDTO, FileOptionDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser);
+	AppList<FileDetailDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser);
 
 	void newFile(NewFileDTO newFile, UserDTO sessionUser, String type);
 

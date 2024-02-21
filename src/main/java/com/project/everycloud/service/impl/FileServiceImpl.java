@@ -45,8 +45,8 @@ public class FileServiceImpl implements FileService {
 	FileDao fileDao;
 
 	@Override
-	public AppList<FileDetailDTO, FileOptionDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
-		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
+	public AppList<FileDetailDTO> getFileList(FileListLoadDTO fileListLoad, UserDTO sessionUser) {
+		AppList<FileDetailDTO> result = new AppList<FileDetailDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
 		boolean isAdmin = userService.isAdmin(sessionUser);
@@ -168,8 +168,8 @@ public class FileServiceImpl implements FileService {
 
 
 	@Override
-	public AppList<FileDetailDTO, FileOptionDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser) {
-		AppList<FileDetailDTO, FileOptionDTO> result = new AppList<FileDetailDTO, FileOptionDTO>();
+	public AppList<FileDetailDTO> getFolderList(FileListLoadDTO folderListLoad, UserDTO sessionUser) {
+		AppList<FileDetailDTO> result = new AppList<FileDetailDTO>();
 		FileOptionDTO options = new FileOptionDTO();
 
 		boolean isAdmin = userService.isAdmin(sessionUser);
