@@ -47,10 +47,32 @@ public class ShareController {
                 .setData(shareInfo);
     }
 
+    @PostMapping("/shareNewInfo")
+    public AppResponse<AppList<ShareGroupDTO>> getShareNewInfo() {
+
+        AppList<ShareGroupDTO> shareInfo = shareService.getShareNewInfo(sessionUser());
+
+        return new AppResponse<AppList<ShareGroupDTO>>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(shareInfo);
+    }
+
     @PostMapping("/shareNewFile")
     public AppResponse<String> shareNewFile(@Valid @RequestBody NewFileDTO shareNewFile) {
 
         String sharedFullLink = shareService.shareNewFile(shareNewFile, sessionUser());
+
+        return new AppResponse<String>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(sharedFullLink);
+    }
+
+    @PostMapping("/shareNewDetailFile")
+    public AppResponse<String> shareNewDetailFile(@Valid @RequestBody ShareDTO shareNewFile) {
+
+        String sharedFullLink = shareService.shareNewDetailFile(shareNewFile, sessionUser());
 
         return new AppResponse<String>()
                 .setCode(ResponseType.SUCCESS.code())

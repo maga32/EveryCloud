@@ -14,7 +14,11 @@ public interface ShareService {
 
     AppList<ShareGroupDTO> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
+    AppList<ShareGroupDTO> getShareNewInfo(UserDTO sessionUser);
+
     String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
+
+    String shareNewDetailFile(ShareDTO shareNewFile, UserDTO sessionUser);
 
     void shareUpdate(ShareDTO share, UserDTO sessionUser);
 

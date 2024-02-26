@@ -22,14 +22,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.sqlite.SQLiteException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ShareServiceImpl implements ShareService {
@@ -87,6 +85,24 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
+    public AppList<ShareGroupDTO> getShareNewInfo(UserDTO sessionUser) {
+
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        AppList<ShareGroupDTO> result = new AppList<ShareGroupDTO>();
+        HashMap<String, Object> shareMap = new HashMap<String, Object>();
+
+        List<ShareGroupDTO> groupList = shareMapper.getShareGroupList(shareMap);
+        shareMap.put("link", createNewShareLink());
+        shareMap.put("externalUrl", settingsService.getSettings("admin").getExternalUrl());
+
+        result.setLists(groupList);
+        result.setOption(shareMap);
+
+        return result;
+    }
+
+    @Override
     public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
@@ -119,12 +135,46 @@ public class ShareServiceImpl implements ShareService {
         return result;
     }
 
-    private ShareDTO createShare(String realPath) {
-        String link = "";
-        while(true) {
-            link = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
-            if(shareMapper.getShareByLink(link) == null) break;
+    @Override
+    public String shareNewDetailFile(ShareDTO shareNewFile, UserDTO sessionUser) {
+
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        String result = "";
+        String path = shareNewFile.getPath();
+
+        if(fileDao.isPathExist(path)) {
+            File nowPath = fileDao.getFile(path);
+            String realPath;
+            try {
+                realPath = FileUtil.macPath(nowPath.getCanonicalPath());
+            } catch (IOException e) {
+                realPath = FileUtil.macPath(nowPath.getPath());
+            }
+
+            // already exist share check
+            ShareDTO pathCheck = shareMapper.getShareByPath(realPath);
+            if(pathCheck != null) throw new DuplicateKeyException("error");
+            ShareDTO linkCheck = shareMapper.getShareByLink(shareNewFile.getLink());
+            if(linkCheck != null) throw new DuplicateKeyException("error");
+
+            // create new share
+            shareNewFile.setOrigLink(createShare(realPath).getLink());
+
+            // update new share
+            shareUpdate(shareNewFile, sessionUser);
+
+            result = shareNewFile.getLink();
+
+        } else {
+            throw new InvalidPathException("Error","error");
         }
+
+        return result;
+    }
+
+    private ShareDTO createShare(String realPath) {
+        String link = createNewShareLink();
         ShareDTO newShare = new ShareDTO();
         newShare.setLink(link);
         newShare.setPath(realPath);
@@ -134,6 +184,15 @@ public class ShareServiceImpl implements ShareService {
         shareMapper.createShare(newShare);
 
         return newShare;
+    }
+
+    private String createNewShareLink() {
+        String link = "";
+        while(true) {
+            link = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10);
+            if (shareMapper.getShareByLink(link) == null) break;
+        }
+        return link;
     }
 
     @Override

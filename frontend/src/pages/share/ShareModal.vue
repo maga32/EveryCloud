@@ -269,7 +269,7 @@
               <div class="modal-footer">
                 <div class="btn btn-danger me-4" @click="deleteFunction">삭제</div>
                 <div class="btn btn-secondary" @click="$emit('close', false)">취소</div>
-                <button class="btn btn-primary" @click="submit">확인</button>
+                <button class="btn btn-primary">확인</button>
               </div>
             </div>
           </div>
@@ -416,10 +416,15 @@ onMounted(()=> {
           }
         })
     } else {
-      $http.post('/settings/getSetting', null, {params:{setting: 'externalUrl'}})
+      $http.post('/share/shareNewInfo', null)
         .then((response) => {
           if(response.data) {
-            externalUrl.value = response.data
+            shareGroup.value = response.data.lists
+            externalUrl.value = response.data.option.externalUrl
+            share.value[0].link = response.data.option.link
+            share.value[0].auth = 0
+            share.value[0].method = 0
+            share.value[0].path = '/'
           }
         })
     }
@@ -490,16 +495,30 @@ const submit = async () => {
       shareGroupList  : ((share.value[0].method === 2) ? shareGroupList() : null),
     }
 
-    await $http.post('/share/shareUpdate', params, null)
-      .then((response) => {
-        result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
-      }
-    )
+    if(params.origLink) {
+      // update share
+      await $http.post('/share/shareUpdate', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+          if(result) modifySuccess()
+        })
+    } else {
+      // create share
+      await $http.post('/share/shareNewDetailFile', params, null)
+        .then((response) => {
+          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+          if(result) copyShareLink()
+        })
+    }
   }
 
   if(!result) return false
 
   emit('close', true)
+}
+
+const modifySuccess = async() => {
+  Swal.fire({ icon: 'success', text: '수정되었습니다.', timer: 1200, showConfirmButton: false })
 }
 
 const deleteFunction = () => {
