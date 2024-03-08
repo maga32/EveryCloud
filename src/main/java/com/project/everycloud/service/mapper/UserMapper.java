@@ -4,11 +4,14 @@ import com.project.everycloud.model.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Mapper
 public interface UserMapper {
 
 	UserDTO getUser(String id);
+
+	List<UserDTO> getUserList(HashMap<String, Object> paramMap);
 
 	UserDTO getUserInfo(String id);
 

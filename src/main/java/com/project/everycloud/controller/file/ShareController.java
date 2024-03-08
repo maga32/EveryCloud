@@ -110,6 +110,28 @@ public class ShareController {
                 .setMessage(ResponseType.SUCCESS.message());
     }
 
+    @PostMapping("/groupList")
+    public AppResponse<AppList<ShareGroupDTO>> getGroupList(@RequestBody HashMap<String, Object> paramMap) {
+
+        AppList<ShareGroupDTO> shareList = shareService.getGroupList(paramMap, sessionUser());
+
+        return new AppResponse<AppList<ShareGroupDTO>>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(shareList);
+    }
+
+    @PostMapping("/groupInfo")
+    public AppResponse<AppList<UserDTO>> getGroupInfo(@RequestBody HashMap<String, Object> paramMap) {
+
+        AppList<UserDTO> shareInfo = shareService.getGroupInfo(paramMap, sessionUser());
+
+        return new AppResponse<AppList<UserDTO>>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(shareInfo);
+    }
+
     private UserDTO sessionUser() {
         return (UserDTO) session.getAttribute("user");
     }

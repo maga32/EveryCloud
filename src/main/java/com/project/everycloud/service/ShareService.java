@@ -28,6 +28,10 @@ public interface ShareService {
 
     UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
 
+    AppList<ShareGroupDTO> getGroupList(HashMap<String, Object> paramMap, UserDTO sessionUser);
+
+    AppList<UserDTO> getGroupInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
+
     /**
      * Verify user's authentication for shareLink
      *

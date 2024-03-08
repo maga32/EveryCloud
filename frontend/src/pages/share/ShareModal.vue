@@ -2,275 +2,391 @@
   <div>
     <div class="modal-backdrop fade show"></div>
     <transition name="modal" appear>
-      <Form @submit="submit">
-        <div @click.self="$emit('close', false)" class="modal fade show" style="display: block" id="functionModal">
-          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-            <div class="modal-content">
+      <Form @submit="submit" @click.self="$emit('close', false)" class="modal fade show" style="display: block" id="functionModal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div class="modal-content">
 
-              <div class="modal-header">
-                <h1 class="modal-title fs-5 text-break w-100 pe-3" id="functionModalLabel">
-                  {{ functionModalLabel[modalFunc] }}
+            <div class="modal-header">
+              <h1 class="modal-title fs-5 text-break w-100 pe-3" id="functionModalLabel">
+                {{ functionModalLabel[modalFunc] }}
 
-                  <template if="modalFunc === 'showImg'">
-                    <span>
-                      <i class="btn btn-outline-secondary fa-solid fa-minus ms-2" />
-                    </span>
-                  </template>
+                <template if="modalFunc === 'showImg'">
+                  <span>
+                    <i class="btn btn-outline-secondary fa-solid fa-minus ms-2" />
+                  </span>
+                </template>
 
-                </h1>
-                <div class="btn-close" @click="$emit('close', false)"></div>
+              </h1>
+              <div class="btn-close" @click="$emit('close', false)"></div>
+            </div>
+
+            <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
+
+              <!-- shareList START -->
+              <div v-if="modalFunc === 'shareList'">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="form-check me-3" style="display:inline-block">
+                      <input class="form-check-input" type="radio" v-model="useExternalUrl" :value="true" name="useUrl" id="externalUrl">
+                      <label class="form-check-label pointer" for="externalUrl">
+                        기본주소
+                      </label>
+                    </div>
+                    <div class="form-check" style="display:inline-block">
+                      <input class="form-check-input" type="radio" v-model="useExternalUrl" :value="false" name="useUrl" id="nowUrl">
+                      <label class="form-check-label pointer" for="nowUrl">
+                        현재주소
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-12 mb-1">
+                    Link :
+                    <div class="text-break-all">{{ fullLink.replaceAll(' ', '&nbsp;') }}</div>
+                    <div>
+                      <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
+                      <div class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</div>
+                      <div class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</div>
+                      <img v-show="QRShow" :src="QRCodeSrc" class="pt-2">
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-lg-6 pt-2 px-1">
+                    <div class="border rounded p-2">
+                      <table class="w-100">
+                        <tr>
+                          <td style="width: 105px">링크 수정 : </td>
+                          <td colspan="2" class="py-1">
+                            <Field type="text" class="form-control-sm" name="changeLink" label="링크" :rules="{ required: true, regex: /^(?:(?!\=|\?|\\|\/|\.).)*$/ }" v-model="share.link"/>
+                            <ErrorMessage name="changeLink" as="p" class="text-danger" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>경로 수정 : </td>
+                          <td class="py-1 text-break-all">{{ share.path }}</td>
+                          <td><div class="btn btn-sm btn-outline-secondary ms-1" @click="modalOn=true">select</div></td>
+                        </tr>
+                        <tr>
+                          <td>만료 기한 : </td>
+                          <td class="py-1" colspan="2">
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="useExpire" :value="false" name="useExpire" id="notUseExpire">
+                              <label class="form-check-label pointer" for="notUseExpire">
+                                미사용
+                              </label>
+                            </div>
+                            <div class="form-check" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="useExpire" :value="true" name="useExpire" id="useExpire">
+                              <label class="form-check-label pointer" for="useExpire">
+                                사용
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr v-if="useExpire">
+                          <td></td>
+                          <td class="py-1" colspan="2">
+                            <VueDatePicker
+                                v-model="share.date"
+                                auto-apply
+                                :enable-time-picker="false"
+                                :month-change-on-scroll="false"
+                                :format="timeFormat"
+                                six-weeks="append"
+                                :auto-position="false"
+                                position="right"
+                                :locale="$i18n.locale"
+                                year-first
+                            />
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="col-12 col-lg-6 pt-2 px-1">
+                    <div class="border rounded p-2">
+                      <table class="w-100">
+
+                        <tr>
+                          <td style="min-width: 90px">공유 방식 : </td>
+                          <td class="py-1">
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share.method" :value="0" name="shareMethod" id="shareByLink">
+                              <label class="form-check-label pointer" for="shareByLink">
+                                링크
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">링크를 알고 있는 모든 사용자</tippy>
+                                </i>
+                              </label>
+                            </div>
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share.method" :value="1" name="shareMethod" id="shareByPass">
+                              <label class="form-check-label pointer" for="shareByPass">
+                                암호
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">비밀번호 입력 필요</tippy>
+                                </i>
+                              </label>
+                            </div>
+                            <div class="form-check" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share.method" :value="2" name="shareMethod" id="shareByGroup">
+                              <label class="form-check-label pointer" for="shareByGroup">
+                                그룹
+                                <i class="fa-solid fa-circle-question">
+                                  <tippy target="_parent">그룹별 공유 지정</tippy>
+                                </i>
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <tr v-if="share.method !== 2">
+                          <td style="width: 105px">유저 권한 : </td>
+                          <td class="py-1" colspan="2">
+                            <div class="form-check me-3" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share.auth" :value="0" name="shareAuth" id="shareAuthDown">
+                              <label class="form-check-label pointer" for="shareAuthDown">
+                                다운로드
+                              </label>
+                            </div>
+                            <div class="form-check" style="display:inline-block">
+                              <input class="form-check-input" type="radio" v-model="share.auth" :value="1" name="shareAuth" id="shareAuthUpdate">
+                              <label class="form-check-label pointer" for="shareAuthUpdate">
+                                수정
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <!-- password share -->
+                        <tr v-if="share.method === 1">
+                          <td class="pt-3">비밀번호 : </td>
+                          <td class="pt-3">
+                            <input type="password" class="form-control-sm" v-model="sharePass">
+                          </td>
+                        </tr>
+
+                        <!-- group share -->
+                        <tr v-if="share.method === 2">
+                          <td colspan="2">
+                            <div class="rounded border p-2 mt-3">
+                              <table class="w-100">
+
+                                <tr>
+                                  <td class="py-2" colspan="4">
+                                    <div class="hstack gap-2 d-flex justify-content-end align-items-center">
+                                      <input type="text" class="border border-secondary rounded-5 px-2" placeholder="Filter" v-model="searchFilter">
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr class="border-bottom text-center fw-bold">
+                                  <td class="pt-2 pb-3">그룹명</td>
+                                  <td class="pt-2 pb-3">권한없음</td>
+                                  <td class="pt-2 pb-3">다운로드</td>
+                                  <td class="pt-2 pb-3">수정</td>
+                                </tr>
+
+                                <!-- group list -->
+                                <tr v-for="(li, i) in searchGroup.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
+                                  <td class="ps-1 py-2 text-break-all">
+                                    {{ shareGroup[li.no].groupName }}
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="null" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="0" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="form-check" style="display:inline-block">
+                                      <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="1" :name="'groupAuth'+i">
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <!-- paging -->
+                                <tr>
+                                  <td colspan="4">
+                                    <ul class="pagination pagination-sm d-flex justify-content-center mt-3 mb-2">
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.first">
+                                          <i class="fa-solid fa-angles-left" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.before">
+                                          <i class="fa-solid fa-angle-left" />
+                                        </div>
+                                      </li>
+
+                                      <li class="page-item" v-for="li in pageList">
+                                        <div class="page-link pointer" @click="paging.page=li" :class="paging.page!==li || 'bg-secondary-subtle'">{{ li }}</div>
+                                      </li>
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.after">
+                                          <i class="fa-solid fa-angle-right" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.last">
+                                          <i class="fa-solid fa-angles-right" />
+                                        </div>
+                                      </li>
+
+                                    </ul>
+                                  </td>
+                                </tr>
+
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- group share -->
+
+                      </table>
+                    </div>
+                  </div>
+
+                </div>
               </div>
+              <!-- shareList END -->
 
-              <div class="modal-body" id="functionModalBody" @keyup.enter="submit">
 
-                <!-- shareList START -->
-                <div v-if="modalFunc === 'shareList'">
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="form-check me-3" style="display:inline-block">
-                        <input class="form-check-input" type="radio" v-model="useExternalUrl" :value="true" name="useUrl" id="externalUrl">
-                        <label class="form-check-label pointer" for="externalUrl">
-                          기본주소
-                        </label>
-                      </div>
-                      <div class="form-check" style="display:inline-block">
-                        <input class="form-check-input" type="radio" v-model="useExternalUrl" :value="false" name="useUrl" id="nowUrl">
-                        <label class="form-check-label pointer" for="nowUrl">
-                          현재주소
-                        </label>
-                      </div>
+              <!-- shareGroup START -->
+              <div v-if="modalFunc === 'shareGroup'">
+                <div class="row">
+                  <div class="col-12 col-lg-6 pt-2 px-1">
+                    <div class="border rounded p-2">
+                      <table class="w-100">
+                        <tr>
+                          <td style="width: 105px">
+                            <span v-if="groupForm.groupNo === 1">
+                              기본
+                            </span>
+                            그룹명 :
+                          </td>
+                          <td colspan="2" class="py-1">
+                            <Field type="text" class="form-control-sm" name="changeGroupName" rules="required" v-model="groupForm.groupName"/>
+                            <ErrorMessage name="changeGroupName" as="p" class="text-danger" />
+                          </td>
+                        </tr>
+                      </table>
                     </div>
-                    <div class="col-12 mb-1">
-                      Link :
-                      <div class="text-break-all">{{ fullLink.replaceAll(' ', '&nbsp;') }}</div>
-                      <div>
-                        <input type="text" class="visually-hidden-focusable" :value="fullLink" id="fullLink">
-                        <div class="btn btn-sm btn-secondary me-2" @click="copyShareLink">복사</div>
-                        <div class="btn btn-sm btn-secondary me-2" @click="QRShow = !QRShow">QR code</div>
-                        <img v-show="QRShow" :src="QRCodeSrc" class="pt-2">
-                      </div>
+                  </div>
+                  <div class="col-12 col-lg-6 pt-2 px-1">
+                    <div class="border rounded p-2">
+                      <table class="w-100">
+                        <tr>
+                          <td>그룹수정</td>
+                        </tr>
+                        <tr>
+                          <td colspan="2">
+                            <div class="rounded border p-2 mt-3">
+                              <table class="w-100">
+
+                                <tr>
+                                  <td class="py-2" colspan="2">
+                                    <div class="pe-3">
+                                      <select class="form-select form-select-sm" v-model="selectedUserFilter">
+                                        <option v-for="(value, key) in userFilter" :value="key">{{value}}</option>
+                                      </select>
+                                    </div>
+                                  </td>
+                                  <td class="py-2" colspan="3">
+                                    <div class="hstack gap-2 d-flex justify-content-end align-items-center">
+                                      <input type="text" class="border border-secondary rounded-5 px-2" placeholder="Filter" v-model="searchFilter">
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr class="border-bottom text-center fw-bold">
+                                  <td class="pt-2 pb-3">id</td>
+                                  <td class="pt-2 pb-3">닉네임</td>
+                                  <td class="pt-2 pb-3">현재그룹</td>
+                                  <td class="pt-2 pb-3">추가</td>
+                                  <td class="pt-2 pb-3">제거</td>
+                                </tr>
+
+                                <!-- user list -->
+                                <tr v-for="(li, i) in searchUser.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
+                                  <td class="ps-1 py-2 text-break-all">
+                                    {{ shareUser[li.no].id }}
+                                  </td>
+                                  <td class="ps-1 py-2 text-break-all">
+                                    {{ shareUser[li.no].nickname }}
+                                  </td>
+                                  <td class="text-center">
+                                    {{ shareUser[li.no].groupName }}
+                                  </td>
+                                  <td class="text-center">
+                                    <i class="fa-solid fa-plus-circle text-success" />
+                                  </td>
+                                  <td class="text-center">
+                                    <i class="fa-solid fa-minus-circle text-danger" />
+                                  </td>
+                                </tr>
+
+                                <!-- paging -->
+                                <tr>
+                                  <td colspan="4">
+                                    <ul class="pagination pagination-sm d-flex justify-content-center mt-3 mb-2">
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.first">
+                                          <i class="fa-solid fa-angles-left" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.before">
+                                          <i class="fa-solid fa-angle-left" />
+                                        </div>
+                                      </li>
+
+                                      <li class="page-item" v-for="li in pageList">
+                                        <div class="page-link pointer" @click="paging.page=li" :class="paging.page!==li || 'bg-secondary-subtle'">{{ li }}</div>
+                                      </li>
+
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.after">
+                                          <i class="fa-solid fa-angle-right" />
+                                        </div>
+                                      </li>
+                                      <li class="page-item">
+                                        <div class="page-link pointer" @click="paging.page=pagingNav.last">
+                                          <i class="fa-solid fa-angles-right" />
+                                        </div>
+                                      </li>
+
+                                    </ul>
+                                  </td>
+                                </tr>
+
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- group share -->
+
+                      </table>
                     </div>
-
-                    <div class="col-12 col-lg-6 pt-2 px-1">
-                      <div class="border rounded p-2">
-                        <table class="w-100">
-                          <tr>
-                            <td style="width: 105px">링크 수정 : </td>
-                            <td colspan="2" class="py-1">
-                              <Field type="text" class="form-control-sm" name="changeLink" label="링크" :rules="{ required: true, regex: /^(?:(?!\=|\?|\\|\/|\.).)*$/ }" v-model="share[0].link"/>
-                              <ErrorMessage name="changeLink" as="p" class="text-danger" />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>경로 수정 : </td>
-                            <td class="py-1 text-break-all">{{ share[0].path }}</td>
-                            <td><div class="btn btn-sm btn-outline-secondary ms-1" @click="modalOn=true">select</div></td>
-                          </tr>
-                          <tr>
-                            <td>만료 기한 : </td>
-                            <td class="py-1" colspan="2">
-                              <div class="form-check me-3" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="useExpire" :value="false" name="useExpire" id="notUseExpire">
-                                <label class="form-check-label pointer" for="notUseExpire">
-                                  미사용
-                                </label>
-                              </div>
-                              <div class="form-check" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="useExpire" :value="true" name="useExpire" id="useExpire">
-                                <label class="form-check-label pointer" for="useExpire">
-                                  사용
-                                </label>
-                              </div>
-                            </td>
-                          </tr>
-                          <tr v-if="useExpire">
-                            <td></td>
-                            <td class="py-1" colspan="2">
-                              <VueDatePicker
-                                  v-model="share[0].date"
-                                  auto-apply
-                                  :enable-time-picker="false"
-                                  :month-change-on-scroll="false"
-                                  :format="timeFormat"
-                                  six-weeks="append"
-                                  :auto-position="false"
-                                  position="right"
-                                  :locale="$i18n.locale"
-                                  year-first
-                              />
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
-                    </div>
-                    <div class="col-12 col-lg-6 pt-2 px-1">
-                      <div class="border rounded p-2">
-                        <table class="w-100">
-
-                          <tr>
-                            <td style="min-width: 90px">공유 방식 : </td>
-                            <td class="py-1">
-                              <div class="form-check me-3" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="share[0].method" :value="0" name="shareMethod" id="shareByLink">
-                                <label class="form-check-label pointer" for="shareByLink">
-                                  링크
-                                  <i class="fa-solid fa-circle-question">
-                                    <tippy target="_parent">링크를 알고 있는 모든 사용자</tippy>
-                                  </i>
-                                </label>
-                              </div>
-                              <div class="form-check me-3" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="share[0].method" :value="1" name="shareMethod" id="shareByPass">
-                                <label class="form-check-label pointer" for="shareByPass">
-                                  암호
-                                  <i class="fa-solid fa-circle-question">
-                                    <tippy target="_parent">비밀번호 입력 필요</tippy>
-                                  </i>
-                                </label>
-                              </div>
-                              <div class="form-check" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="share[0].method" :value="2" name="shareMethod" id="shareByGroup">
-                                <label class="form-check-label pointer" for="shareByGroup">
-                                  그룹
-                                  <i class="fa-solid fa-circle-question">
-                                    <tippy target="_parent">그룹별 공유 지정</tippy>
-                                  </i>
-                                </label>
-                              </div>
-                            </td>
-                          </tr>
-
-                          <tr v-if="share[0].method !== 2">
-                            <td style="width: 105px">유저 권한 : </td>
-                            <td class="py-1" colspan="2">
-                              <div class="form-check me-3" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="share[0].auth" :value="0" name="shareAuth" id="shareAuthDown">
-                                <label class="form-check-label pointer" for="shareAuthDown">
-                                  다운로드
-                                </label>
-                              </div>
-                              <div class="form-check" style="display:inline-block">
-                                <input class="form-check-input" type="radio" v-model="share[0].auth" :value="1" name="shareAuth" id="shareAuthUpdate">
-                                <label class="form-check-label pointer" for="shareAuthUpdate">
-                                  수정
-                                </label>
-                              </div>
-                            </td>
-                          </tr>
-
-                          <!-- password share -->
-                          <tr v-if="share[0].method === 1">
-                            <td class="pt-3">비밀번호 : </td>
-                            <td class="pt-3">
-                              <input type="password" class="form-control-sm" v-model="sharePass">
-                            </td>
-                          </tr>
-
-                          <!-- group share -->
-                          <tr v-if="share[0].method === 2">
-                            <td colspan="2">
-                              <div class="rounded border p-2 mt-3">
-                                <table class="w-100">
-
-                                  <tr>
-                                    <td class="py-2" colspan="4">
-                                      <div class="hstack gap-2 d-flex justify-content-end align-items-center">
-                                        <input type="text" class="border border-secondary rounded-5 px-2" placeholder="Filter" v-model="searchFilter">
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr class="border-bottom text-center fw-bold">
-                                    <td class="pt-2 pb-3">그룹명</td>
-                                    <td class="pt-2 pb-3">권한없음</td>
-                                    <td class="pt-2 pb-3">다운로드</td>
-                                    <td class="pt-2 pb-3">수정</td>
-                                  </tr>
-
-                                  <!-- group list -->
-                                  <tr v-for="(li, i) in searchGroup.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
-                                    <td class="ps-1 py-2 text-break-all">
-                                      {{ shareGroup[li.no].groupName }}
-                                    </td>
-                                    <td class="text-center">
-                                      <div class="form-check" style="display:inline-block">
-                                        <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="null" :name="'groupAuth'+i">
-                                      </div>
-                                    </td>
-                                    <td class="text-center">
-                                      <div class="form-check" style="display:inline-block">
-                                        <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="0" :name="'groupAuth'+i">
-                                      </div>
-                                    </td>
-                                    <td class="text-center">
-                                      <div class="form-check" style="display:inline-block">
-                                        <input class="form-check-input" type="radio" v-model="shareGroup[li.no].auth" :value="1" :name="'groupAuth'+i">
-                                      </div>
-                                    </td>
-                                  </tr>
-
-                                  <!-- paging -->
-                                  <tr>
-                                    <td colspan="4">
-                                      <ul class="pagination pagination-sm d-flex justify-content-center mt-3 mb-2">
-
-                                        <li class="page-item">
-                                          <div class="page-link pointer" @click="paging.page=pagingNav.first">
-                                            <i class="fa-solid fa-angles-left" />
-                                          </div>
-                                        </li>
-                                        <li class="page-item">
-                                          <div class="page-link pointer" @click="paging.page=pagingNav.before">
-                                            <i class="fa-solid fa-angle-left" />
-                                          </div>
-                                        </li>
-
-                                        <li class="page-item" v-for="li in pageList">
-                                          <div class="page-link pointer" @click="paging.page=li" :class="paging.page!==li || 'bg-secondary-subtle'">{{ li }}</div>
-                                        </li>
-
-                                        <li class="page-item">
-                                          <div class="page-link pointer" @click="paging.page=pagingNav.after">
-                                            <i class="fa-solid fa-angle-right" />
-                                          </div>
-                                        </li>
-                                        <li class="page-item">
-                                          <div class="page-link pointer" @click="paging.page=pagingNav.last">
-                                            <i class="fa-solid fa-angles-right" />
-                                          </div>
-                                        </li>
-
-                                      </ul>
-                                    </td>
-                                  </tr>
-
-                                </table>
-                              </div>
-                            </td>
-                          </tr>
-                          <!-- group share -->
-
-                        </table>
-                      </div>
-                    </div>
-
                   </div>
                 </div>
-                <!-- shareList END -->
-
-
-                <!-- shareGroup START -->
-                <!-- shareGroup END -->
-
-                <!-- shareLog START -->
-                <!-- shareLog END -->
-
               </div>
+              <!-- shareGroup END -->
 
-              <div class="modal-footer">
-                <div class="btn btn-danger me-4" @click="deleteFunction">삭제</div>
-                <div class="btn btn-secondary" @click="$emit('close', false)">취소</div>
-                <button class="btn btn-primary">확인</button>
-              </div>
+              <!-- shareLog START -->
+              <!-- shareLog END -->
+
+            </div>
+
+            <div class="modal-footer">
+              <div v-if="isUpdate" class="btn btn-danger me-4" @click="deleteFunction">삭제</div>
+              <div class="btn btn-secondary" @click="$emit('close', false)">취소</div>
+              <button class="btn btn-primary">확인</button>
             </div>
           </div>
         </div>
@@ -279,7 +395,7 @@
 
     <FileModal
       v-if="modalOn"
-      :form="form"
+      :form="shareForm"
       :extensions="extensions"
       modalFunc="selectFile"
       @selectedFile="selectPath"
@@ -305,9 +421,12 @@ const emit = defineEmits(['close'])
 
 const functionModalLabel = {
   shareList: '파일공유',
+  shareGroup: '그룹관리',
 }
 
-const share = ref([{
+const isUpdate = ref(false)
+
+const share = ref({
   link: '',
   path: '',
   date:'',
@@ -315,11 +434,18 @@ const share = ref([{
   pass: '',
   auth: '',
   exist: '',
-}])
+})
 
-const form = ref({
+const shareForm = ref({
   shareLink: '',
   path: '',
+})
+
+const groupForm = ref({
+  groupNo: '',
+  groupName: '',
+  sort: 'id',
+  order: 'asc',
 })
 
 const modalOn = ref(false)
@@ -333,6 +459,13 @@ const shareGroup = ref([{
   auth: '',
 }])
 
+const shareUser = ref([{
+  id: '',
+  nickname: '',
+  groupNo: '',
+  groupName: '',
+}])
+
 const paging = ref({
   page: 1,
   size: 5,
@@ -341,19 +474,55 @@ const paging = ref({
 })
 
 const searchFilter = ref('')
+const userFilter = ref({
+  id: 'id',
+  nickname: '닉네임',
+  groupName: '그룹명',
+})
+const selectedUserFilter = ref('id')
+
+// search group in shareList
 const searchGroup = computed({
   get() {
     let list = []
     for(let i = 0; i < shareGroup.value.length; i++) {
       if(shareGroup.value[i].groupName.includes(searchFilter.value)) {
-          list.push({
-            no: i,
-            shareLink: shareGroup.value[i].shareLink,
-            groupNo: shareGroup.value[i].groupNo,
-            groupName: shareGroup.value[i].groupName,
-            auth: shareGroup.value[i].auth,
-          })
-        }
+        list.push({
+          no: i,
+          shareLink: shareGroup.value[i].shareLink,
+          groupNo: shareGroup.value[i].groupNo,
+          groupName: shareGroup.value[i].groupName,
+          auth: shareGroup.value[i].auth,
+        })
+      }
+    }
+    paging.value.total = list.length
+
+    return list
+  }
+})
+
+// search user in groupList
+const searchUser = computed({
+  get() {
+    let list = []
+    for(let i = 0; i < shareUser.value.length; i++) {
+      let isFiltered = false
+
+      if(selectedUserFilter.value==='id'        && shareUser.value[i].id.includes(searchFilter.value)       ||
+         selectedUserFilter.value==='nickname'  && shareUser.value[i].nickname.includes(searchFilter.value) ||
+         selectedUserFilter.value==='groupName' && shareUser.value[i].groupName.includes(searchFilter.value)
+        ) { isFiltered = true }
+
+      if(isFiltered) {
+        list.push({
+          no: i,
+          id: shareUser.value[i].id,
+          nickname: shareUser.value[i].nickname,
+          groupNo: shareUser.value[i].groupNo,
+          groupName: shareUser.value[i].groupName,
+        })
+      }
     }
     paging.value.total = list.length
 
@@ -399,17 +568,21 @@ const QRCodeSrc = useQRCode(QRLink)
 const QRShow = ref(false)
 
 onMounted(()=> {
+  isUpdate.value = false
   nowUrl.value = window.location.origin
 
+  // shareList
   if(props.modalFunc === 'shareList') {
     if(props.modalBody?.shareLink && (typeof props.modalBody?.shareLink === 'string')) {
+      isUpdate.value = true
+      
       $http.post('/share/shareInfo', props.modalBody, null)
         .then((response) => {
           if(response.data) {
             shareGroup.value = response.data.lists
             paging.value.total = response.data.lists.length
-            share.value[0] = response.data.option.share
-            form.value.path = share.value[0].path
+            share.value = response.data.option.share
+            shareForm.value.path = share.value.path
             origLink.value = response.data.option.share.link
             useExpire.value = !!response.data.option.share.date
             externalUrl.value = response.data.option.externalUrl
@@ -421,13 +594,30 @@ onMounted(()=> {
           if(response.data) {
             shareGroup.value = response.data.lists
             externalUrl.value = response.data.option.externalUrl
-            share.value[0].link = response.data.option.link
-            share.value[0].auth = 0
-            share.value[0].method = 0
-            share.value[0].path = '/'
+            share.value.link = response.data.option.link
+            share.value.auth = 0
+            share.value.method = 0
+            share.value.path = '/'
           }
         })
     }
+  // shareGroup
+  } else if(props.modalFunc === 'shareGroup') {
+    if(props.modalBody?.groupNo && props.modalBody.groupNo > 1) {
+      isUpdate.value = true
+    }
+
+    groupForm.value.groupNo = props.modalBody.groupNo
+
+    $http.post('/share/groupInfo', groupForm.value, null)
+      .then((response) => {
+        if(response.data) {
+          shareUser.value = response.data.lists
+          paging.value.total = response.data.lists.length
+          groupForm.value.groupName = response.data.option.groupName
+        }
+      })
+
   }
 })
 
@@ -437,7 +627,7 @@ onUnmounted(() => {
 
 const fullLink = computed({
   get() {
-    const result = (useExternalUrl.value ? externalUrl.value : nowUrl.value) + '/file?shareLink=' + share.value[0].link
+    const result = (useExternalUrl.value ? externalUrl.value : nowUrl.value) + '/file?shareLink=' + share.value.link
     QRLink.value = result
     return result
   }
@@ -460,7 +650,7 @@ const shareGroupList = () => {
   for(let i = 0; i < shareGroup.value.length; i++) {
     if(shareGroup.value[i].auth != null) {
       list.push({
-        shareLink: share.value[0].link,
+        shareLink: share.value.link,
         groupNo: shareGroup.value[i].groupNo,
         auth: shareGroup.value[i].auth,
       })
@@ -472,7 +662,7 @@ const shareGroupList = () => {
 }
 
 const selectPath = (path) => {
-  share.value[0].path = path
+  share.value.path = path
 }
 
 const closeModal = (reload, checkedFiles) => {
@@ -486,13 +676,13 @@ const submit = async () => {
   if(props.modalFunc === 'shareList') {
     const params = {
       origLink        : origLink.value,
-      link            : share.value[0].link.trim(),
-      path            : share.value[0].path,
-      method          : share.value[0].method,
-      date            : (useExpire.value ? share.value[0].date : null),
-      auth            : share.value[0].auth,
-      pass            : ((share.value[0].method === 1) ? sharePass.value : null),
-      shareGroupList  : ((share.value[0].method === 2) ? shareGroupList() : null),
+      link            : share.value.link.trim(),
+      path            : share.value.path,
+      method          : share.value.method,
+      date            : (useExpire.value ? share.value.date : null),
+      auth            : share.value.auth,
+      pass            : ((share.value.method === 1) ? sharePass.value : null),
+      shareGroupList  : ((share.value.method === 2) ? shareGroupList() : null),
     }
 
     if(params.origLink) {

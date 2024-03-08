@@ -3,6 +3,7 @@ package com.project.everycloud.service;
 import com.project.everycloud.model.UserDTO;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface UserService {
 
@@ -21,6 +22,14 @@ public interface UserService {
 	 * @return UserDTO
 	 */
 	UserDTO getUser(String id);
+
+	/**
+	 * return all UserDTO List
+	 *
+	 * @param paramMap
+	 * @return List&lt;UserDTO&gt;
+	 */
+	List<UserDTO> getUserList(HashMap<String, Object> paramMap);
 
 	/**
 	 * return UserDTO(id,nickname,email,auth) by user id

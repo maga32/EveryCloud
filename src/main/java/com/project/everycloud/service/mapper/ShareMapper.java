@@ -33,4 +33,6 @@ public interface ShareMapper {
     void deleteShareGroup(ShareDTO share);
 
     void deleteShare(String link);
+
+    List<ShareGroupDTO> getGroupList(HashMap<String, Object> paramMap);
 }

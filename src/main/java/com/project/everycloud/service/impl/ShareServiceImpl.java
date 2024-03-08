@@ -242,6 +242,51 @@ public class ShareServiceImpl implements ShareService {
         shareMapper.deleteShare(link);
     }
 
+    @Override
+    public ShareGroupDTO getShareGroup(String shareLink, Integer groupNo) {
+        return shareMapper.getShareGroup(shareLink, groupNo);
+    }
+
+    @Override
+    public UserDTO inputSharePass(String sharePass, UserDTO sessionUser) {
+        sessionUser = sessionUser != null ? sessionUser : new UserDTO();
+        sessionUser.setSharePass(sharePass);
+
+        return sessionUser;
+    }
+
+
+    @Override
+    public AppList<ShareGroupDTO> getGroupList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        AppList<ShareGroupDTO> result = new AppList<ShareGroupDTO>();
+        List<ShareGroupDTO> groupList = shareMapper.getGroupList(paramMap);
+        result.setLists(groupList);
+
+        return result;
+    }
+
+    @Override
+    public AppList<UserDTO> getGroupInfo(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        AppList<UserDTO> result = new AppList<UserDTO>();
+        HashMap<String, Object> shareMap = new HashMap<String, Object>();
+
+        // all user list
+        List<UserDTO> groupList = userService.getUserList(paramMap);
+        result.setLists(groupList);
+
+        // when Group is not new one, get the group name
+        String groupName = ((Integer) paramMap.get("groupNo") == 0) ? "" : shareMapper.getGroupList(paramMap).get(0).getGroupName();
+        shareMap.put("groupName", groupName);
+        result.setOption(shareMap);
+
+        return result;
+    }
+
+
 
     static BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(10);
     @Override
@@ -282,21 +327,6 @@ public class ShareServiceImpl implements ShareService {
         }
 
         if(!isValid) throw new NotAllowedException();
-    }
-
-
-    @Override
-    public UserDTO inputSharePass(String sharePass, UserDTO sessionUser) {
-        sessionUser = sessionUser != null ? sessionUser : new UserDTO();
-        sessionUser.setSharePass(sharePass);
-
-        return sessionUser;
-    }
-
-
-    @Override
-    public ShareGroupDTO getShareGroup(String shareLink, Integer groupNo) {
-        return shareMapper.getShareGroup(shareLink, groupNo);
     }
 
     @Override

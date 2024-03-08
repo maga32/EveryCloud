@@ -25,10 +25,17 @@
 
   <!-- tabs -->
   <ShareList
-      v-if="tab==='shareList'"
-      :key="reloadTab"
-      :setting="setting"
-      :modalBody="modalBody"
+    v-if="tab==='shareList'"
+    :key="reloadTab"
+    :setting="setting"
+    :modalBody="modalBody"
+  />
+
+  <ShareGroup
+    v-if="tab==='shareGroup'"
+    :key="reloadTab"
+    :setting="setting"
+    :modalBody="modalBody"
   />
 
   <!-- Modal -->
@@ -47,6 +54,7 @@ import { onMounted, reactive, ref, provide, watch, computed } from 'vue'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import ShareList from './ShareList.vue'
+import ShareGroup from './ShareGroup.vue'
 import ShareModal from './ShareModal.vue'
 import Const from '@/const'
 

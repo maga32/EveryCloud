@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -38,6 +39,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO getUser(String id) {
 		return userMapper.getUser(id);
+	}
+
+	@Override
+	public List<UserDTO> getUserList(HashMap<String, Object> paramMap) {
+		return userMapper.getUserList(paramMap);
 	}
 
 	@Override

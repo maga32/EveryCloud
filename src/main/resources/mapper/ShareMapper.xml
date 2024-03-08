@@ -52,15 +52,15 @@
 
 	<insert id="createShare" parameterType="ShareDTO">
 		INSERT /* ShareMapper.createShare */
-			INTO SHARE(LINK, PATH, DATE, METHOD, PASS, AUTH)
-			VALUES (
-			        #{link},
-			        #{path},
-					strftime('%Y-%m-%d 23:59:59', datetime(datetime(#{date}/1000, 'unixepoch'), 'localtime')),
-			        #{method},
-			        #{pass},
-			        #{auth}
-				   )
+		INTO SHARE(LINK, PATH, DATE, METHOD, PASS, AUTH)
+		VALUES (
+				#{link},
+				#{path},
+				strftime('%Y-%m-%d 23:59:59', datetime(datetime(#{date}/1000, 'unixepoch'), 'localtime')),
+				#{method},
+				#{pass},
+				#{auth}
+			   )
 	</insert>
 
 	<update id="updateShare">
@@ -98,29 +98,53 @@
 
 	<select id="getShareGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
 		SELECT /* ShareMapper.getShareGroupList */
-		    sg.SHARE_LINK, gs.NO as GROUP_NO, gs.NAME as GROUP_NAME, sg.AUTH
-			FROM GROUP_SETTING gs
-			LEFT JOIN SHARE_GROUP sg
-				ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
+		    sg.SHARE_LINK,
+		    gs.NO as GROUP_NO,
+		    gs.NAME as GROUP_NAME,
+		    sg.AUTH
+		FROM GROUP_SETTING gs
+		LEFT JOIN SHARE_GROUP sg
+			ON gs.NO = sg.GROUP_NO and sg.SHARE_LINK = #{shareLink}
 		ORDER BY GROUP_NAME
 	</select>
 
 	<insert id="insertShareGroup" parameterType="ShareGroupDTO">
 		INSERT /* ShareMapper.insertShareGroup */
-			INTO SHARE_GROUP(SHARE_LINK, GROUP_NO, AUTH)
-			VALUES (#{shareLink}, #{groupNo}, #{auth})
+		INTO SHARE_GROUP(SHARE_LINK, GROUP_NO, AUTH)
+		VALUES (
+				#{shareLink},
+				#{groupNo},
+				#{auth}
+		)
 	</insert>
 
 	<delete id="deleteShareGroup" parameterType="ShareDTO">
 		DELETE /* ShareMapper.deleteShareGroup */
-			FROM SHARE_GROUP
+		FROM SHARE_GROUP
 		WHERE SHARE_LINK = #{origLink}
 	</delete>
 
 	<delete id="deleteShare">
 		DELETE /* ShareMapper.deleteShare */
-			FROM SHARE
+		FROM SHARE
 		WHERE LINK = #{link}
 	</delete>
+
+	<select id="getGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
+		SELECT /* ShareMapper.getGroupList */
+			NO as GROUP_NO,
+		    NAME as GROUP_NAME
+		FROM GROUP_SETTING
+		<where>
+			<if test="keyword != null and !keyword.equals('')">
+				NAME LIKE '%' || #{keyword} || '%'
+			</if>
+			<if test="groupNo != null and !groupNo.equals('')">
+				NO = #{groupNo}
+			</if>
+		</where>
+		ORDER BY (CASE WHEN GROUP_NO = 1 THEN 1 ELSE 2 END)
+		, GROUP_NAME
+	</select>
 
 </mapper>
