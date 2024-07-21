@@ -10,27 +10,32 @@ import java.util.HashMap;
 
 public interface ShareService {
 
+    String shareSimpleNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
+
+    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
+
+
     AppList<ShareDTO> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
     AppList<ShareGroupDTO> getShareInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
     AppList<ShareGroupDTO> getShareNewInfo(UserDTO sessionUser);
 
-    String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser);
-
-    String shareNewDetailFile(ShareDTO shareNewFile, UserDTO sessionUser);
+    String shareNewFile(ShareDTO shareNewFile, UserDTO sessionUser);
 
     void shareUpdate(ShareDTO share, UserDTO sessionUser);
 
     void shareDelete(String link, UserDTO sessionUser);
 
-    ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
-    UserDTO inputSharePass(String sharePass, UserDTO sessionUser);
+    ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
 
     AppList<ShareGroupDTO> getGroupList(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
     AppList<UserDTO> getGroupInfo(HashMap<String, Object> paramMap, UserDTO sessionUser);
+
+    void groupUpdate(ShareGroupDTO shareGroup, UserDTO sessionUser);
+
 
     /**
      * Verify user's authentication for shareLink

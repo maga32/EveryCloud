@@ -71,8 +71,6 @@ public class FileServiceImpl implements FileService {
 			path = sharePath + (path.equals("/") ? "" : path);
 		}
 
-		String windowsSharePath = FileUtil.winPath(sharePath);
-
 		if(!isPathExist(path)) throw new InvalidPathException("","");
 
 		File nowPath = getFile(path);
@@ -86,14 +84,14 @@ public class FileServiceImpl implements FileService {
 			return getFileList(fileListLoad, sessionUser);
 		}
 
-		options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
-		options.setPath(path.replace(sharePath, ""));
+		options.setNowPath(FileUtil.removeSharePath(nowPath.getPath(), sharePath));
+		options.setPath(FileUtil.removeSharePath(path, sharePath));
 		options.setShareLink(shareLink);
 		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
 
-		String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
-				? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
-				: "/";
+		String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length()  &&  nowPath.getParent() != null
+						  ? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
+						  : "/";
 
 		options.setParentPath(parentPath);
 
@@ -117,16 +115,16 @@ public class FileServiceImpl implements FileService {
 			file.setIsDirectory(i.isDirectory());
 			file.setIsFile(i.isFile());
 			file.setIsHidden(i.isHidden());
-			file.setAbsolutePath(i.getAbsolutePath().replace(sharePath,"").replace(windowsSharePath,""));
+			file.setAbsolutePath(FileUtil.removeSharePath(i.getAbsolutePath(), sharePath));
 			file.setName(i.getName());
 			file.setLowerName(i.getName().toLowerCase());
 			file.setExtension(FilenameUtils.getExtension(i.getName()).toLowerCase());
-			file.setParent(i.getParent().replace(sharePath, "").replace(windowsSharePath,""));
-			file.setPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setParent(FileUtil.removeSharePath(i.getParent(), sharePath));
+			file.setPath(FileUtil.removeSharePath(i.getPath(), sharePath));
 			file.setDate(i.lastModified());
 			file.setSize(i.length());
 			try {
-				file.setCanonicalPath(i.getCanonicalPath().replace(sharePath,"").replace(windowsSharePath,""));
+				file.setCanonicalPath(FileUtil.removeSharePath(i.getCanonicalPath(), sharePath));
 			} catch (IOException e) { }
 			fileList.add(file);
 		}
@@ -197,16 +195,17 @@ public class FileServiceImpl implements FileService {
 		if(validPath) {
 			File nowPath = getFile(path);
 			path = FileUtil.macPath(path);
-			String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length() && nowPath.getParent() != null
-								? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
-								: "/";
+			String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length()  &&  nowPath.getParent() != null
+							  ? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
+							  : "/";
 
 			result.setLists(folderList(sharePath, path));
-			options.setNowPath(nowPath.getPath().replace(sharePath, "").replace(windowsSharePath, ""));
+			result.setTotal(result.getLists().size());
+			options.setNowPath(FileUtil.removeSharePath(nowPath.getPath(), sharePath));
 			options.setParentPath(parentPath);
 		}
 
-		options.setPath(path.replace(sharePath, ""));
+		options.setPath(FileUtil.removeSharePath(path, sharePath));
 		options.setShareLink(shareLink);
 		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
 
@@ -224,9 +223,11 @@ public class FileServiceImpl implements FileService {
 			FileDetailDTO file = new FileDetailDTO();
 			if(i.getAbsolutePath().contains(".everyCloud")) continue;
 
+			file.setIsDirectory(true);
+			file.setIsFile(false);
 			file.setName(i.getName());
 			file.setLowerName(i.getName().toLowerCase());
-			file.setPath(i.getPath().replace(sharePath, "").replace(windowsSharePath,""));
+			file.setPath(FileUtil.removeSharePath(i.getPath(), sharePath));
 			file.setDate(i.lastModified());
 			file.setIsHidden(i.isHidden());
 

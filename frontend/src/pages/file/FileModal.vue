@@ -68,10 +68,10 @@
                   <!-- file list -->
                   <tr v-for="li in moveTo.folderList" class="pointer" @click="loadFiles(li.path.replace(/\\/g, '/'))">
                     <td class='text-center py-2' style='width:50px'>
-                      <img class='fileImg' :src="Utils.imgSelector(li.extension, li.isDirectory, li.isHidden, li.path)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
+                      <img class='fileImg' :src="Utils.imgSelector(li.extension, li.isDirectory, li.isHidden, li.path, form.shareLink)" :style="li.isHidden ? 'opacity:0.3;' : ''" style="max-width:64px" loading="lazy">
                     </td>
                     <td class='w-auto'>
-                      <div>{{ li.name }}</div>
+                      <div style="word-break: break-all">{{ li.name }}</div>
                     </td>
                   </tr>
 

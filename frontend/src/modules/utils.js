@@ -74,7 +74,12 @@ const backSlashToSlash = (str) => {
  * @returns String
  */
 const imgSelector = (extension, isDirectory, isHidden, path, shareLink='') => {
-  extension = isDirectory ? 'folder' : (extensions.hasOwnProperty(extension) ? extension : 'default')
+  extension = (isDirectory && extension !== 'app')
+            ? 'folder'
+            : (extensions.hasOwnProperty(extension)
+               ? extension
+               : 'default'
+              )
 
   if(imageThumbnail.hasOwnProperty(extension) && !isHidden) {
     return (import.meta.env.VITE_SERVER_BASE_URL) + '/file/thumbnailMaker?shareLink=' + shareLink + '&name=' + encodeURIComponent(path.replace(/\\/g, '/'))

@@ -271,7 +271,7 @@
                             그룹명 :
                           </td>
                           <td colspan="2" class="py-1">
-                            <Field type="text" class="form-control-sm" name="changeGroupName" rules="required" v-model="groupForm.groupName"/>
+                            <Field type="text" class="form-control-sm" name="changeGroupName" label="그룹명" rules="required" v-model="groupForm.groupName"/>
                             <ErrorMessage name="changeGroupName" as="p" class="text-danger" />
                           </td>
                         </tr>
@@ -304,15 +304,23 @@
                                   </td>
                                 </tr>
                                 <tr class="border-bottom text-center fw-bold">
-                                  <td class="pt-2 pb-3">id</td>
-                                  <td class="pt-2 pb-3">닉네임</td>
-                                  <td class="pt-2 pb-3">현재그룹</td>
+                                  <td class="pt-2 pb-3 pointer" @click="loadGroupInfo('id')">
+                                    id {{sortArrow('id')}}
+                                  </td>
+                                  <td class="pt-2 pb-3 pointer" @click="loadGroupInfo('nickname')">
+                                    닉네임 {{sortArrow('nickname')}}
+                                  </td>
+                                  <td class="pt-2 pb-3 pointer" @click="loadGroupInfo('groupName')">
+                                    현재그룹 {{sortArrow('groupName')}}
+                                  </td>
                                   <td class="pt-2 pb-3">추가</td>
                                   <td class="pt-2 pb-3">제거</td>
                                 </tr>
 
                                 <!-- user list -->
-                                <tr v-for="(li, i) in searchUser.slice((paging.page-1) * paging.size, paging.page * paging.size)" class="border-bottom">
+                                <tr v-for="(li, i) in searchUser.slice((paging.page-1) * paging.size, paging.page * paging.size)"
+                                    class="border-bottom" :class="addUser.includes(shareUser[li.no].id) ? 'bg-success-subtle' : deleteUser.includes(shareUser[li.no].id) ? 'bg-danger-subtle' : ''"
+                                >
                                   <td class="ps-1 py-2 text-break-all">
                                     {{ shareUser[li.no].id }}
                                   </td>
@@ -323,10 +331,16 @@
                                     {{ shareUser[li.no].groupName }}
                                   </td>
                                   <td class="text-center">
-                                    <i class="fa-solid fa-plus-circle text-success" />
+                                    <i v-if="shareUser[li.no].groupNo === groupForm.groupNo && deleteUser.includes(shareUser[li.no].id) ||
+                                             shareUser[li.no].groupNo !== groupForm.groupNo && !addUser.includes(shareUser[li.no].id)"
+                                       class="fa-solid fa-plus-circle text-success" @click="addUserToGroup(shareUser[li.no].id)"
+                                    />
                                   </td>
                                   <td class="text-center">
-                                    <i class="fa-solid fa-minus-circle text-danger" />
+                                    <i v-if="shareUser[li.no].groupNo === groupForm.groupNo && !deleteUser.includes(shareUser[li.no].id) && groupForm.groupNo !== 1 ||
+                                             shareUser[li.no].groupNo !== groupForm.groupNo && addUser.includes(shareUser[li.no].id)"
+                                       class="fa-solid fa-minus-circle text-danger" @click="deleteUserFromGroup(shareUser[li.no].id)"
+                                    />
                                   </td>
                                 </tr>
 
@@ -445,7 +459,7 @@ const groupForm = ref({
   groupNo: '',
   groupName: '',
   sort: 'id',
-  order: 'asc',
+  order: 'desc',
 })
 
 const modalOn = ref(false)
@@ -465,6 +479,9 @@ const shareUser = ref([{
   groupNo: '',
   groupName: '',
 }])
+
+const addUser = ref([])
+const deleteUser = ref([])
 
 const paging = ref({
   page: 1,
@@ -608,16 +625,7 @@ onMounted(()=> {
     }
 
     groupForm.value.groupNo = props.modalBody.groupNo
-
-    $http.post('/share/groupInfo', groupForm.value, null)
-      .then((response) => {
-        if(response.data) {
-          shareUser.value = response.data.lists
-          paging.value.total = response.data.lists.length
-          groupForm.value.groupName = response.data.option.groupName
-        }
-      })
-
+    loadGroupInfo()
   }
 })
 
@@ -645,6 +653,8 @@ const timeFormat = (time) => {
   return dayjs(time).format('YYYY/MM/DD')
 }
 
+const sortArrow = (sort) => { return (sort === groupForm.value.sort) ? ((groupForm.value.order === 'asc') ? '↑' : '↓') : '' }
+
 const shareGroupList = () => {
   let list = []
   for(let i = 0; i < shareGroup.value.length; i++) {
@@ -656,13 +666,73 @@ const shareGroupList = () => {
       })
     }
   }
-  paging.value.total = list.length
-
   return list
+}
+
+const loadGroupInfo = (sort = 'id') => {
+  groupForm.value.order = (groupForm.value.sort === sort) && (groupForm.value.order === 'asc') ? 'desc' : 'asc'
+  groupForm.value.sort = sort
+
+  $http.post('/share/groupInfo', groupForm.value, null)
+    .then((response) => {
+      if(response.data) {
+        shareUser.value = response.data.lists
+        paging.value.total = response.data.lists.length
+        groupForm.value.groupName = response.data.option.groupName
+      }
+    })
 }
 
 const selectPath = (path) => {
   share.value.path = path
+}
+
+const addUserToGroup = (id) => {
+  const addIndex = addUser.value.indexOf(id)
+  const deleteIndex = deleteUser.value.indexOf(id)
+
+  // if user is in the deleteList, remove from the list
+  if(deleteIndex !== -1) {
+    deleteUser.value.splice(deleteIndex, 1)
+  // if user is not in the addList, add to the list
+  } else if(addIndex === -1) {
+    addUser.value.push(id)
+  }
+}
+
+const deleteUserFromGroup = (id) => {
+  const addIndex = addUser.value.indexOf(id)
+  const deleteIndex = deleteUser.value.indexOf(id)
+
+  // if user is in the addList, remove from the list
+  if(addIndex !== -1) {
+    addUser.value.splice(addIndex, 1)
+  // if user is not in the deleteList, add to the list
+  } else if(deleteIndex === -1) {
+    deleteUser.value.push(id)
+  }
+}
+
+const shareUserList = () => {
+  let list = []
+  if(addUser.value.length > 0) {
+    for(let i = 0; i < addUser.value.length; i++) {
+      list.push({
+        id: addUser.value[i].id,
+        groupNo: groupForm.value.groupNo,
+      })
+    }
+  }
+
+  if(deleteUser.value.length > 0) {
+    for(let i = 0; i < deleteUser.value.length; i++) {
+      list.push({
+        id: deleteUser.value[i].id,
+        groupNo: 1,
+      })
+    }
+  }
+  return list
 }
 
 const closeModal = (reload, checkedFiles) => {
@@ -673,6 +743,7 @@ const closeModal = (reload, checkedFiles) => {
 const submit = async () => {
   let result = false
 
+  // shareList submit
   if(props.modalFunc === 'shareList') {
     const params = {
       origLink        : origLink.value,
@@ -685,30 +756,40 @@ const submit = async () => {
       shareGroupList  : ((share.value.method === 2) ? shareGroupList() : null),
     }
 
+    // update share
     if(params.origLink) {
-      // update share
       await $http.post('/share/shareUpdate', params, null)
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
-          if(result) modifySuccess()
+          if(result) alertSuccess('수정되었습니다.')
         })
+    // create share
     } else {
-      // create share
-      await $http.post('/share/shareNewDetailFile', params, null)
+      await $http.post('/share/shareNewFile', params, null)
         .then((response) => {
           result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
           if(result) copyShareLink()
         })
     }
+
+  // shareGroup submit
+  } else if(props.modalFunc === 'shareGroup') {
+    const params = {
+      groupNo       : groupForm.value.groupNo,
+      groupName     : groupForm.value.groupName,
+      shareUserList : shareUserList(),
+    }
+
+    await $http.post('/share/groupUpdate', params, null)
+      .then((response) => {
+        result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        if(result) alertSuccess('수정되었습니다.')
+      })
   }
 
   if(!result) return false
 
   emit('close', true)
-}
-
-const modifySuccess = async() => {
-  Swal.fire({ icon: 'success', text: '수정되었습니다.', timer: 1200, showConfirmButton: false })
 }
 
 const deleteFunction = () => {
@@ -736,12 +817,16 @@ const deleteFunction = () => {
         }
 
         if(!resultOk) return false
-        Swal.fire({ icon: 'success', text: '삭제되었습니다.', timer: 1200, showConfirmButton: false })
+        alertSuccess('삭제되었습니다.')
         emit('close', true)
       }
 
     }
   )
+}
+
+const alertSuccess = async(alertText='') => {
+  await Swal.fire({icon: 'success', text: alertText, timer: 1200, showConfirmButton: false})
 }
 
 const setModalBody = inject('setModalBody')

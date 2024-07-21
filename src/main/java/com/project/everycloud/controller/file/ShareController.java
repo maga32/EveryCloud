@@ -25,6 +25,28 @@ public class ShareController {
     @Autowired
     HttpSession session;
 
+    @PostMapping("/shareSimpleNewFile")
+    public AppResponse<String> shareSimpleNewFile(@Valid @RequestBody NewFileDTO shareNewFile) {
+
+        String sharedFullLink = shareService.shareSimpleNewFile(shareNewFile, sessionUser());
+
+        return new AppResponse<String>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message())
+                .setData(sharedFullLink);
+    }
+
+    @PostMapping("/inputSharePass")
+    public AppResponse<Void> inputSharePass(@RequestParam("sharePass") String sharePass) {
+
+        session.setAttribute("user", shareService.inputSharePass(sharePass, sessionUser()));
+
+        return new AppResponse<Void>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message());
+    }
+
+    /* ----- share list start ----- */
     @PostMapping("/shareList")
     public AppResponse<AppList<ShareDTO>> getShareList(@RequestBody HashMap<String, Object> paramMap) {
 
@@ -59,20 +81,9 @@ public class ShareController {
     }
 
     @PostMapping("/shareNewFile")
-    public AppResponse<String> shareNewFile(@Valid @RequestBody NewFileDTO shareNewFile) {
+    public AppResponse<String> shareNewFile(@Valid @RequestBody ShareDTO shareNewFile) {
 
         String sharedFullLink = shareService.shareNewFile(shareNewFile, sessionUser());
-
-        return new AppResponse<String>()
-                .setCode(ResponseType.SUCCESS.code())
-                .setMessage(ResponseType.SUCCESS.message())
-                .setData(sharedFullLink);
-    }
-
-    @PostMapping("/shareNewDetailFile")
-    public AppResponse<String> shareNewDetailFile(@Valid @RequestBody ShareDTO shareNewFile) {
-
-        String sharedFullLink = shareService.shareNewDetailFile(shareNewFile, sessionUser());
 
         return new AppResponse<String>()
                 .setCode(ResponseType.SUCCESS.code())
@@ -99,17 +110,10 @@ public class ShareController {
                 .setCode(ResponseType.SUCCESS.code())
                 .setMessage(ResponseType.SUCCESS.message());
     }
+    /* ----- share list end ----- */
 
-    @PostMapping("/inputSharePass")
-    public AppResponse<Void> inputSharePass(@RequestParam("sharePass") String sharePass) {
 
-        session.setAttribute("user", shareService.inputSharePass(sharePass, sessionUser()));
-
-        return new AppResponse<Void>()
-                .setCode(ResponseType.SUCCESS.code())
-                .setMessage(ResponseType.SUCCESS.message());
-    }
-
+    /* ----- share group start ----- */
     @PostMapping("/groupList")
     public AppResponse<AppList<ShareGroupDTO>> getGroupList(@RequestBody HashMap<String, Object> paramMap) {
 
@@ -131,6 +135,17 @@ public class ShareController {
                 .setMessage(ResponseType.SUCCESS.message())
                 .setData(shareInfo);
     }
+
+    @PostMapping("/groupUpdate")
+    public AppResponse<Void> groupUpdate(@RequestBody ShareGroupDTO shareGroup) {
+
+        shareService.groupUpdate(shareGroup, sessionUser());
+
+        return new AppResponse<Void>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message());
+    }
+    /* ----- share group end ----- */
 
     private UserDTO sessionUser() {
         return (UserDTO) session.getAttribute("user");

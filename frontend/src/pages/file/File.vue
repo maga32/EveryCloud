@@ -113,35 +113,43 @@
     </template>
 
     <table v-if="shareAuth !== 1">
-      <tr class="pointer">
+      <tr>
         <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
-        <td class="p-1" @click="downloadFiles()">다운로드</td>
+        <td class="p-1 pointer" @click="downloadFiles()">다운로드</td>
+      </tr>
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-circle-xmark" /></td>
+        <td class="p-1 pointer" @click="setting.checkedFiles = []">선택해제</td>
       </tr>
     </table>
 
     <table v-else-if="setting.checkedFiles.length > 1">
-      <tr class="pointer">
+      <tr>
         <td class="p-1"><i class="fa-solid fa-cloud-arrow-down" /></td>
-        <td class="p-1" @click="downloadFiles()">다운로드</td>
+        <td class="p-1 pointer" @click="downloadFiles()">다운로드</td>
       </tr>
-      <tr class="pointer">
+      <tr>
         <td class="p-1"><i class="fa-solid fa-share" /></td>
-        <td class="p-1" @click="fileModal('moveFiles')">이동</td>
+        <td class="p-1 pointer" @click="fileModal('moveFiles')">이동</td>
       </tr>
-      <tr class="pointer">
+      <tr>
         <td class="p-1"><i class="fa-solid fa-clipboard" /></td>
-        <td class="p-1" @click="fileModal('copyFiles')">복사</td>
+        <td class="p-1 pointer" @click="fileModal('copyFiles')">복사</td>
       </tr>
-      <tr class="pointer">
+      <tr>
         <td class="p-1"><i class="fa-solid fa-trash" /></td>
         <td class="p-1 pointer" @click="fileModal('deleteFiles')">삭제</td>
+      </tr>
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-circle-xmark" /></td>
+        <td class="p-1 pointer" @click="setting.checkedFiles = []">선택해제</td>
       </tr>
     </table>
 
     <table v-else-if="setting.checkedFiles.length === 1">
       <tr>
         <td class="p-1"><i class="fa-solid fa-star" /></td>
-        <td class="p-1">즐겨찾기</td>
+        <td class="p-1 pointer">즐겨찾기</td>
       </tr>
       <tr>
         <td class="p-1"><i class="fa-solid fa-pen-to-square" /></td>
@@ -150,6 +158,10 @@
       <tr>
         <td class="p-1"><i class="fa-solid fa-share-nodes" /></td>
         <td class="p-1 pointer" @click="shareFile">공유</td>
+      </tr>
+      <tr>
+        <td class="p-1"><i class="fa-solid fa-circle-xmark" /></td>
+        <td class="p-1 pointer" @click="setting.checkedFiles = []">선택해제</td>
       </tr>
       <tr>
         <td colspan="2" class="p-2">
@@ -307,12 +319,7 @@ const getFileList = async (checkedFiles = []) =>{
           if(response.data) {
             homeLink(form.shareLink, response.data.option.nowPath)
             shareAuth.value = response.data.option.shareAuth
-            fileList.value = response.data.lists.map(li => {
-                                return {
-                                  ...li,
-                                  extension: li.isDirectory ? 'folder' : extensions.hasOwnProperty(li.extension) ? li.extension : 'default'
-                                }
-                              })
+            fileList.value = response.data.lists
             $store.dispatch('link/addSiteHtml')
           } else if(response.code === Const.RESPONSE_TYPE.INVALID_PATH) {
             setTimeout(() => router.go(-1), 2000)
@@ -357,7 +364,7 @@ const shareFile = () => {
     name: setting.checkedFiles[0]
   }
 
-  $http.post('/share/shareNewFile', params, null)
+  $http.post('/share/shareSimpleNewFile', params, null)
     .then((response) => {
       if(response.data) {
         modalBody.value = { shareLink: response.data }

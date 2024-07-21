@@ -26,6 +26,17 @@ public class FileUtil {
     }
 
     /**
+     * Remove sharePath from path
+     *
+     * @param path
+     * @param sharePath
+     * @return path.replace(sharePath, "").replace(windowsPath, "")
+     */
+    public static String removeSharePath(String path, String sharePath) {
+        return path.replace(sharePath, "").replace(winPath(sharePath), "");
+    }
+
+    /**
      * If String doesn't end with '/', add '/' end of the String
      *
      * @param str String

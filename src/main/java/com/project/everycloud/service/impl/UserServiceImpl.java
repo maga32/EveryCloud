@@ -1,9 +1,9 @@
 package com.project.everycloud.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.everycloud.common.exception.InvalidLoginException;
 import com.project.everycloud.common.exception.NeedAdminException;
 import com.project.everycloud.common.exception.NeedLoginException;
-import com.project.everycloud.common.exception.InvalidLoginException;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.UserMapper;
@@ -119,11 +119,7 @@ public class UserServiceImpl implements UserService {
 		UserDTO admin = getAdmin();
 
 		if(user != null && StringUtils.hasText(user.getId())) {
-			if(user.getId().equals(admin.getId())) {
-				userType = 2;
-			} else {
-				userType = 1;
-			}
+			userType = admin.getId().equals(user.getId()) ? 2 : 1;
 		} else if(userMapper.getPass(admin.getId()).equals("admin")) {
 			userType = 3;
 		}

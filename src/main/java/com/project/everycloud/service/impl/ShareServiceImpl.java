@@ -22,12 +22,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.sqlite.SQLiteException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ShareServiceImpl implements ShareService {
@@ -103,7 +105,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public String shareNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
+    public String shareSimpleNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
@@ -136,7 +138,8 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
-    public String shareNewDetailFile(ShareDTO shareNewFile, UserDTO sessionUser) {
+    @Transactional
+    public String shareNewFile(ShareDTO shareNewFile, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
@@ -286,6 +289,11 @@ public class ShareServiceImpl implements ShareService {
         return result;
     }
 
+    @Override
+    public void groupUpdate(ShareGroupDTO shareGroup, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+    }
 
 
     static BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(10);

@@ -15,7 +15,7 @@
 
     <!-- language select -->
     <div class="d-flex flex-wrap pt-2">
-      <select v-model="state.language" class="form-select-sm flex-grow-1" @change="languageSelect(this.value)">
+      <select v-model="state.language" class="form-select-sm flex-grow-1" @change="languageSelect(state.language)">
         <option disabled value="">Select</option>
         <option v-for="locale in $i18n.availableLocales" :value="locale">
           {{ $t('selectLanguage.'+locale) }}
@@ -128,10 +128,12 @@ const closeWing = () => { minWing.value = false }
 const closeThemeSelect = () => { themeSelect.value = false }
 
 const languageSelect = (language='') => {
+  const reload = (language !== '')
   language = language || (state.value.language || (form.languages.includes(usePreferredLanguages()) || 'en'))
   state.value.language = language
   window.$i18n.global.locale = language
   setLocale(language)
+  if(reload) location.reload()
 }
 </script>
 
