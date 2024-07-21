@@ -1,9 +1,6 @@
 package com.project.everycloud.service.impl;
 
-import com.project.everycloud.common.exception.InvalidLinkException;
-import com.project.everycloud.common.exception.InvalidPasswordException;
-import com.project.everycloud.common.exception.NeedPasswordException;
-import com.project.everycloud.common.exception.NotAllowedException;
+import com.project.everycloud.common.exception.*;
 import com.project.everycloud.common.util.FileUtil;
 import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
@@ -15,6 +12,7 @@ import com.project.everycloud.service.ShareService;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.FileDao;
 import com.project.everycloud.service.mapper.ShareMapper;
+import com.project.everycloud.service.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -26,10 +24,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ShareServiceImpl implements ShareService {
@@ -45,6 +40,9 @@ public class ShareServiceImpl implements ShareService {
 
     @Autowired
     ShareMapper shareMapper;
+
+    @Autowired
+    UserMapper userMapper;
 
     @Override
     public AppList<ShareDTO> getShareList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
@@ -227,7 +225,7 @@ public class ShareServiceImpl implements ShareService {
         try {
             shareMapper.updateShare(share);
         } catch(UncategorizedSQLException e) {
-            throw new DuplicateKeyException("");
+            if(e.getSQLException().toString().contains("SQLITE_CONSTRAINT_UNIQUE")) throw new DuplicateKeyException("");
         }
     }
 
@@ -290,9 +288,43 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
+    @Transactional
     public void groupUpdate(ShareGroupDTO shareGroup, UserDTO sessionUser) {
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
 
+        try {
+            int result = (shareGroup.getGroupNo() == 0)
+                       ? shareMapper.insertNewGroup(shareGroup)
+                       : shareMapper.updateGroup(shareGroup);
+        } catch(UncategorizedSQLException e) {
+            if(e.getSQLException().toString().contains("SQLITE_CONSTRAINT_UNIQUE")) throw new DuplicateKeyException("");
+        }
+
+        List<UserDTO> users = shareGroup.getShareUserList();
+
+        // if user list exist, update group of user
+        if(users != null && !users.isEmpty()) {
+            for(UserDTO user : users) {
+                if(user.getGroupNo() == 0) user.setGroupNo(shareGroup.getGroupNo());
+                HashMap<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("user", user);
+                userMapper.updateUser(paramMap);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void groupDelete(String groupNo, UserDTO sessionUser) {
+        if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
+
+        if(groupNo == null || groupNo.isEmpty() || groupNo.equals("1")) throw new BadRequestException();
+
+        // update user group to default group
+        userMapper.updateUserGroupToDefault(groupNo);
+
+        // delete group
+        shareMapper.deleteGroup(groupNo);
     }
 
 

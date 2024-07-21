@@ -657,15 +657,15 @@ const sortArrow = (sort) => { return (sort === groupForm.value.sort) ? ((groupFo
 
 const shareGroupList = () => {
   let list = []
-  for(let i = 0; i < shareGroup.value.length; i++) {
-    if(shareGroup.value[i].auth != null) {
+  shareGroup.value.forEach((li)=>{
+    if(li.auth != null) {
       list.push({
         shareLink: share.value.link,
-        groupNo: shareGroup.value[i].groupNo,
-        auth: shareGroup.value[i].auth,
+        groupNo: li.groupNo,
+        auth: li.auth,
       })
     }
-  }
+  })
   return list
 }
 
@@ -715,23 +715,15 @@ const deleteUserFromGroup = (id) => {
 
 const shareUserList = () => {
   let list = []
-  if(addUser.value.length > 0) {
-    for(let i = 0; i < addUser.value.length; i++) {
-      list.push({
-        id: addUser.value[i].id,
-        groupNo: groupForm.value.groupNo,
-      })
-    }
-  }
 
-  if(deleteUser.value.length > 0) {
-    for(let i = 0; i < deleteUser.value.length; i++) {
-      list.push({
-        id: deleteUser.value[i].id,
-        groupNo: 1,
-      })
-    }
-  }
+  addUser.value.forEach((id)=>{
+    list.push({ id: id, groupNo: groupForm.value.groupNo })
+  })
+
+  deleteUser.value.forEach((id)=>{
+    list.push({ id: id, groupNo: 1 })
+  })
+
   return list
 }
 
@@ -760,14 +752,14 @@ const submit = async () => {
     if(params.origLink) {
       await $http.post('/share/shareUpdate', params, null)
         .then((response) => {
-          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+          result = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
           if(result) alertSuccess('수정되었습니다.')
         })
     // create share
     } else {
       await $http.post('/share/shareNewFile', params, null)
         .then((response) => {
-          result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+          result = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
           if(result) copyShareLink()
         })
     }
@@ -782,7 +774,7 @@ const submit = async () => {
 
     await $http.post('/share/groupUpdate', params, null)
       .then((response) => {
-        result = (response.code === Const.RESPONSE_TYPE.SUCCESS)
+        result = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
         if(result) alertSuccess('수정되었습니다.')
       })
   }
@@ -807,12 +799,18 @@ const deleteFunction = () => {
       if (result.isDenied) {
         let resultOk = false
 
+        // shareList delete
         if(props.modalFunc === 'shareList') {
           await $http.post('/share/shareDelete', null, {params: {link: origLink.value}})
             .then((response) => {
-              if (response?.code === Const.RESPONSE_TYPE.SUCCESS) {
-                resultOk = true
-              }
+              resultOk = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
+            })
+
+        // shareGroup delete
+        } else if(props.modalFunc === 'shareGroup') {
+          await $http.post('/share/groupDelete', null, {params: {groupNo: groupForm.value.groupNo}})
+            .then((response) => {
+              resultOk = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
             })
         }
 

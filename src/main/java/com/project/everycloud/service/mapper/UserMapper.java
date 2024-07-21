@@ -20,4 +20,6 @@ public interface UserMapper {
     UserDTO getAdmin();
 
 	void updateUser(HashMap<String, Object> paramMap);
+
+    void updateUserGroupToDefault(String groupNo);
 }

@@ -81,7 +81,7 @@
 					EMAIL = #{user.email},
 				</if>
 				<if test="user.groupNo != null and !user.groupNo.equals('')">
-					NO = #{user.no},
+					GROUP_NO = #{user.groupNo},
 				</if>
 			</set>
 			<where>
@@ -92,5 +92,12 @@
 					AND ID = #{user.id}
 				</if>
 			</where>
+	</update>
+
+	<update id="updateUserGroupToDefault">
+		UPDATE /* UserMapper.updateUserGroupToDefault */
+			USER
+		SET GROUP_NO = 1
+		WHERE GROUP_NO = #{groupNo}
 	</update>
 </mapper>

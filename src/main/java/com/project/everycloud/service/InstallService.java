@@ -40,7 +40,7 @@ public class InstallService {
             Statement stmt = conn.createStatement();
             stmt.execute("CREATE TABLE SETTINGS (TYPE TEXT, EXTERNAL_URL TEXT, USE_TRASH TEXT, TRASH_PATH TEXT, META_TITLE TEXT, META_AUTHOR TEXT, META_DESCRIPTION TEXT, META_KEYWORDS TEXT" +
                             ", PRIMARY KEY(TYPE))");
-            stmt.execute("CREATE TABLE GROUP_SETTING (NO INTEGER, NAME TEXT NOT NULL" +
+            stmt.execute("CREATE TABLE GROUP_SETTING (NO INTEGER, NAME TEXT NOT NULL UNIQUE" +
                             ", PRIMARY KEY(NO AUTOINCREMENT))");
             stmt.execute("CREATE TABLE SHARE (LINK TEXT, PATH TEXT NOT NULL UNIQUE, DATE TEXT, METHOD INTEGER NOT NULL, PASS TEXT, AUTH INTEGER NOT NULL DEFAULT 0" +
                             ", PRIMARY KEY(LINK))");

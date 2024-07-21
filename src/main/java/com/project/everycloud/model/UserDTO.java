@@ -15,4 +15,5 @@ public class UserDTO {
 	private Integer groupNo;
 	private String groupName;
 	private String sharePass;
+	private String needVerify;
 }

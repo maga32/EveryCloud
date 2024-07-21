@@ -145,6 +145,16 @@ public class ShareController {
                 .setCode(ResponseType.SUCCESS.code())
                 .setMessage(ResponseType.SUCCESS.message());
     }
+
+    @PostMapping("/groupDelete")
+    public AppResponse<Void> groupDelete(@RequestParam("groupNo") String groupNo) {
+
+        shareService.groupDelete(groupNo, sessionUser());
+
+        return new AppResponse<Void>()
+                .setCode(ResponseType.SUCCESS.code())
+                .setMessage(ResponseType.SUCCESS.message());
+    }
     /* ----- share group end ----- */
 
     private UserDTO sessionUser() {

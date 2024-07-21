@@ -36,6 +36,8 @@ public interface ShareService {
 
     void groupUpdate(ShareGroupDTO shareGroup, UserDTO sessionUser);
 
+    void groupDelete(String groupNo, UserDTO sessionUser);
+
 
     /**
      * Verify user's authentication for shareLink

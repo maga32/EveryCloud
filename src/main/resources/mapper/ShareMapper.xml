@@ -147,4 +147,26 @@
 		, GROUP_NAME
 	</select>
 
+	<insert id="insertNewGroup" parameterType="ShareGroupDTO" useGeneratedKeys="true" keyProperty="groupNo">
+		INSERT /* ShareMapper.insertNewGroup */
+		INTO GROUP_SETTING(NAME)
+		VALUES (
+				   #{groupName}
+			   )
+	</insert>
+
+	<update id="updateGroup">
+		UPDATE /* ShareMapper.updateGroup */
+		    GROUP_SETTING
+		SET
+		    NAME = #{groupName}
+		WHERE NO = #{groupNo}
+	</update>
+
+	<delete id="deleteGroup">
+		DELETE /* ShareMapper.deleteGroup */
+		FROM GROUP_SETTING
+		WHERE NO = #{groupNo}
+	</delete>
+
 </mapper>

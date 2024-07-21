@@ -35,4 +35,10 @@ public interface ShareMapper {
     void deleteShare(String link);
 
     List<ShareGroupDTO> getGroupList(HashMap<String, Object> paramMap);
+
+    int insertNewGroup(ShareGroupDTO shareGroup);
+
+    int updateGroup(ShareGroupDTO shareGroup);
+
+    void deleteGroup(String groupNo);
 }

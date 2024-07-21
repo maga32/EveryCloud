@@ -36,7 +36,7 @@
             </div>
           </td>
           <td class="text-center text-secondary" style="width:40px">
-            <i v-if="li.groupNo !== 1" class="fa-solid fa-trash" @click="deleteGroup(li.groupNo)"/>
+            <i v-if="li.groupNo !== 1" class="fa-solid fa-trash pointer" @click="deleteGroup(li.groupNo)"/>
           </td>
         </tr>
       </table>
@@ -48,10 +48,9 @@
 
 <script setup>
 import { computed, inject, onMounted, onUpdated, reactive, ref } from 'vue'
-import Utils from '@/modules/utils'
-import dayjs from 'dayjs'
-import Const from "@/const";
-import router from "@/router";
+import Const from '@/const'
+import router from '@/router'
+import Swal from 'sweetalert2'
 
 const props = defineProps(['setting', 'modalBody'])
 
@@ -83,6 +82,35 @@ const loadShareGroup = () => {
 const editShareModal = (groupNo) => {
   setModalBody({ groupNo: groupNo })
   shareModal('shareGroup')
+}
+
+const deleteGroup = (groupNo) => {
+  Swal.fire({
+    icon: 'error',
+    text: '삭제하시겠습니까?',
+    showConfirmButton: false,
+    showCancelButton: true,
+    showDenyButton: true,
+    denyButtonText: '삭제',
+    cancelButtonText: '취소',
+  }).then(
+      async(result) => {
+
+        if(result.isDenied) {
+          let resultOk = false
+
+          await $http.post('/share/groupDelete', null, {params: {groupNo: groupNo}})
+            .then((response) => {
+              resultOk = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
+            })
+
+          if(!resultOk) return false
+          Swal.fire({icon: 'success', text: '삭제되었습니다.', timer: 1200, showConfirmButton: false})
+          loadShareGroup()
+        }
+
+      }
+  )
 }
 
 const shareModal = inject('shareModal')
