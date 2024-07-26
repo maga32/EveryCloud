@@ -24,6 +24,8 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -330,21 +332,23 @@ public class ShareServiceImpl implements ShareService {
 
     static BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(10);
     @Override
-    public void verifyAuth(String shareLink, int authType, UserDTO sessionUser) {
+    public int verifyAuth(String shareLink, int authType, UserDTO sessionUser) {
+        int result = 0;
         boolean isValid = false;
 
         if(userService.isAdmin(sessionUser)) {
             isValid = true;
+            result = 1;
         } else if(!StringUtils.hasText(shareLink)) {
             throw new NotAllowedException();
         } else {
             ShareDTO share = getShareByLink(shareLink);
+            result = share.getAuth();
 
             // - auth 0 : read, auth 1 : write
             // method 0 : share for who has the link
             if(share.getMethod() == 0 && !(share.getAuth() == 0 && authType == 1)) {
                 isValid = true;
-
             // method 1 : share for who know the password
             } else if(share.getMethod() == 1 && !(share.getAuth() == 0 && authType == 1)) {
                 String sharePass = (sessionUser == null) ? null : sessionUser.getSharePass();
@@ -361,18 +365,25 @@ public class ShareServiceImpl implements ShareService {
                     ShareGroupDTO shareGroup = getShareGroup(shareLink, sessionUser.getGroupNo());
                     if(shareGroup != null && !(shareGroup.getAuth() == 0 && authType == 1)) {
                         isValid = true;
+                        result = shareGroup.getAuth();
                     }
                 }
             }
         }
 
         if(!isValid) throw new NotAllowedException();
+        return result;
     }
 
     @Override
     public ShareDTO getShareByLink(String link) {
         ShareDTO share = shareMapper.getShareByLink(link);
         if(share == null) throw new InvalidLinkException();
+        if(share.getDate() != null) {
+            Timestamp nowTime = Timestamp.valueOf(LocalDateTime.now());
+            if(nowTime.after(share.getDate())) throw new InvalidLinkException();
+        }
+
         return share;
     }
 

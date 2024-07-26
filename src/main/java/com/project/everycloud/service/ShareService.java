@@ -45,8 +45,9 @@ public interface ShareService {
      * @param shareLink shareLink
      * @param authType 0: read / 1: write
      * @param sessionUser session's UserDTO
+     * @return authType auth for Link 0: read / 1: write
      */
-    void verifyAuth(String shareLink, int authType, UserDTO sessionUser);
+    int verifyAuth(String shareLink, int authType, UserDTO sessionUser);
 
     ShareDTO getShareByLink(String link);
 

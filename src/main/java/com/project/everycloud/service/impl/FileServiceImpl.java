@@ -62,7 +62,7 @@ public class FileServiceImpl implements FileService {
 		String path = fileListLoad.getPath();
 		String shareLink = fileListLoad.getShareLink();
 
-		shareService.verifyAuth(shareLink, 0, sessionUser);
+		int shareAuth = shareService.verifyAuth(shareLink, 0, sessionUser);
 
 		if(path.equals("") && shareLink.equals("")) path += "/";
 
@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
 		options.setNowPath(FileUtil.removeSharePath(nowPath.getPath(), sharePath));
 		options.setPath(FileUtil.removeSharePath(path, sharePath));
 		options.setShareLink(shareLink);
-		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
+		options.setShareAuth(isAdmin ? 1 : shareAuth);
 
 		String parentPath = FileUtil.macPath(nowPath.getPath()).length() > sharePath.length()  &&  nowPath.getParent() != null
 						  ? FileUtil.macPath(nowPath.getParent()).replace(sharePath, "")
@@ -182,7 +182,7 @@ public class FileServiceImpl implements FileService {
 		String path = folderListLoad.getPath();
 		String shareLink = folderListLoad.getShareLink();
 
-		shareService.verifyAuth(shareLink, 0, sessionUser);
+		int shareAuth = shareService.verifyAuth(shareLink, 0, sessionUser);
 
 		if(StringUtils.hasText(shareLink)) {
 			sharePath = shareService.getShareByLink(shareLink).getPath();
@@ -207,7 +207,7 @@ public class FileServiceImpl implements FileService {
 
 		options.setPath(FileUtil.removeSharePath(path, sharePath));
 		options.setShareLink(shareLink);
-		options.setShareAuth(isAdmin ? 1 : shareService.getShareByLink(shareLink).getAuth());
+		options.setShareAuth(isAdmin ? 1 : shareAuth);
 
 		result.setOption(options);
 

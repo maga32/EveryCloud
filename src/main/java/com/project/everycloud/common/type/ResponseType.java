@@ -11,7 +11,7 @@ public enum ResponseType {
     NOT_ALLOWED("403", "접근권한이 없습니다."),
     INVALID_LOGIN("403", "id와 password를 확인해주세요."),
     INVALID_PATH("404", "잘못된 경로입니다."),
-    INVALID_LINK("404", "삭제되었거나 잘못된 링크입니다."),
+    INVALID_LINK("404", "만료되었거나 잘못된 링크입니다."),
     INVALID_PASSWORD("406", "비밀번호가 일치하지 않습니다."),
     NEED_PASSWORD("406", "비밀번호가 필요한 서비스입니다."),
 

@@ -42,6 +42,7 @@
             <div class="d-flex">
               <div class="flex-grow-1 text-break-all">
                 <span v-if="!li.exist" class="badge text-bg-danger">Invalid</span>
+                <span v-else-if="li.date && new Date() > new Date(li.date)" class="badge text-bg-danger">Expired</span>
                 {{ li.path }}
               </div>
             </div>
