@@ -22,4 +22,6 @@ public interface UserMapper {
 	void updateUser(HashMap<String, Object> paramMap);
 
     void updateUserGroupToDefault(String groupNo);
+
+    int countExistEmail(HashMap<String, Object> paramMap);
 }

@@ -3,6 +3,7 @@ package com.project.everycloud.common.config;
 import com.project.everycloud.common.exception.*;
 import com.project.everycloud.common.type.ResponseType;
 import com.project.everycloud.model.AppResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,7 @@ import java.nio.file.InvalidPathException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Log4j2
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = {Exception.class, RuntimeException.class})
@@ -28,10 +30,20 @@ public class GlobalExceptionHandler {
         ResponseType apiResponseType = null;
         String apiResponseMessage = "";
 
+        log.debug("exception: ", e);
+
         // NoAuth
         if(e instanceof HttpClientErrorException.Unauthorized || e instanceof NotAllowedException) {
             apiResponseType = ResponseType.NOT_ALLOWED;
             apiResponseMessage = ResponseType.NOT_ALLOWED.message();
+        // ExistId
+        } else if(e instanceof ExistIdException) {
+            apiResponseType = ResponseType.EXIST_ID;
+            apiResponseMessage = ResponseType.EXIST_ID.message();
+        // ExistEmail
+        } else if(e instanceof ExistEmailException) {
+            apiResponseType = ResponseType.EXIST_EMAIL;
+            apiResponseMessage = ResponseType.EXIST_EMAIL.message();
         // DupPk
         } else if(e instanceof DuplicateKeyException) {
             apiResponseType = ResponseType.DUP_PK;

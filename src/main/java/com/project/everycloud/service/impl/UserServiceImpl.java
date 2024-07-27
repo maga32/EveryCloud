@@ -1,6 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.everycloud.common.exception.ExistEmailException;
 import com.project.everycloud.common.exception.InvalidLoginException;
 import com.project.everycloud.common.exception.NeedAdminException;
 import com.project.everycloud.common.exception.NeedLoginException;
@@ -95,22 +96,34 @@ public class UserServiceImpl implements UserService {
 	public UserDTO updateUser(HashMap<String, Object> paramMap) {
 		UserDTO sessionUser = (UserDTO) paramMap.get("sessionUser");
 		UserDTO user = new ObjectMapper().convertValue(paramMap.get("user"),UserDTO.class);
+		String origId = paramMap.get("origId").toString();
+		boolean isAdmin = isAdmin(sessionUser);
+		boolean isUser = isUser(sessionUser);
+		if(isUser) user.setId("");
 
-		try {
-			if(isAdmin(sessionUser) || isUser(sessionUser) && sessionUser.getId().equals(user.getId())) {
-				// Encode password
-				if(StringUtils.hasText(user.getPass())) {
-					BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
-					user.setPass(pass.encode(user.getPass()));
+		if(isAdmin || isUser && sessionUser.getId().equals(origId)) {
+			UserDTO oldUser = getUser(origId);
+
+			// if the email has changed, check the email exist and change the status need to verify
+			if(!oldUser.getEmail().equals(user.getEmail())) {
+				if(userMapper.countExistEmail(paramMap) > 0) {
+					throw new ExistEmailException();
+				} else if(!isAdmin){
+					user.setNeedVerify("Y");
 				}
-				paramMap.put("user", user);
-				userMapper.updateUser(paramMap);
 			}
-		} catch (Exception e) {
-			throw new NeedLoginException();
+
+			// Encode password
+			if(StringUtils.hasText(user.getPass())) {
+				BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
+				user.setPass(pass.encode(user.getPass()));
+			}
+
+			paramMap.put("user", user);
+			userMapper.updateUser(paramMap);
 		}
 
-		return isAdmin(sessionUser) ? getAdmin() : getUser(user.getId());
+		return isAdmin ? getAdmin() : getUser(origId);
 	}
 
 	@Override

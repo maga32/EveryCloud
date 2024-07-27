@@ -32,7 +32,7 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/updateUserForm")
-	public AppResponse<UserDTO> updateUserForm(@RequestParam HashMap<String, Object> paramMap) {
+	public AppResponse<UserDTO> updateUserForm(@RequestBody HashMap<String, Object> paramMap) {
 
 		paramMap.put("user", sessionUser());
 		UserDTO user = userService.updateUserForm(paramMap);

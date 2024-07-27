@@ -53,7 +53,7 @@
       <div class="col-12 mb-4"></div>
       <div class="col-12 col-md-6 mb-4">
         <button class="col-12 btn btn-danger btn-lg mb-2" type="submit">확인</button>
-        <router-link :to="{path:$store.state.link.siteHtml}" class="col-12 btn btn-secondary btn-lg">취소</router-link>
+        <router-link :to="{path:$store.state.link.siteHtml || '/'}" class="col-12 btn btn-secondary btn-lg">취소</router-link>
       </div>
     </div>
   </div>
@@ -98,7 +98,7 @@ const form = reactive({
 
 onMounted(() => {
   form.type = params.type
-  $http.post('/updateUserForm',{params:params}, null)
+  $http.post('/updateUserForm', params, null)
     .then((response) => {
       if(!form.type || !response.data || !response.data.id) {
         $store.dispatch('user/getSession')
@@ -143,6 +143,7 @@ const submit = () => {
   $http.post('/updateUser', form, null)
     .then((response) => {
       if(response.data) {
+        Swal.fire({ icon: 'success', text: '수정되었습니다.', showConfirmButton: false, timer: 1500})
         $store.dispatch('user/getSession')
         router.replace($store.getters['link/siteHtml'])
       }
