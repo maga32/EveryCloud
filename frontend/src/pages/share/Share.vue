@@ -56,7 +56,6 @@ import { useRoute } from 'vue-router'
 import ShareList from './ShareList.vue'
 import ShareGroup from './ShareGroup.vue'
 import ShareModal from './ShareModal.vue'
-import Const from '@/const'
 
 const route = useRoute()
 

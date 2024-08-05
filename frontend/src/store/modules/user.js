@@ -23,11 +23,11 @@ const user = {
   actions: {
     getSession: ({commit}) => {
       return new Promise((resolve, reject) => {
-        $http.post('/getSessionUser')
+        $http.post('/user/getSessionUser')
           .then((response) => {
             if (response.code === Const.RESPONSE_TYPE.NEED_ADMIN) {
               router.push({
-                path: '/updateUserForm',
+                path: '/user/updateUserForm',
                 state: {params: {type: 'admin'}}
               })
             } else {

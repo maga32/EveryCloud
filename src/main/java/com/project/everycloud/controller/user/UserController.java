@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/user")
 @RestController
 public class UserController {
 

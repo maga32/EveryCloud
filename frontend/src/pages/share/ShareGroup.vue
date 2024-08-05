@@ -9,7 +9,7 @@
           <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareGroup">
         </div>
         <div class="col-1 pointer" @click="loadShareGroup"><i class="fa-solid fa-magnifying-glass" /></div>
-        <div class="col-1 pointer" @click="editShareModal(0)"><i class="fa-solid fa-user-plus" /></div>
+        <div class="col-1 pointer" @click="editShareModal(0)"><i class="fa-solid fa-user-group" /></div>
       </div>
     </div>
   </div>

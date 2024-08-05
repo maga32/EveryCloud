@@ -61,7 +61,7 @@ onMounted(() => {
 })
 
 const submit = () => {
-  $http.post('/login', form.user, null)
+  $http.post('/user/login', form.user, null)
     .then((response) => {
       if(response.data) {
         $store.dispatch('user/getSession')

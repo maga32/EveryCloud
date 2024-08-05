@@ -98,7 +98,7 @@ const form = reactive({
 
 onMounted(() => {
   form.type = params.type
-  $http.post('/updateUserForm', params, null)
+  $http.post('/user/updateUserForm', params, null)
     .then((response) => {
       if(!form.type || !response.data || !response.data.id) {
         $store.dispatch('user/getSession')
@@ -128,7 +128,7 @@ const checkOverlapId = () => {
     return false
   }
 
-  $http.post('/checkOverlapId',null,{params:{id: form.user.id}})
+  $http.post('/user/checkOverlapId',null,{params:{id: form.user.id}})
     .then((response) => {
       if(response.data===true) {
         duplicateChecked.value = true
@@ -140,7 +140,7 @@ const checkOverlapId = () => {
 }
 
 const submit = () => {
-  $http.post('/updateUser', form, null)
+  $http.post('/user/updateUser', form, null)
     .then((response) => {
       if(response.data) {
         Swal.fire({ icon: 'success', text: '수정되었습니다.', showConfirmButton: false, timer: 1500})

@@ -48,7 +48,7 @@ public class InstallService {
                             ", PRIMARY KEY(SHARE_LINK, GROUP_NO)" +
                             ", FOREIGN KEY(GROUP_NO) REFERENCES GROUP_SETTING(NO)" +
                             ", FOREIGN KEY(SHARE_LINK) REFERENCES SHARE(LINK))");
-            stmt.execute("CREATE TABLE USER (ID TEXT, PASS TEXT NOT NULL, NICKNAME TEXT NOT NULL, EMAIL TEXT UNIQUE, AUTH TEXT NOT NULL DEFAULT N, NEED_VERIFY TEXT DEFAULT 'Y', GROUP_NO INTEGER NOT NULL DEFAULT 1" +
+            stmt.execute("CREATE TABLE USER (ID TEXT, PASS TEXT NOT NULL, NICKNAME TEXT NOT NULL, EMAIL TEXT NOT NULL UNIQUE, AUTH TEXT NOT NULL DEFAULT N, NEED_VERIFY TEXT DEFAULT 'Y', GROUP_NO INTEGER NOT NULL DEFAULT 1" +
                             ", PRIMARY KEY(ID)" +
                             ", FOREIGN KEY(GROUP_NO) REFERENCES GROUP_SETTING(NO))");
 
@@ -59,7 +59,7 @@ public class InstallService {
             stmt.execute("INSERT INTO GROUP_SETTING  (NO, NAME) " +
                             "VALUES(1, 'default')");
             stmt.execute("INSERT INTO USER (ID, PASS, NICKNAME, EMAIL, AUTH, NEED_VERIFY, GROUP_NO) " +
-                            "VALUES('admin', 'admin', 'admin', null, 'Y', '', 1)");
+                            "VALUES('admin', 'admin', 'admin', 'please@write.email', 'Y', '', 1)");
 
         } catch (final SQLException e) {
             e.printStackTrace();

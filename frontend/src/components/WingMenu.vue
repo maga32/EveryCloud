@@ -55,7 +55,7 @@
       </div>
       <div class="d-grid gap-2 my-4" @click="closeWing">
         <router-link class="btn btn-outline-secondary"
-            :to="{ path:'/updateUserForm',
+            :to="{ path:'/user/updateUserForm',
                    state:{ params:{ type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user',
                                     id: $store.state.user.user.id
                           }}
@@ -111,7 +111,7 @@ onMounted(()=> {
 })
 
 const logout = () => {
-  $http.post('/logout')
+  $http.post('/user/logout')
     .then(() => $store.dispatch('user/getSession'))
 }
 

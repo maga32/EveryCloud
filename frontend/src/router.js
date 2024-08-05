@@ -10,14 +10,14 @@ const LoginForm       = () => import(/* webpackChunkName: "User" */ '@/pages/use
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/',                name: 'home',           component: Sample,          meta: { } },
-    { path: '/sample',          name: 'sample',         component: Sample,          meta: { } },
-    { path: '/sample2',         name: 'sample2',        component: Sample2,         meta: { } },
-    { path: '/file',            name: 'file',           component: File,            meta: { } },
-    { path: '/share',           name: 'share',          component: Share,           meta: { } },
-    { path: '/settings',        name: 'settings',       component: Settings,        meta: { } },
-    { path: '/updateUserForm',  name: 'updateUserForm', component: UpdateUserForm,  meta: { } },
-    { path: '/loginForm',       name: 'loginForm',      component: LoginForm,       meta: { } },
+    { path: '/',                     name: 'home',           component: Sample,          meta: { } },
+    { path: '/sample',               name: 'sample',         component: Sample,          meta: { } },
+    { path: '/sample2',              name: 'sample2',        component: Sample2,         meta: { } },
+    { path: '/file',                 name: 'file',           component: File,            meta: { } },
+    { path: '/share',                name: 'share',          component: Share,           meta: { } },
+    { path: '/settings',             name: 'settings',       component: Settings,        meta: { } },
+    { path: '/user/updateUserForm',  name: 'updateUserForm', component: UpdateUserForm,  meta: { } },
+    { path: '/loginForm',            name: 'loginForm',      component: LoginForm,       meta: { } },
     // 모바일 샘플
     { path: '/m',      name: 'mobile',     component: Sample,     meta: { isMobile: true } },
   ]

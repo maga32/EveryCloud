@@ -1,10 +1,7 @@
 package com.project.everycloud.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.everycloud.common.exception.ExistEmailException;
-import com.project.everycloud.common.exception.InvalidLoginException;
-import com.project.everycloud.common.exception.NeedAdminException;
-import com.project.everycloud.common.exception.NeedLoginException;
+import com.project.everycloud.common.exception.*;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import com.project.everycloud.service.mapper.UserMapper;
@@ -99,29 +96,34 @@ public class UserServiceImpl implements UserService {
 		String origId = paramMap.get("origId").toString();
 		boolean isAdmin = isAdmin(sessionUser);
 		boolean isUser = isUser(sessionUser);
-		if(isUser) user.setId("");
 
-		if(isAdmin || isUser && sessionUser.getId().equals(origId)) {
-			UserDTO oldUser = getUser(origId);
-
-			// if the email has changed, check the email exist and change the status need to verify
-			if(!oldUser.getEmail().equals(user.getEmail())) {
-				if(userMapper.countExistEmail(paramMap) > 0) {
-					throw new ExistEmailException();
-				} else if(!isAdmin){
-					user.setNeedVerify("Y");
-				}
-			}
-
-			// Encode password
-			if(StringUtils.hasText(user.getPass())) {
-				BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
-				user.setPass(pass.encode(user.getPass()));
-			}
-
-			paramMap.put("user", user);
-			userMapper.updateUser(paramMap);
+		// if user is not admin, only can edit own account
+		if(!isAdmin && isUser) {
+			user.setId("");
+			origId = sessionUser.getId();
+		} else if(!isAdmin) {
+			throw new NotAllowedException();
 		}
+
+		UserDTO oldUser = getUser(origId);
+
+		// if the email has changed, check the email exist and change the status need to verify
+		if(!oldUser.getEmail().equals(user.getEmail())) {
+			if(userMapper.countExistEmail(paramMap) > 0) {
+				throw new ExistEmailException();
+			} else if(!isAdmin){
+				user.setNeedVerify("Y");
+			}
+		}
+
+		// Encode password
+		if(StringUtils.hasText(user.getPass())) {
+			BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
+			user.setPass(pass.encode(user.getPass()));
+		}
+
+		paramMap.put("user", user);
+		userMapper.updateUser(paramMap);
 
 		return isAdmin ? getAdmin() : getUser(origId);
 	}

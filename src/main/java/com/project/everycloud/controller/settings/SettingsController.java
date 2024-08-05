@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/settings")
-public class settingsController {
+public class SettingsController {
 
     @Autowired
     SettingsService settingsService;
