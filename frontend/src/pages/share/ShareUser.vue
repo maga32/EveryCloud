@@ -4,12 +4,20 @@
     <div class="col-0 col-md-3"></div>
     <div class="col-12 col-md-9 px-4 ps-md-0" id="fileMenu">
       <div class="row rounded-bottom border border-top-0 p-2 m-0 bg-light-subtle">
-        <div class="col-4"></div>
-        <div class="col-6 px-2">
-          <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareGroup">
+        <div class="col-4">
+          <select class="form-select form-select-sm" v-model="form.condition">
+            <option value="all">전체</option>
+            <option value="id">ID</option>
+            <option value="nickname">닉네임</option>
+            <option value="email">Email</option>
+            <option value="groupName">그룹명</option>
+          </select>
         </div>
-        <div class="col-1 text-center pointer" @click="loadShareGroup"><i class="fa-solid fa-magnifying-glass" /></div>
-        <div class="col-1 text-center pointer" @click="editShareModal(0)"><i class="fa-solid fa-user-group" /></div>
+        <div class="col-6 px-2">
+          <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" v-model="form.keyword" @keyup.enter="loadShareUser">
+        </div>
+        <div class="col-1 text-center pointer" @click="loadShareUser"><i class="fa-solid fa-magnifying-glass" /></div>
+        <div class="col-1 text-center pointer" @click="editShareModal(0)"><i class="fa-solid fa-user-plus" /></div>
       </div>
     </div>
   </div>
@@ -30,13 +38,14 @@
 
       <table v-for="li in groupList" class="w-100 rounded border-bottom pointer">
         <tr>
-          <td class="w-auto py-2" @click="editShareModal(li.groupNo)">
+          <td class="w-auto py-2" @click="editShareModal(li.id)">
             <div class="flex-grow-1 text-break-all">
-              {{ li.groupName }}
+              <div>{{ li.nickname }} ( {{ li.id }} )</div>
+              <div class="text-gray">{{ li.groupName }} / {{ li.email }}</div>
             </div>
           </td>
           <td class="text-center text-secondary" style="width:40px">
-            <i v-if="li.groupNo !== 1" class="fa-solid fa-trash pointer" @click="deleteGroup(li.groupNo)"/>
+            <i v-if="li.auth !== 'Y'" class="fa-solid fa-trash pointer" @click="deleteUser(li.id)"/>
           </td>
         </tr>
       </table>
@@ -57,18 +66,18 @@ const props = defineProps(['setting', 'modalBody'])
 const groupList = ref([])
 
 const form = reactive({
-  shareLink: '',
+  condition: 'all',
   keyword: '',
 })
 
 onMounted(() => {
-  loadShareGroup()
+  loadShareUser()
 })
 
-const loadShareGroup = () => {
+const loadShareUser = () => {
   props.setting.loadingList = true
 
-  $http.post('/share/groupList', form, null)
+  $http.post('/user/userList', form, null)
     .then((response) => {
       if(response.code === Const.RESPONSE_TYPE.NOT_ALLOWED) {
         router.go(-1)
@@ -79,34 +88,41 @@ const loadShareGroup = () => {
     })
 }
 
-const editShareModal = (groupNo) => {
-  setModalBody({ groupNo: groupNo })
-  shareModal('shareGroup')
+const editShareModal = (userId) => {
+  setModalBody({ userId: userId })
+  shareModal('userSetting')
 }
 
-const deleteGroup = (groupNo) => {
+const deleteUser = (userId) => {
   Swal.fire({
     icon: 'error',
-    text: '삭제하시겠습니까?',
-    showConfirmButton: false,
+    input: 'checkbox',
+    inputPlaceholder: '확인',
+    customClass: {
+      input: 'bg-transparent',
+      confirmButton: 'bg-danger',
+    },
+    inputValidator: (result) => {
+      return !result && '확인버튼을 체크해주세요';
+    },
+    html: `${userId} <span class="text-danger">사용자를 삭제하시겠습니까?<br>
+    이 행위는 사용자 계정을 삭제하며 복구할 수 없습니다.</span>`,
     showCancelButton: true,
-    showDenyButton: true,
-    denyButtonText: '삭제',
+    confirmButtonText: '삭제',
     cancelButtonText: '취소',
   }).then(
       async(result) => {
-
-        if(result.isDenied) {
+        if(result.isConfirmed) {
           let resultOk = false
 
-          await $http.post('/share/groupDelete', null, {params: {groupNo: groupNo}})
+          await $http.post('/user/deleteUser', null, {params: {userId: userId}})
             .then((response) => {
               resultOk = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
             })
 
           if(!resultOk) return false
           Swal.fire({icon: 'success', text: '삭제되었습니다.', timer: 1200, showConfirmButton: false})
-          loadShareGroup()
+          loadShareUser()
         }
 
       }

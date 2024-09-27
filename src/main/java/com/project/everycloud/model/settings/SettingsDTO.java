@@ -10,6 +10,7 @@ public class SettingsDTO {
     private String externalUrl;
     private String useTrash;
     private String trashPath;
+    private String allowJoin;
 
     private String metaTitle;
     private String metaAuthor;

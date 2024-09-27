@@ -76,7 +76,7 @@
 		WHERE LINK = #{origLink}
 	</update>
 
-	<select id="getShareGroup" resultType="ShareGroupDTO" parameterType="HashMap">
+	<select id="getShareGroup" resultType="ShareGroupDTO">
 		SELECT /* ShareMapper.getShareList */
 		    sg.SHARE_LINK,
 		    sg.GROUP_NO,
@@ -96,7 +96,7 @@
 		</where>
 	</select>
 
-	<select id="getShareGroupList" resultType="ShareGroupDTO" parameterType="HashMap">
+	<select id="getShareGroupList" resultType="ShareGroupDTO">
 		SELECT /* ShareMapper.getShareGroupList */
 		    sg.SHARE_LINK,
 		    gs.NO as GROUP_NO,
@@ -166,7 +166,7 @@
 	<delete id="deleteGroup">
 		DELETE /* ShareMapper.deleteGroup */
 		FROM GROUP_SETTING
-		WHERE NO = #{groupNo}
+		WHERE NO = #{groupNo} AND NO != 1
 	</delete>
 
 </mapper>

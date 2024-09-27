@@ -2,8 +2,10 @@ package com.project.everycloud.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.everycloud.common.exception.*;
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
+import com.project.everycloud.service.mapper.SettingsMapper;
 import com.project.everycloud.service.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +20,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserMapper userMapper;
+
+	@Autowired
+	SettingsMapper settingsMapper;
 
 	@Override
 	public UserDTO getSessionUser(UserDTO user) {
@@ -40,8 +45,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDTO> getUserList(HashMap<String, Object> paramMap) {
-		return userMapper.getUserList(paramMap);
+	public List<UserDTO> getAllUserList(HashMap<String, Object> paramMap) {
+		return userMapper.getAllUserList(paramMap);
+	}
+
+	@Override
+	public AppList<UserDTO> getUserList(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+		if(!isAdmin(sessionUser)) throw new NotAllowedException();
+
+		AppList<UserDTO> result = new AppList<UserDTO>();
+		List<UserDTO> userList = userMapper.getUserList(paramMap);
+
+		result.setLists(userList);
+		result.setTotal(userList.size());
+
+		return result;
 	}
 
 	@Override
@@ -90,12 +108,39 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDTO updateUser(HashMap<String, Object> paramMap) {
-		UserDTO sessionUser = (UserDTO) paramMap.get("sessionUser");
+	public void createUser(HashMap<String, Object> paramMap, UserDTO sessionUser) {
+		boolean isAdmin = isAdmin(sessionUser);
+		String allowJoin = settingsMapper.getSettings("admin").getAllowJoin();
+
+		if(!isAdmin && allowJoin.equals("N")) throw new NotAllowedException();
+
+		UserDTO user = new ObjectMapper().convertValue(paramMap.get("user"),UserDTO.class);
+
+		if(userMapper.countExistEmail(paramMap) > 0) {
+			throw new ExistEmailException();
+		} else if (!isAdmin) {
+			user.setNeedVerify("Y");
+		} else {
+			user.setNeedVerify("N");
+		}
+
+		BCryptPasswordEncoder pass = new BCryptPasswordEncoder(10);
+		user.setPass(pass.encode(user.getPass()));
+
+		userMapper.createUser(user);
+	}
+
+	@Override
+	public UserDTO updateUser(HashMap<String, Object> paramMap, UserDTO sessionUser) {
 		UserDTO user = new ObjectMapper().convertValue(paramMap.get("user"),UserDTO.class);
 		String origId = paramMap.get("origId").toString();
 		boolean isAdmin = isAdmin(sessionUser);
 		boolean isUser = isUser(sessionUser);
+
+		// if there is no email or nickname, throw error
+		if(!StringUtils.hasText(user.getEmail()) || !StringUtils.hasText(user.getNickname())) {
+			throw new BadRequestException();
+		}
 
 		// if user is not admin, only can edit own account
 		if(!isAdmin && isUser) {
@@ -127,6 +172,16 @@ public class UserServiceImpl implements UserService {
 
 		return isAdmin ? getAdmin() : getUser(origId);
 	}
+
+	@Override
+	public void deleteUser(String userId, UserDTO sessionUser) {
+		boolean isAdmin = isAdmin(sessionUser);
+		boolean isUser = isUser(sessionUser);
+		if(!isAdmin && (!isUser || !sessionUser.getId().equals(userId)) ) throw new NotAllowedException();
+
+		userMapper.deleteUser(userId);
+	}
+
 
 	@Override
 	public int checkUserType(UserDTO user) {

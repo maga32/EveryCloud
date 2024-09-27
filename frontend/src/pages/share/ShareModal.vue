@@ -258,7 +258,7 @@
 
 
               <!-- shareGroup START -->
-              <div v-if="modalFunc === 'shareGroup'">
+              <div v-else-if="modalFunc === 'shareGroup'">
                 <div class="row">
                   <div class="col-12 col-lg-6 pt-2 px-1">
                     <div class="border rounded p-2">
@@ -392,6 +392,22 @@
               </div>
               <!-- shareGroup END -->
 
+              <!-- shareUser START -->
+              <div v-else-if="modalFunc === 'userSetting'">
+                <UpdateUserForm
+                  v-if="isMounted"
+                  ref="userForm"
+                  :params="{
+                    type: 'admin',
+                    id: origUserId,
+                    accessFrom: 'userSetting',
+                  }"
+                  @close="$emit('close', true)"
+                />
+              </div>
+              <!-- shareUser END -->
+
+
               <!-- shareLog START -->
               <!-- shareLog END -->
 
@@ -429,13 +445,16 @@ import { Tippy } from 'tippy.vue'
 import Const from '@/const'
 import { extensions } from '@/assets/extensions'
 import FileModal from '@/pages/file/FileModal.vue'
+import UpdateUserForm from '@/pages/user/UpdateUserForm.vue'
 
 const props = defineProps(['tab', 'modalFunc', 'modalBody', 'setting'])
 const emit = defineEmits(['close'])
+const userForm = ref(null)
 
 const functionModalLabel = {
   shareList: '파일공유',
-  shareGroup: '그룹관리',
+  shareGroup: '그룹설정',
+  userSetting: '유저설정',
 }
 
 const isUpdate = ref(false)
@@ -584,6 +603,9 @@ const QRLink = ref('')
 const QRCodeSrc = useQRCode(QRLink)
 const QRShow = ref(false)
 
+const origUserId = ref('')
+const isMounted = ref(false)
+
 onMounted(()=> {
   isUpdate.value = false
   nowUrl.value = window.location.origin
@@ -626,7 +648,12 @@ onMounted(()=> {
 
     groupForm.value.groupNo = props.modalBody.groupNo
     loadGroupInfo()
+  // userSetting
+  } else if(props.modalFunc === 'userSetting') {
+    origUserId.value = props.modalBody.userId
   }
+
+  isMounted.value = true
 })
 
 onUnmounted(() => {
@@ -777,6 +804,10 @@ const submit = async () => {
         result = (response?.code === Const.RESPONSE_TYPE.SUCCESS)
         if(result) alertSuccess('수정되었습니다.')
       })
+
+  // userSetting submit
+  } else if(props.modalFunc === 'userSetting') {
+    if(userForm.value) userForm.value.$refs.submitButton.click()
   }
 
   if(!result) return false

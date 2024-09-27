@@ -57,7 +57,8 @@
         <router-link class="btn btn-outline-secondary"
             :to="{ path:'/user/updateUserForm',
                    state:{ params:{ type: $store.state.user.user.auth == 'Y' ? 'admin' : 'user',
-                                    id: $store.state.user.user.id
+                                    id: $store.state.user.user.id,
+                                    accessFrom: 'wing',
                           }}
                   }"
           >Edit Profile</router-link>

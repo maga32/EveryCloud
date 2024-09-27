@@ -12,10 +12,13 @@
             <label class="btn btn-outline-secondary px-3" for="btnradio1" @click="tab='shareList'">공유파일</label>
 
             <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
-            <label class="btn btn-outline-secondary px-3" for="btnradio2" @click="tab='shareGroup'">공유그룹</label>
+            <label class="btn btn-outline-secondary px-3" for="btnradio2" @click="tab='shareGroup'">그룹설정</label>
 
             <input type="radio" class="btn-check" name="btnradio" id="btnradio3">
-            <label class="btn btn-outline-secondary px-3" for="btnradio3" @click="tab='shareLog'">공유기록</label>
+            <label class="btn btn-outline-secondary px-3" for="btnradio3" @click="tab='shareUser'">유저설정</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio4">
+            <label class="btn btn-outline-secondary px-3" for="btnradio4" @click="tab='shareLog'">공유기록</label>
           </div>
         </table>
       </div>
@@ -38,6 +41,13 @@
     :modalBody="modalBody"
   />
 
+  <ShareUser
+    v-if="tab==='shareUser'"
+    :key="reloadTab"
+    :setting="setting"
+    :modalBody="modalBody"
+  />
+
   <!-- Modal -->
   <ShareModal
     v-if="modalOn"
@@ -55,6 +65,8 @@ import router from '@/router'
 import { useRoute } from 'vue-router'
 import ShareList from './ShareList.vue'
 import ShareGroup from './ShareGroup.vue'
+import ShareUser from './ShareUser.vue'
+
 import ShareModal from './ShareModal.vue'
 
 const route = useRoute()

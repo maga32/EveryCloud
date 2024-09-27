@@ -1,8 +1,9 @@
 package com.project.everycloud.controller.user;
 
 import com.project.everycloud.common.type.ResponseType;
-import com.project.everycloud.model.UserDTO;
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.AppResponse;
+import com.project.everycloud.model.UserDTO;
 import com.project.everycloud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -54,16 +55,47 @@ public class UserController {
 				.setData(result);
 	}
 
-	@PostMapping("/updateUser")
-	public AppResponse<Boolean> updateUser(@RequestBody HashMap<String, Object> paramMap) {
+	@PostMapping("/createUser")
+	public AppResponse<Boolean> createUser(@RequestBody HashMap<String, Object> paramMap) {
 
-		paramMap.put("sessionUser", sessionUser());
-		setSessionUser(userService.updateUser(paramMap));
+		userService.createUser(paramMap, sessionUser());
 
 		return new AppResponse<Boolean>()
 				.setCode(ResponseType.SUCCESS.code())
 				.setMessage(ResponseType.SUCCESS.message())
 				.setData(true);
+	}
+
+	@PostMapping("/updateUser")
+	public AppResponse<Boolean> updateUser(@RequestBody HashMap<String, Object> paramMap) {
+
+		setSessionUser(userService.updateUser(paramMap, sessionUser()));
+
+		return new AppResponse<Boolean>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(true);
+	}
+
+	@PostMapping("/deleteUser")
+	public AppResponse<Void> deleteUser(@RequestParam("userId") String userId) {
+
+		userService.deleteUser(userId, sessionUser());
+
+		return new AppResponse<Void>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message());
+	}
+
+	@PostMapping("/userList")
+	public AppResponse<AppList<UserDTO>> getUserList(@RequestBody HashMap<String, Object> paramMap) {
+
+		AppList<UserDTO> userList = userService.getUserList(paramMap, sessionUser());
+
+		return new AppResponse<AppList<UserDTO>>()
+				.setCode(ResponseType.SUCCESS.code())
+				.setMessage(ResponseType.SUCCESS.message())
+				.setData(userList);
 	}
 
 	@PostMapping("/login")

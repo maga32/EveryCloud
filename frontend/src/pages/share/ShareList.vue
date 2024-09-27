@@ -8,8 +8,8 @@
         <div class="col-6 px-2">
           <input type="text" class="w-100 border border-secondary rounded-5 px-2" placeholder="Filter" id="keyword" v-model="form.keyword" @keyup.enter="loadShareList">
         </div>
-        <div class="col-1 pointer" @click="loadShareList"><i class="fa-solid fa-magnifying-glass" /></div>
-        <div class="col-1 pointer" @click="editShareModal"><i class="fa-solid fa-share-from-square" /></div>
+        <div class="col-1 text-center pointer" @click="loadShareList"><i class="fa-solid fa-magnifying-glass" /></div>
+        <div class="col-1 text-center pointer" @click="editShareModal"><i class="fa-solid fa-share-from-square" /></div>
       </div>
     </div>
   </div>
@@ -28,7 +28,7 @@
     <!-- File List -->
     <div id="shareList" class="pe-0 pe-md-3">
 
-      <table v-for="li in shareList" class="w-100 rounded border-bottom">
+      <table v-for="li in shareList" class="w-100 rounded border-bottom pointer">
         <tr @click="editShareModal(li.link)">
           <td class="text-center text-secondary" style="width:40px">
             <i v-if="li.method === 0" class="fa-solid fa-globe" />

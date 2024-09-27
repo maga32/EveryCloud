@@ -3,6 +3,7 @@ package com.project.everycloud.service.mapper;
 import com.project.everycloud.model.share.ShareDTO;
 import com.project.everycloud.model.share.ShareGroupDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface ShareMapper {
 
     void createShare(ShareDTO newShare);
 
-    ShareGroupDTO getShareGroup(String shareLink, Integer groupNo);
+    ShareGroupDTO getShareGroup(@Param("shareLink") String shareLink, @Param("groupNo") Integer groupNo);
 
     List<ShareGroupDTO> getShareGroupList(HashMap<String, Object> paramMap);
 

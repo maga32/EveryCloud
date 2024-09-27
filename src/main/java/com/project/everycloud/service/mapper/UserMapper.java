@@ -11,6 +11,8 @@ public interface UserMapper {
 
 	UserDTO getUser(String id);
 
+	List<UserDTO> getAllUserList(HashMap<String, Object> paramMap);
+
 	List<UserDTO> getUserList(HashMap<String, Object> paramMap);
 
 	UserDTO getUserInfo(String id);
@@ -19,7 +21,11 @@ public interface UserMapper {
 
     UserDTO getAdmin();
 
+	void createUser(UserDTO user);
+
 	void updateUser(HashMap<String, Object> paramMap);
+
+	void deleteUser(String id);
 
     void updateUserGroupToDefault(String groupNo);
 

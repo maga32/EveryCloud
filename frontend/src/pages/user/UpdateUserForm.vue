@@ -7,7 +7,7 @@
       </div>
       <div class="col-12 col-md-6 mb-4">
         <div v-if="form.type==='admin'">
-          <Field name="id" label="아이디" rules="required|alpha_num" type="text" size="20" class="form-control" v-model="form.user.id" @keyup="unDupCheck"/>
+          <Field name="id" label="아이디" rules="required|alpha_num|is_not:0" type="text" size="20" class="form-control" v-model="form.user.id" @keyup="unDupCheck"/>
           <ErrorMessage name="id" as="p" class="text-danger"/>
           <div class="col-12 btn btn-secondary btn-lg mt-2" @click="checkOverlapId">중복확인</div>
           <Field name="duplicateChecked" label="중복확인" rules="boolean" type="hidden" class="form-control" v-model="duplicateChecked"/>
@@ -51,8 +51,8 @@
       </div>
 
       <div class="col-12 mb-4"></div>
-      <div class="col-12 col-md-6 mb-4">
-        <button class="col-12 btn btn-danger btn-lg mb-2" type="submit">확인</button>
+      <div v-show="params.accessFrom !== 'userSetting'" class="col-12 col-md-6 mb-4">
+        <button ref="submitButton" class="col-12 btn btn-danger btn-lg mb-2" type="submit">확인</button>
         <router-link :to="{path:$store.state.link.siteHtml || '/'}" class="col-12 btn btn-secondary btn-lg">취소</router-link>
       </div>
     </div>
@@ -60,27 +60,16 @@
 </Form>
 </template>
 
-<script>
-import router from '@/router'
-import Swal from 'sweetalert2'
-
-export default {
-  beforeMount(to, from, next) {
-    if(!history.state.params?.type) {
-      router.replace($store.getters['link/siteHtml'])
-      Swal.fire({icon: 'error', text: '잘못된 접근방식입니다.'})
-    }
-  }
-}
-</script>
-
 <script setup>
-import { onMounted, ref, reactive } from 'vue'
+import { onBeforeMount, onMounted, ref, reactive } from 'vue'
 import Swal from 'sweetalert2'
 import router from '@/router'
 
+const submitButton = ref(null)
 const duplicateChecked = ref(true)
-const params = history.state.params || {}
+const props = defineProps(['params'])
+const params = history.state.params || props.params || {}
+const emit = defineEmits(['close'])
 
 const form = reactive({
   type: 'user',
@@ -96,23 +85,35 @@ const form = reactive({
   },
 })
 
+onBeforeMount(() => {
+  if(!history.state.params?.type && !props.params?.type) {
+    router.replace($store.getters['link/siteHtml'])
+    Swal.fire({icon: 'error', text: '잘못된 접근방식입니다.'})
+  }
+})
+
 onMounted(() => {
   form.type = params.type
-  $http.post('/user/updateUserForm', params, null)
-    .then((response) => {
-      if(!form.type || !response.data || !response.data.id) {
-        $store.dispatch('user/getSession')
-        router.replace($store.getters['link/siteHtml'])
-        Swal.fire({ icon: 'error', text: '잘못된 접근방식입니다.' })
-      } else {
-        form.user.id = response.data.id
-        form.user.nickname = response.data.nickname
-        form.user.email = response.data.email
 
-        form.origId = response.data.id
-        form.origPass = response.data.pass
-      }
-    })
+  if(params.id == '0') {
+    form.origId = '0'
+  } else {
+    $http.post('/user/updateUserForm', params, null)
+      .then((response) => {
+        if(!form.type || !response.data || !response.data.id) {
+          $store.dispatch('user/getSession')
+          router.replace($store.getters['link/siteHtml'])
+          Swal.fire({icon: 'error', text: '잘못된 접근방식입니다.'})
+        } else {
+          form.user.id = response.data.id
+          form.user.nickname = response.data.nickname
+          form.user.email = response.data.email
+
+          form.origId = response.data.id
+          form.origPass = response.data.pass
+        }
+      })
+  }
 })
 
 const unDupCheck = () => { duplicateChecked.value = false }
@@ -121,6 +122,9 @@ const checkOverlapId = () => {
   duplicateChecked.value = false
   if(!form.user.id) {
     Swal.fire({ icon: 'error', text: '아이디를 입력해주세요.', showConfirmButton: false, timer: 1500})
+    return false
+  } else if (form.user.id === '0') {
+    Swal.fire({ icon: 'error', text: '사용 불가능한 아이디입니다.', showConfirmButton: false, timer: 1500})
     return false
   } else if (form.user.id === form.origId) {
     Swal.fire({ icon: 'success', text: '사용 가능한 아이디입니다.', showConfirmButton: false, timer: 1500})
@@ -140,15 +144,33 @@ const checkOverlapId = () => {
 }
 
 const submit = () => {
-  $http.post('/user/updateUser', form, null)
-    .then((response) => {
-      if(response.data) {
-        Swal.fire({ icon: 'success', text: '수정되었습니다.', showConfirmButton: false, timer: 1500})
-        $store.dispatch('user/getSession')
-        router.replace($store.getters['link/siteHtml'])
-      }
-    })
+  if(form.origId == '0') {
+    $http.post('/user/createUser', form, null)
+      .then((response) => {
+        if(response.data) {
+          Swal.fire({icon: 'success', text: '계정이 생성되었습니다.', showConfirmButton: false, timer: 1500})
+          if(params.accessFrom === 'userSetting') {
+            emit('close')
+          } else {
+            router.replace('/')
+          }
+        }
+      })
+  } else {
+    $http.post('/user/updateUser', form, null)
+      .then((response) => {
+        if(response.data) {
+          Swal.fire({icon: 'success', text: '수정되었습니다.', showConfirmButton: false, timer: 1500})
+          $store.dispatch('user/getSession')
 
+          if(params.accessFrom === 'userSetting') {
+            emit('close')
+          } else {
+            router.replace($store.getters['link/siteHtml'])
+          }
+        }
+      })
+  }
 }
 </script>
 

@@ -1,5 +1,6 @@
 package com.project.everycloud.service;
 
+import com.project.everycloud.model.AppList;
 import com.project.everycloud.model.UserDTO;
 
 import java.util.HashMap;
@@ -29,7 +30,16 @@ public interface UserService {
 	 * @param paramMap
 	 * @return List&lt;UserDTO&gt;
 	 */
-	List<UserDTO> getUserList(HashMap<String, Object> paramMap);
+	List<UserDTO> getAllUserList(HashMap<String, Object> paramMap);
+
+	/**
+	 * return List of UserDTO
+	 *
+	 * @param paramMap
+	 * @param sessionUser
+	 * @return List&lt;UserDTO&gt;
+	 */
+	AppList<UserDTO> getUserList(HashMap<String, Object> paramMap, UserDTO sessionUser);
 
 	/**
 	 * return UserDTO(id,nickname,email,auth) by user id
@@ -59,12 +69,29 @@ public interface UserService {
 	UserDTO updateUserForm(HashMap<String,Object> paramMap);
 
 	/**
+	 * create user
+	 *
+	 * @param userId
+	 * @param sessionUser
+	 */
+	void createUser(HashMap<String, Object> paramMap, UserDTO sessionUser);
+
+	/**
 	 * update user and retern updated user info
 	 *
 	 * @param paramMap
 	 * @return UserDTO
 	 */
-	UserDTO updateUser(HashMap<String, Object> paramMap);
+	UserDTO updateUser(HashMap<String, Object> paramMap, UserDTO sessionUser);
+
+	/**
+	 * delete user
+	 *
+	 * @param userId
+	 * @param sessionUser
+	 * @return UserDTO
+	 */
+	void deleteUser(String userId, UserDTO sessionUser);
 
 	/**
 	 * return user type by session's user
@@ -118,5 +145,4 @@ public interface UserService {
 	 * @return boolean
 	 */
 	public boolean isAdmin(String id);
-
 }

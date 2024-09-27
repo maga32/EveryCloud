@@ -105,6 +105,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
     @Override
+    @Transactional
     public String shareSimpleNewFile(NewFileDTO shareNewFile, UserDTO sessionUser) {
 
         if(!userService.isAdmin(sessionUser)) throw new NotAllowedException();
@@ -278,7 +279,7 @@ public class ShareServiceImpl implements ShareService {
         HashMap<String, Object> shareMap = new HashMap<String, Object>();
 
         // all user list
-        List<UserDTO> groupList = userService.getUserList(paramMap);
+        List<UserDTO> groupList = userService.getAllUserList(paramMap);
         result.setLists(groupList);
 
         // when Group is not new one, get the group name

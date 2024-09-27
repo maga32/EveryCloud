@@ -36,7 +36,7 @@
 #fileControlMenu {
 	width: 200px;
 	position: fixed;
-	top: 25%;
+	top: 30%;
 	right: 40px;
 	z-index: 5;
 	--bs-bg-opacity: 0.8;
