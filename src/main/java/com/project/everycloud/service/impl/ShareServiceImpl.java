@@ -406,7 +406,7 @@ public class ShareServiceImpl implements ShareService {
     }
 
     private String getFullShareLink(String shareLink) {
-        return FileUtil.addSlash(settingsService.getSettings("admin").getExternalUrl()) + "file?shareLink=" + shareLink;
+        return FileUtil.addSlash(settingsService.getSettings("admin").getExternalUrl()) + "share/link/" + shareLink;
     }
 
 }

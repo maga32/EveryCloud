@@ -662,7 +662,7 @@ onUnmounted(() => {
 
 const fullLink = computed({
   get() {
-    const result = (useExternalUrl.value ? externalUrl.value : nowUrl.value) + '/file?shareLink=' + share.value.link
+    const result = (useExternalUrl.value ? externalUrl.value : nowUrl.value) + '/share/link/' + share.value.link
     QRLink.value = result
     return result
   }

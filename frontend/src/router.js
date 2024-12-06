@@ -18,6 +18,7 @@ const router = createRouter({
     { path: '/settings',             name: 'settings',       component: Settings,        meta: { } },
     { path: '/user/updateUserForm',  name: 'updateUserForm', component: UpdateUserForm,  meta: { } },
     { path: '/loginForm',            name: 'loginForm',      component: LoginForm,       meta: { } },
+    { path: '/share/link/:link',     name: 'sharefile',      redirect: to => { const { link } = to.params; return `/file?shareLink=${link}`} },
     // 모바일 샘플
     { path: '/m',      name: 'mobile',     component: Sample,     meta: { isMobile: true } },
   ]
